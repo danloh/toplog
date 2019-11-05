@@ -19,7 +19,8 @@ use crate::{DbAddr, PooledConn};
 #[table_name = "issues"]
 pub struct Issue {
     pub id: i32,
-    pub title: String, // unique, person's name
+    pub title: String,
+    pub slug: String,
     pub content: String,
     pub author: String,
     pub post_at: NaiveDateTime,

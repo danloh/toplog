@@ -20,12 +20,15 @@ use crate::{DbAddr, PooledConn};
 pub struct Article {
     pub id: i32,
     pub title: String, // unique, person's name
+    pub slug: String,
     pub content: String,
     pub author: String,
     pub ty: i32,        // from blog or translate
+    pub language: String,
     pub topic: String,
     pub link: String,
     pub link_host: String,
+    pub post_by: String,
     pub post_at: NaiveDateTime,
     pub pub_at: NaiveDateTime,
     pub vote: i32,
