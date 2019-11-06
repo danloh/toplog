@@ -66,7 +66,7 @@ impl Handler<RegUser> for Dba {
 
     fn handle(&mut self, reg: RegUser, _: &mut Self::Context) -> Self::Result {
         let conn = &self.0.get()?;
-        Ok(reg.register(conn)?)
+        reg.register(conn)
     }
 }
 
@@ -117,7 +117,7 @@ impl Handler<AuthUser> for Dba {
 
     fn handle(&mut self, au: AuthUser, _: &mut Self::Context) -> Self::Result {
         let conn = &self.0.get()?;
-        Ok(au.auth(conn)?)
+        au.auth(conn)
     }
 }
 
@@ -199,7 +199,7 @@ impl Handler<UpdateUser> for Dba {
 
     fn handle(&mut self, up: UpdateUser, _: &mut Self::Context) -> Self::Result {
         let conn = &self.0.get()?;
-        Ok(up.update(conn)?)
+        up.update(conn)
     }
 }
 
@@ -772,7 +772,7 @@ impl AuthUser {
         use crate::schema::users::dsl::*;
 
         let query_user = users
-            .filter(&uname.eq(&self.uname.trim()))
+            .filter(&uname.eq(self.uname.trim()))
             .load::<User>(conn)?
             .pop();
 
@@ -849,7 +849,7 @@ impl UpdateUser {
         use crate::schema::users::dsl::*;
 
         let user_ = self.clone(); // get a copy for later use
-        let new_user_email: &str = &self.email.trim();
+        let new_user_email: &str = self.email.trim();
         let unm = &self.uname.trim();
 
         let old_user = users.filter(&uname.eq(unm)).get_result::<User>(conn)?;

@@ -96,6 +96,45 @@ pub fn init_server() -> std::io::Result<()> {
             .wrap(Compress::default())
             .wrap(Cors::default())
             // everything under '/api/' route
+            .service(scope("/api")
+                // to auth
+                .service(
+                    resource("/signin")
+                        .route(post().to_async(api::auth::signin))
+                )
+                // to register
+                .service(
+                    resource("/signup")
+                        .route(post().to_async(api::auth::signup))
+                )
+                .service(
+                    resource("/reset")   // reset-1: request rest psw, send mail
+                        .route(post().to_async(api::auth::reset_psw_req))
+                )
+                .service(
+                    resource("/reset/{token}")   // reset-2: copy token, new psw
+                        .route(post().to_async(api::auth::reset_psw))
+                )
+                .service(
+                    resource("/users/{uname}")
+                        .route(get().to_async(api::auth::get))
+                        .route(post().to_async(api::auth::update))
+                        .route(put().to_async(api::auth::change_psw))
+                )
+                .service(
+                    resource("/blogs")
+                        .route(post().to_async(api::blog::new))
+                        .route(put().to_async(api::blog::update))
+                        // get_list: ?per=topic&kw=&perpage=20&page=p
+                        .route(get().to_async(api::blog::get_list)) 
+                )
+                .service(
+                    resource("/blogs/{id}")
+                        .route(get().to_async(api::blog::get))
+                        .route(delete().to_async(api::blog::del))
+                )
+                .default_service(route().to(|| HttpResponse::NotFound()))
+            )
             //.service(scope("/api")
                
             .default_service(route().to(|| HttpResponse::NotFound()))

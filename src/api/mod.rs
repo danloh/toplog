@@ -1,5 +1,15 @@
 
 pub mod auth;
+pub mod blog;
+
+
+#[derive(Deserialize, Clone)]
+pub struct ReqQuery {
+    per: String,
+    kw: String,
+    perpage: i32,
+    page: i32,
+}
 
 use crate::api::auth::CheckUser;
 
