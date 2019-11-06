@@ -3,17 +3,29 @@
 use futures::{future::result, Future};
 use actix::{Handler, Message};
 use actix_web::{
+    dev::Payload,
     web::{Data, Json, Path},
     Error, HttpResponse, ResponseError,
+    FromRequest, HttpRequest,
 };
-use base64::decode;
+use base64::decode as base64_decode;
 use diesel::prelude::*;
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
+use bcrypt::{hash, verify, DEFAULT_COST};
+use chrono::{Duration, Local, NaiveDateTime, Utc};
+use std::convert::From;
+use jsonwebtoken::{decode, encode, Header, Validation};
 
 use crate::errors::{ServiceError, ServiceResult};
-use crate::api::{AuthMsg, UserMsg};
+use crate::api::{Msg, AuthMsg, UserMsg};
 use crate::util::helper::gen_slug;
-use crate::{DbAddr, PooledConn};
+use crate::util::email::{try_send_confirm_email, try_send_reset_email};
+use crate::schema::{users};
+use crate::api::{
+    re_test_email, re_test_name, re_test_psw, re_test_url, test_len_limit,
+    MID_LEN,
+};
+use crate::{Dba, DbAddr, PooledConn};
 
 pub const LIMIT_PERMIT: i16 = 0x01; // follow,star...
 pub const BASIC_PERMIT: i16 = 0x02; // create, edit self created...
@@ -30,8 +42,10 @@ pub fn signup(
     let reg_usr = reg_user.into_inner();
 
     // for decode password
-    let pswd = String::from_utf8(decode(&reg_usr.password).unwrap_or(Vec::new()))
-        .unwrap_or("".into());
+    let pswd = String::from_utf8(
+        base64_decode(&reg_usr.password).unwrap_or(Vec::new())
+    )
+    .unwrap_or("".into());
 
     let reg = RegUser {
         password: pswd,
@@ -47,6 +61,16 @@ pub fn signup(
         })
 }
 
+impl Handler<RegUser> for Dba {
+    type Result = ServiceResult<Msg>;
+
+    fn handle(&mut self, reg: RegUser, _: &mut Self::Context) -> Self::Result {
+        let conn = &self.0.get()?;
+        Ok(reg.register(conn)?)
+    }
+}
+
+
 // POST: api/signin
 //
 pub fn signin(
@@ -56,8 +80,10 @@ pub fn signin(
     let auth_usr = auth.into_inner();
 
     // for decode password
-    let pswd = String::from_utf8(decode(&auth_usr.password).unwrap_or(Vec::new()))
-        .unwrap_or("".into());
+    let pswd = String::from_utf8(
+        base64_decode(&auth_usr.password).unwrap_or(Vec::new())
+    )
+    .unwrap_or("".into());
 
     let auth_user = AuthUser {
         password: pswd,
@@ -86,6 +112,15 @@ pub fn signin(
         })
 }
 
+impl Handler<AuthUser> for Dba {
+    type Result = ServiceResult<CheckUser>;
+
+    fn handle(&mut self, au: AuthUser, _: &mut Self::Context) -> Self::Result {
+        let conn = &self.0.get()?;
+        Ok(au.auth(conn)?)
+    }
+}
+
 // GET: api/users/{uname}
 //
 pub fn get(
@@ -106,6 +141,21 @@ pub fn get(
             }
             Err(er) => Ok(er.error_response()),
         })
+}
+
+impl Handler<QueryUser> for Dba {
+    type Result = ServiceResult<CheckUser>;
+
+    fn handle(&mut self, uid: QueryUser, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+        let conn = &self.0.get()?;
+
+        let query_user = users
+            .filter(&uname.eq(&uid.uname))
+            .get_result::<User>(conn)?;
+
+        Ok(query_user.into())
+    }
 }
 
 // POST: api/users/{uname}
@@ -144,6 +194,15 @@ pub fn update(
         })
 }
 
+impl Handler<UpdateUser> for Dba {
+    type Result = ServiceResult<CheckUser>;
+
+    fn handle(&mut self, up: UpdateUser, _: &mut Self::Context) -> Self::Result {
+        let conn = &self.0.get()?;
+        Ok(up.update(conn)?)
+    }
+}
+
 // PUT: api/users/{uname}
 //
 pub fn change_psw(
@@ -159,11 +218,15 @@ pub fn change_psw(
     }
 
     // for decode password
-    let new_psw = String::from_utf8(decode(&usr_psw.new_psw).unwrap_or(Vec::new()))
-        .unwrap_or("".into());
+    let new_psw = String::from_utf8(
+        base64_decode(&usr_psw.new_psw).unwrap_or(Vec::new())
+    )
+    .unwrap_or("".into());
 
-    let old_psw = String::from_utf8(decode(&usr_psw.old_psw).unwrap_or(Vec::new()))
-        .unwrap_or("".into());
+    let old_psw = String::from_utf8(
+        base64_decode(&usr_psw.old_psw).unwrap_or(Vec::new())
+    )
+    .unwrap_or("".into());
 
     let user_psw = ChangePsw {
         old_psw,
@@ -180,8 +243,44 @@ pub fn change_psw(
         })
 }
 
-pub fn auth_token(user: CheckUser) -> HttpResponse {
-    HttpResponse::Ok().json(user)
+impl Handler<ChangePsw> for Dba {
+    type Result = Result<Msg, ServiceError>;
+
+    fn handle(&mut self, psw: ChangePsw, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+        let conn = &self.0.get()?;
+
+        let check_user = users
+            .filter(&uname.eq(&psw.uname))
+            .load::<User>(conn)?
+            .pop();
+
+        if let Some(old) = check_user {
+            match verify(&psw.old_psw, &old.psw_hash) {
+                Ok(valid) if valid => {
+                    // hash psw then update
+                    let new_password: String = hash_password(&psw.new_psw)?;
+                    diesel::update(&old)
+                        .set(psw_hash.eq(new_password))
+                        .execute(conn)?;
+
+                    Ok(Msg {
+                        status: 200,
+                        message: String::from("Success"),
+                    })
+                }
+                _ => Ok(Msg {
+                    status: 401,
+                    message: String::from("Somehing Wrong"),
+                }),
+            }
+        } else {
+            Ok(Msg {
+                status: 404,
+                message: String::from("No Existing"),
+            })
+        }
+    }
 }
 
 // POST api/reset
@@ -239,8 +338,110 @@ pub fn reset_psw(
         })
 }
 
+impl Handler<ResetReq> for Dba {
+    type Result = Result<Msg, ServiceError>;
 
-// ===========================================================================
+    fn handle(&mut self, req: ResetReq, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+        let conn = &self.0.get()?;
+
+        let check_user = users
+            .filter(&uname.eq(&req.uname))
+            .get_result::<User>(conn)?;
+
+        if req.email == check_user.email {
+            let rq_uname = req.uname;
+            let rq_email = req.email;
+            let tok = generate_token(&rq_uname, &rq_email, 60 * 2)
+                .unwrap_or("".to_owned());
+
+            try_send_reset_email(&rq_email, &rq_uname, &tok)?;
+
+            Ok(Msg {
+                status: 200,
+                message: String::from("The token has been sent to you via email"),
+            })
+        } else {
+            Ok(Msg {
+                status: 404,
+                message: String::from("No Existing User or Email"),
+            })
+        }
+    }
+}
+
+// handle msg from .reset_psw
+impl Handler<ResetPsw> for Dba {
+    type Result = Result<Msg, ServiceError>;
+
+    fn handle(&mut self, psw: ResetPsw, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+        let conn = &self.0.get()?;
+
+        let check_user = users
+            .filter(&uname.eq(&psw.uname))
+            .load::<User>(conn)?
+            .pop();
+
+        if let Some(old) = check_user {
+            if old.email == psw.email {
+                let new_password: String = hash_password(&psw.re_psw)?;
+                diesel::update(&old)
+                    .set(psw_hash.eq(new_password))
+                    .execute(conn)?;
+
+                return Ok(Msg {
+                    status: 200,
+                    message: String::from("Success"),
+                });
+            }
+            Ok(Msg {
+                status: 401,
+                message: String::from("Something Wrong"),
+            })
+        } else {
+            Ok(Msg {
+                status: 404,
+                message: String::from("No Existing User"),
+            })
+        }
+    }
+}
+
+// handle msg from tmpl.confirm_email
+// only signed up user need to confirm email
+impl Handler<TokClaim> for Dba {
+    type Result = Result<bool, ServiceError>;
+
+    fn handle(&mut self, tok: TokClaim, _: &mut Self::Context) -> Self::Result {
+        use crate::schema::users::dsl::*;
+        let conn = &self.0.get()?;
+
+        let check_user = users
+            .filter(&uname.eq(&tok.uname))
+            .load::<User>(conn)?
+            .pop();
+
+        let now = chrono::Utc::now().timestamp();
+        let check: bool = tok.exp >= now;
+
+        if let Some(old) = check_user {
+            if check && old.email == tok.email {
+                diesel::update(&old)
+                    .set(email_confirmed.eq(true))
+                    .execute(conn)?;
+                return Ok(true);
+            }
+            Ok(false)
+        } else {
+            Ok(false)
+        }
+    }
+}
+
+
+// ============================================================================
+// ============================================================================
 // Model
 // ============================================================================
 
@@ -289,9 +490,8 @@ impl User {
         BuildUser {
             uname: uname.to_owned(),
             psw_hash: psw_hash.to_owned(),
-            join_at: Utc::now().naive_utc(),
             permission: LIMIT_PERMIT | BASIC_PERMIT,
-            ..Builduser::default()
+            ..BuildUser::default()
         }
     }
     // check permission
@@ -349,7 +549,7 @@ impl From<BuildUser> for CheckUser {
         CheckUser {
             id: 0,
             uname: user.uname,
-            join_at: user.join_at,
+            join_at: Utc::now().naive_utc(),
             avatar: user.avatar,
             email: user.email,
             intro: user.intro,
@@ -437,7 +637,7 @@ impl From<Claims> for CheckUser {
 // # decode token to get authed user info w/ secret key
 
 fn get_secret() -> String {
-    dotenv::var("SECRET_KEY").unwrap_or_else(|_| "AHaR9RdGuES3s5SeCREkY".into())
+    dotenv::var("SECRET_KEY").unwrap_or_else(|_| "AHaR9uyS3s5SeCREkY".into())
 }
 
 pub fn encode_token(data: &CheckUser) -> Result<String, ServiceError> {
@@ -452,6 +652,16 @@ pub fn decode_token(token: &str) -> Result<CheckUser, ServiceError> {
         .map_err(|_err| ServiceError::Unauthorized)?
 }
 
+pub fn hash_password(plain: &str) -> Result<String, ServiceError> {
+    // get the hashing cost from the env variable or use default
+    let hashing_cost: u32 = match dotenv::var("HASH_ROUNDS") {
+        Ok(cost) => cost.parse().unwrap_or(DEFAULT_COST),
+        _ => DEFAULT_COST,
+    };
+    hash(plain, hashing_cost)
+        .map_err(|_| ServiceError::InternalServerError("hash".into()))
+}
+
 // # modle for api/handler
 
 // message to sign up user
@@ -464,7 +674,7 @@ pub struct RegUser {
 }
 
 impl RegUser {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let uname = &self.uname.trim();
         let psw = &self.password;
         let check = re_test_name(uname) && re_test_psw(psw);
@@ -472,7 +682,61 @@ impl RegUser {
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid username or password"))
+            Err(ServiceError::BadRequest("Invalid username or password".into()))
+        }
+    }
+
+    fn register(
+        &self,
+        conn: &PooledConn
+    ) -> ServiceResult<Msg> {
+        use crate::schema::users::dsl::*;
+        let check_user = users
+            .filter(&uname.eq(&self.uname))
+            .load::<User>(conn)?
+            .pop();
+        match check_user {
+            Some(_) => Ok(Msg {
+                status: 409,
+                message: String::from("Duplicated"),
+            }),
+            None => {
+                // hash password
+                let pswd: String = hash_password(&self.password)?;
+                let unm: &str = &self.uname.trim();
+                let new_user = User::new(unm, &pswd);
+                let mut newUser = new_user.clone();
+
+                let user_email: &str = &self.email.trim();
+                if re_test_email(user_email) {
+                    // check user-email duplication
+                    let check_email_user = users
+                        .filter(&email.eq(user_email))
+                        .load::<User>(conn)?
+                        .pop();
+                    let check_dup_email = match check_email_user {
+                        Some(_) => true,
+                        None => false,
+                    };
+                    if !check_dup_email {
+                        newUser = BuildUser {
+                            email: user_email.to_owned(),
+                            ..new_user
+                        };
+                        let tok = generate_token(unm, user_email, 60 * 24 * 2)?;
+                        try_send_confirm_email(user_email, unm, &tok)?;
+                    }
+                }
+
+                diesel::insert_into(users)
+                    .values(&newUser)
+                    .get_result::<User>(conn)?;
+
+                Ok(Msg {
+                    status: 201,
+                    message: String::from("Success"),
+                })
+            }
         }
     }
 }
@@ -489,7 +753,7 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let uname = &self.uname.trim();
         let psw = &self.password;
         let check = test_len_limit(uname, 3, 42) && test_len_limit(psw, 8, 18);
@@ -497,28 +761,38 @@ impl AuthUser {
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid username or password"))
+            Err(ServiceError::BadRequest("Invalid username or password".into()))
         }
+    }
+
+    fn auth(
+       &self,
+       conn: &PooledConn
+    ) -> ServiceResult<CheckUser> {
+        use crate::schema::users::dsl::*;
+
+        let query_user = users
+            .filter(&uname.eq(&self.uname.trim()))
+            .load::<User>(conn)?
+            .pop();
+
+        if let Some(check_user) = query_user {
+            match verify(&self.password, &check_user.psw_hash) {
+                Ok(valid) if valid => {
+                    // update last_seen
+                    let logged = diesel::update(&check_user)
+                        .set(last_seen.eq(Utc::now().naive_utc()))
+                        .get_result::<User>(conn)?;
+                    return Ok(logged.into());
+                }
+                _ => (),
+            }
+        }
+        Err(ServiceError::BadRequest("Auth Failed".into()))
     }
 }
 
 impl Message for AuthUser {
-    type Result = Result<CheckUser, ServiceError>;
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct GUser {
-    pub sub: Option<String>,  // required
-    pub name: Option<String>, // required
-    pub given_name: Option<String>,
-    pub family_name: Option<String>,
-    pub picture: Option<String>,
-    pub email: Option<String>, // required
-    pub email_verified: Option<bool>,
-    pub locale: Option<String>,
-}
-
-impl Message for GUser {
     type Result = Result<CheckUser, ServiceError>;
 }
 
@@ -536,16 +810,16 @@ impl Message for QueryUser {
 #[derive(Deserialize, Serialize, Debug, Clone, AsChangeset)]
 #[table_name = "users"]
 pub struct UpdateUser {
-    pub uname: String, // cannot change, just as id
+    pub uname: String,
     pub avatar: String,
     pub email: String,
     pub intro: String,
     pub location: String,
-    pub nickname: String,
+    pub nickname: String, 
 }
 
 impl UpdateUser {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let nickname = &self.nickname.trim();
         let nickname_test = if nickname.len() == 0 {
             true
@@ -564,9 +838,55 @@ impl UpdateUser {
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid Input"))
+            Err(ServiceError::BadRequest("Invalid Input".into()))
         }
     }
+
+    fn update(
+       &self,
+       conn: &PooledConn
+    ) -> ServiceResult<CheckUser> {
+        use crate::schema::users::dsl::*;
+
+        let user_ = self.clone(); // get a copy for later use
+        let new_user_email: &str = &self.email.trim();
+        let unm = &self.uname.trim();
+
+        let old_user = users.filter(&uname.eq(unm)).get_result::<User>(conn)?;
+        let old_user_email: &str = old_user.email.trim();
+
+        // default using old email
+        let mut up_user = UpdateUser {
+            email: old_user_email.to_owned(),
+            ..self.clone()
+        };
+
+        // if update w/ another email
+        if re_test_email(new_user_email) && new_user_email != old_user_email {
+            // check user-email duplication
+            let check_email_user = users
+                .filter(&email.eq(new_user_email))
+                .load::<User>(conn)?
+                .pop();
+            let check_dup_email = match check_email_user {
+                Some(_) => true,
+                None => false,
+            };
+            // sen confirm email if new unique email added
+            if !check_dup_email {
+                // if not dup and valid new email, using new email
+                up_user = user_;
+                let tok = generate_token(unm, new_user_email, 60 * 24 * 2)?;
+                try_send_confirm_email(new_user_email, unm, &tok)?;
+            }
+        }
+
+        let update_user = diesel::update(&old_user)
+            .set(&up_user)
+            .get_result::<User>(conn)?;
+
+        Ok(update_user.into())
+    } 
 }
 
 impl Message for UpdateUser {
@@ -582,13 +902,13 @@ pub struct ChangePsw {
 }
 
 impl ChangePsw {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let check = re_test_psw(&self.new_psw);
 
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid Password"))
+            Err(ServiceError::BadRequest("Invalid password".into()))
         }
     }
 }
@@ -605,12 +925,12 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let check = re_test_name(&self.uname) && re_test_email(&self.email);
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid Content"))
+            Err(ServiceError::BadRequest("Invalid".into()))
         }
     }
 }
@@ -633,14 +953,14 @@ impl Message for ResetPsw {
 }
 
 impl ResetPsw {
-    fn validate(&self) -> Result<(), Error> {
+    fn validate(&self) -> ServiceResult<()> {
         let check = re_test_psw(&self.re_psw)
             && re_test_name(&self.uname)
             && Utc::now().timestamp() <= self.exp;
         if check {
             Ok(())
         } else {
-            Err(error::ErrorBadRequest("Invalid Password"))
+            Err(ServiceError::BadRequest("Invalid password".into()))
         }
     }
 }
@@ -683,4 +1003,20 @@ pub fn verify_token(token: &str) -> TokClaim {
         _ => (0, "".to_string(), "".to_string()),
     };
     TokClaim { exp, uname, email }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct GUser {
+    pub sub: Option<String>,  // required
+    pub name: Option<String>, // required
+    pub given_name: Option<String>,
+    pub family_name: Option<String>,
+    pub picture: Option<String>,
+    pub email: Option<String>, // required
+    pub email_verified: Option<bool>,
+    pub locale: Option<String>,
+}
+
+impl Message for GUser {
+    type Result = Result<CheckUser, ServiceError>;
 }
