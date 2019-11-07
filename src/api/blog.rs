@@ -42,7 +42,7 @@ impl Handler<NewBlog> for Dba {
 // PUT: /api/blogs
 // 
 pub fn update(
-    blog: Json<Blog>,
+    blog: Json<UpdateBlog>,
     _auth: CheckUser,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
@@ -54,10 +54,10 @@ pub fn update(
         })
 }
 
-impl Handler<Blog> for Dba {
+impl Handler<UpdateBlog> for Dba {
     type Result = ServiceResult<Blog>;
 
-    fn handle(&mut self, b: Blog, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, b: UpdateBlog, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         b.update(conn)
     }
@@ -71,7 +71,8 @@ pub fn get(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let blog = QueryBlog{
         id: qb.into_inner(), 
-        method: String::from("GET")
+        method: String::from("GET"),
+        uname: String::new()
     };
     db.send(blog)
         .from_err()
@@ -85,11 +86,13 @@ pub fn get(
 // 
 pub fn del(
     qb: Path<i32>,
+    auth: CheckUser,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let blog = QueryBlog{
         id: qb.into_inner(), 
-        method: String::from("DELETE")
+        method: String::from("DELETE"),
+        uname: auth.uname
     };
     db.send(blog)
         .from_err()
@@ -125,6 +128,7 @@ pub fn get_list(
     let per = pq.per.trim();
     let blog = match per {
         "topic" => QueryBlogs::Topic(kw, perpage, page),
+        "top" => QueryBlogs::Top(kw, perpage, page),
         _ => QueryBlogs::Index(kw, perpage, page),
     };
     db.send(blog)
@@ -150,10 +154,7 @@ impl Handler<QueryBlogs> for Dba {
 // Model
 // =================================================================================
 
-#[derive(
-    Clone, Debug, Serialize, Deserialize, Default, 
-    Identifiable, Queryable, AsChangeset
-)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
 #[table_name = "blogs"]
 pub struct Blog {
     pub id: i32,
@@ -168,29 +169,6 @@ pub struct Blog {
     pub other_link: String,
     pub is_top: bool,
     pub karma: i32,
-}
-
-impl Blog {
-    fn update(
-        mut self, 
-        conn: &PooledConn,
-    ) -> ServiceResult<Blog> {
-        use crate::schema::blogs::dsl::*;
-        let old_blog = blogs.filter(id.eq(self.id))
-            .get_result::<Blog>(conn)?;
-
-        let blog_update = diesel::update(
-            blogs.filter(id.eq(self.id))
-        )
-        .set(&self)
-        .get_result::<Blog>(conn)?;
-
-        Ok(blog_update)
-    }
-}
-
-impl Message for Blog {
-    type Result = ServiceResult<Blog>;
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default, Insertable)]
@@ -227,10 +205,56 @@ impl Message for NewBlog {
     type Result = ServiceResult<Blog>;
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, Default, AsChangeset)]
+#[table_name = "blogs"]
+pub struct UpdateBlog {
+    pub id: i32,
+    pub aname: String,
+    pub avatar: String,
+    pub intro: String,
+    pub topic: String,
+    pub blog_link: String,
+    pub blog_host: String,
+    pub tw_link: String,
+    pub gh_link: String,
+    pub other_link: String,
+}
+
+impl UpdateBlog {
+    fn update(
+        mut self,
+        conn: &PooledConn,
+    ) -> ServiceResult<Blog> {
+        use crate::schema::blogs::dsl::*;
+        let old = blogs.filter(id.eq(self.id))
+            .get_result::<Blog>(conn)?;
+        // check if anything chenged
+        let check_changed: bool = self.aname.trim() != old.aname.trim()
+            || self.avatar.trim() != old.avatar.trim()
+            || self.intro.trim() != old.intro.trim()
+            || self.topic.trim() != old.topic.trim()
+            || self.blog_link.trim() != old.blog_link.trim()
+            || self.tw_link.trim() != old.tw_link.trim()
+            || self.gh_link.trim() != old.gh_link.trim()
+            || self.other_link.trim() != old.other_link.trim();
+        if !check_changed {
+            return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
+        }
+
+        let blog_update = diesel::update(&old).set(&self).get_result::<Blog>(conn)?;
+        Ok(blog_update)
+    }
+}
+
+impl Message for UpdateBlog {
+    type Result = ServiceResult<Blog>;
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct QueryBlog {
     pub id: i32,
     pub method: String, // get|delete
+    pub uname: String,
 }
 
 impl QueryBlog {
@@ -248,9 +272,14 @@ impl QueryBlog {
         conn: &PooledConn,
     ) -> ServiceResult<Blog> {
         use crate::schema::blogs::dsl::{blogs, id};
-        diesel::delete(
-            blogs.filter(id.eq(self.id))
-        ).execute(conn)?;
+        // check permission
+        let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
+        let check_permission: bool = self.uname == admin_env;
+        if !check_permission {
+            return Err(ServiceError::Unauthorized);
+        }
+
+        diesel::delete(blogs.filter(id.eq(self.id))).execute(conn)?;
         Ok(Blog::default())
     }
 }
@@ -263,6 +292,7 @@ impl Message for QueryBlog {
 pub enum QueryBlogs {
     Index(String, i32, i32),
     Topic(String, i32, i32),
+    Top(String, i32, i32),  // topic, perpage-42, page
 }
 
 impl QueryBlogs {
@@ -284,8 +314,20 @@ impl QueryBlogs {
                     .offset((o * p_o).into())
                     .load::<Blog>(conn)?;
             }
+            QueryBlogs::Top(t, o, p) => {
+                let query = blogs.filter(is_top.eq(true)).filter(topic.eq(t));
+                let p_o = std::cmp::max(0, p-1);
+                blog_count = query.clone().count().get_result(conn)?;
+                blog_list = query
+                    .order(karma.desc())
+                    .limit(o.into())
+                    .offset((o * p_o).into())
+                    .load::<Blog>(conn)?;
+            }
             _ => {
-                blog_list = blogs.order(karma.desc()).limit(10).load::<Blog>(conn)?;
+                blog_list = blogs
+                    .filter(is_top.eq(true))
+                    .order(karma.desc()).limit(42).load::<Blog>(conn)?;
                 blog_count = blog_list.len() as i64;
             }
         }

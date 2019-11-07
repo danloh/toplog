@@ -133,6 +133,18 @@ pub fn init_server() -> std::io::Result<()> {
                         .route(get().to_async(api::blog::get))
                         .route(delete().to_async(api::blog::del))
                 )
+                .service(
+                    resource("/articles")
+                        .route(post().to_async(api::article::new))
+                        .route(put().to_async(api::article::update))
+                        // get_list: ?per=topic&kw=&perpage=20&page=p
+                        .route(get().to_async(api::article::get_list)) 
+                )
+                .service(
+                    resource("/articles/{slug}")
+                        .route(get().to_async(api::article::get))
+                        .route(delete().to_async(api::article::del))
+                )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             //.service(scope("/api")

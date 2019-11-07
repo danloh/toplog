@@ -10,9 +10,9 @@ lazy_static! {
 }
 
 // slug, better to show url: ty as type, for rut|item|collect
-pub fn gen_slug(ty: &str, text: &str) -> String {
+pub fn gen_slug(text: &str) -> String {
     let ts =  chrono::Utc::now().timestamp();
-    format!("{}-{}-{}", ty, slugify(text), ts)
+    format!("{}-{}", slugify(text), ts)
 }
 
 // credit to https://github.com/Stebalien/slug-rs/blob/master/src/lib.rs

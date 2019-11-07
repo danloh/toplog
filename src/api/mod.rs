@@ -1,6 +1,7 @@
 
 pub mod auth;
 pub mod blog;
+pub mod article;
 
 
 #[derive(Deserialize, Clone)]
