@@ -1,4 +1,11 @@
 table! {
+    articlecomments (article_id, comment_id) {
+        article_id -> Int4,
+        comment_id -> Int4,
+    }
+}
+
+table! {
     articles (id) {
         id -> Int4,
         title -> Varchar,
@@ -18,6 +25,15 @@ table! {
 }
 
 table! {
+    articletrans (origin_slug, trans_slug) {
+        origin_slug -> Varchar,
+        trans_slug -> Varchar,
+        trans_lang -> Varchar,
+        trans_at -> Timestamp,
+    }
+}
+
+table! {
     blogs (id) {
         id -> Int4,
         aname -> Varchar,
@@ -31,6 +47,24 @@ table! {
         other_link -> Varchar,
         is_top -> Bool,
         karma -> Int4,
+    }
+}
+
+table! {
+    comments (id) {
+        id -> Int4,
+        content -> Text,
+        author -> Varchar,
+        post_at -> Timestamp,
+        vote -> Int4,
+        is_closed -> Bool,
+    }
+}
+
+table! {
+    issuecomments (issue_id, comment_id) {
+        issue_id -> Int4,
+        comment_id -> Int4,
     }
 }
 
@@ -78,11 +112,19 @@ table! {
     }
 }
 
+joinable!(articlecomments -> articles (article_id));
+joinable!(articlecomments -> comments (comment_id));
+joinable!(issuecomments -> comments (comment_id));
+joinable!(issuecomments -> issues (issue_id));
 joinable!(issuelabels -> issues (issue_id));
 
 allow_tables_to_appear_in_same_query!(
+    articlecomments,
     articles,
+    articletrans,
     blogs,
+    comments,
+    issuecomments,
     issuelabels,
     issues,
     users,
