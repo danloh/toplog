@@ -4,7 +4,6 @@ use base64;
 use deunicode::deunicode_char;
 use regex::Regex;
 use std::collections::HashMap;
-use minimal_id::Generator;
 
 lazy_static! {
     static ref RE_SPC: Regex = Regex::new(r"[^a-zA-Z0-9]").unwrap(); // let fail in test
@@ -12,9 +11,8 @@ lazy_static! {
 
 // slug, better to show url: ty as type, for rut|item|collect
 pub fn gen_slug(ty: &str, text: &str) -> String {
-    let generator = Generator::default();
-    let minid = generator.generate();
-    format!("{}-{}-{}", ty, slugify(text), minid)
+    let ts =  chrono::Utc::now().timestamp();
+    format!("{}-{}-{}", ty, slugify(text), ts)
 }
 
 // credit to https://github.com/Stebalien/slug-rs/blob/master/src/lib.rs

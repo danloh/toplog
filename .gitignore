@@ -5,3 +5,4 @@ src/.DS_Store
 
 .env
 migrations/.gitkeep
+rut.log
