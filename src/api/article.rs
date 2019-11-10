@@ -11,7 +11,7 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 use chrono::{NaiveDateTime, Utc};
 
 use crate::errors::{ServiceError, ServiceResult};
-use crate::api::{*};
+use crate::api::{ReqQuery, auth::CheckUser};
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{articles};
@@ -191,12 +191,17 @@ pub struct NewArticle {
 
 impl NewArticle {
     fn new(
-        &self, 
+        self, 
         conn: &PooledConn,
     ) -> ServiceResult<Article> {
         use crate::schema::articles::dsl::articles;
+        let a_slug = gen_slug(&self.title);
+        let new_article = NewArticle {
+            slug: a_slug,
+            ..self
+        };
         let article_new = diesel::insert_into(articles)
-            .values(self)
+            .values(&new_article)
             .on_conflict_do_nothing()
             .get_result::<Article>(conn)?;
 

@@ -2,6 +2,7 @@
 pub mod auth;
 pub mod blog;
 pub mod article;
+pub mod rfc;
 
 
 #[derive(Deserialize, Clone)]

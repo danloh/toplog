@@ -145,6 +145,23 @@ pub fn init_server() -> std::io::Result<()> {
                         .route(get().to_async(api::article::get))
                         .route(delete().to_async(api::article::del))
                 )
+                .service(
+                    resource("/issues")
+                        .route(post().to_async(api::rfc::new))
+                        .route(put().to_async(api::rfc::update))
+                        // get_list: ?per=label&kw=&perpage=20&page=p
+                        .route(get().to_async(api::rfc::get_list)) 
+                )
+                .service(
+                    resource("/issues/{slug}")
+                        .route(get().to_async(api::rfc::get))
+                        .route(delete().to_async(api::rfc::del))
+                )
+                .service(
+                    resource("/labelissues")
+                        .route(post().to_async(api::rfc::label_isuue))
+                        .route(delete().to_async(api::rfc::del_label_isuue))
+                )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             //.service(scope("/api")
