@@ -1,0 +1,13 @@
+<div class="s-rut-list-view">
+  <div class="s-count-title" *ngIf="action !== '0'"> 
+    <b> {{ action | titleCase }}: {{ totalCount }}</b>
+  </div>
+  <div class="s-rut-list">
+    <app-rut-sum *ngFor="let rut of ruts" [rut]="rut"></app-rut-sum>
+  </div>
+  <div *ngIf="hasMore">
+    <button nz-button nzSize="small" nzType="primary" (click)="loadMore()">
+      Show More
+    </button>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="s-create-page" *ngIf="canAdd">
+  <div class="s-add-title">
+    To get <h2>{{ title }}</h2>
+  </div>
+  <table class="s-add-info">
+    <tr *ngFor="let url of itemUrls">
+      <td><a href="{{ url.get_url }}">{{ url.ty}}</a></td>
+      <td> {{ url.note }}</td>
+      <td>
+        <button nz-button nzType="link" nzSize="small" (click)="onUrl('DELETE', url.ty, url.get_url)">
+          <b style="color:orangered">Delete</b>
+        </button>
+      </td>
+    </tr>
+  </table>
+  <br>
+  <form nz-form [formGroup]="urlsForm" (ngSubmit)="onUrl('POST')" class="s-create-form">
+    <nz-form-label>Format: PDF/mobi/awz or Binding: PaperBack/Hardcover</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="ty" placeholder="Type">
+    </nz-form-control>
+    <nz-form-label>Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="url" [nzAutosize]="{ minRows: 2 }" placeholder="URL"></textarea>
+    </nz-form-control>
+    <nz-form-label>Note</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="note" placeholder="Note">
+    </nz-form-control>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!urlsForm.valid">Add</button>
+  </form>
+</div>

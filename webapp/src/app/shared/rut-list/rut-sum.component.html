@@ -1,0 +1,27 @@
+<div class="s-rut-sum">
+  <span class="s-rut-sum-title">
+    <div *ngIf="rut.url; else toPage">
+      <b>{{ rut.title }}</b>
+      <span class="s-host">
+        <a [href]="rut.url" target="_blank" rel="nofollow noopener noreferrer">
+          | <span style="color: #37a">{{ rut.url | host }}</span>
+        </a>
+      </span>
+    </div>
+    <ng-template #toPage>
+      <a href="{{to_url + rut.slug}}"><b>{{ rut.title }}</b></a>
+    </ng-template>
+  </span>
+  <a [href]="to_url + rut.slug">
+    <span>
+      <img class="s-rut-cover" [src]="rut.logo" referrerPolicy="no-referrer">
+    </span>
+    <div class="s-rut-sum-content">{{ rut.content | showLess }}</div>
+    <span class="s-rut-sum-meta" *ngIf="rut.item_count > 0; else toview">
+      including {{ rut.item_count | plur:"item" }}
+    </span>
+    <ng-template #toview>
+      <span class="s-rut-sum-meta">...view</span>
+    </ng-template>
+  </a>
+</div>

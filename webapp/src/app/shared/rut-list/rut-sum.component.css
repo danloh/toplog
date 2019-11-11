@@ -1,0 +1,38 @@
+.s-rut-sum {
+  background-color:#f5f7f8;
+  min-height: 115px;
+  padding: 10px 100px 10px 15px;
+  border-bottom: 1px dashed #ddd;
+  position: relative;
+}
+div.s-rut-sum:hover {
+  background-color:  #fcfdfc;
+}
+.s-rut-cover {
+  position: absolute;
+  max-width: 80px;
+  max-height: 100px;
+  top: 10px;
+  right: 10px;
+}
+.s-rut-sum-title {
+  font-size: 20px;
+  padding-top: 10px;
+}
+.s-rut-sum-title .s-host {
+  font-size: 18px;
+}
+.s-rut-sum-content {
+  color: #828282;
+  font-size: 16px;
+}
+.s-rut-sum-meta {
+  font-size: 14px;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .s-rut-sum, div.s-rut-sum:hover {
+    background-color: #353746;
+    color: #e4e4e4;
+  }
+} */

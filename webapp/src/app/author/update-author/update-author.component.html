@@ -1,0 +1,32 @@
+<div class="s-update-page">
+  <div class="s-update-title">
+    <span>Update Author: <small class="s-help-tips">{{ author.aname }}</small></span>
+  </div>
+  <form nz-form nzLayout="vertical" [formGroup]="auForm" (ngSubmit)="onUpdate()" class="s-update-form">
+    <nz-form-label>Author Name</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="aname" maxlength="42" placeholder="Author Name"/>
+    </nz-form-control>
+    <nz-form-label>Author Gender</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="gender" maxlength="42" placeholder="Author Gender"/>
+    </nz-form-control>
+    <nz-form-label>Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="link" nzAutosize maxlength="255" placeholder="Link"></textarea>
+    </nz-form-control>
+    <nz-form-label>Author Introduction</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="intro" maxlength="512" [nzAutosize]="{ minRows: 4 }" placeholder="About Author"></textarea>
+    </nz-form-control>
+    <nz-form-label>Avatar Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="avatar" nzAutosize maxlength="255" placeholder="Avatar Link"></textarea>
+    </nz-form-control>
+    <br>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!auForm.valid">Update</button>
+  </form>
+  <br>
+  <a href="{{host_url + '/author/' + author.aname}}">Cancel and back</a>
+</div>
+

@@ -1,0 +1,14 @@
+.s-auth-page {
+  padding: 40px 40% 10px 20%;
+  position: relative;
+} 
+.s-auth-form {
+  padding: 20px;
+  border: 1px dotted #689f38;
+}
+
+@media (max-width: 680px) {
+  .s-auth-page {
+    padding: 20px;
+  }
+}

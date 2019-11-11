@@ -1,0 +1,14 @@
+.s-update-p-page {
+  padding: 10px 210px 10px 210px;
+  position: relative;
+} 
+.s-user-form {
+  padding: 20px;
+  border: 1px dotted #689f38;
+}
+
+@media (max-width: 800px) {
+  .s-update-p-page {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,17 @@
+<div class="s-show-page">
+  <div class="s-show-view">
+    <div class="s-show-title">
+        To Get &nbsp; <h2>{{ title }}</h2>
+    </div>
+    <table class="s-show-info">
+      <tr *ngFor="let url of itemUrls">
+        <td>{{ url.ty}}</td>
+        <td>{{ url.note }}</td>
+        <td><a href="{{ url.get_url }}">.:::.</a></td>
+      </tr>
+    </table>
+    <div class="s-show-declare">
+      <p></p>
+    </div>
+  </div>
+</div>

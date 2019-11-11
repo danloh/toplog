@@ -1,0 +1,27 @@
+<div class="s-auth-page">
+  <h2 class="s-form-title">Please Log in</h2>
+  <form nz-form [formGroup]="authForm" (ngSubmit)="onLogin()" class="s-auth-form">
+    <nz-form-item>
+      <nz-form-control>
+        <input nz-input formControlName="uname" nzRequired placeholder="Username*" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <input nz-input type="password" formControlName="password" nzRequired autocomplete="off" placeholder="Password*" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <a routerLink="/reset">Forget Password? </a><br>
+        <button nz-button class="s-full-width" nzType="primary" [disabled]="!authForm.valid">Log In</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+  <div style="text-align: center">
+    <a routerLink="/signup"><small>No Account?  To Sign Up</small></a>
+    <button nz-button nzType="link" (click)="onGoauth()">
+      or  Continue with Google
+    </button>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div *ngIf="canUpdate">
+  <a [routerLink]="'/p/' + uname"><small> Cancel and back  </small></a>
+  <button nz-button (click)="onSwitch()">
+    {{ showUserForm ? 'Change Password': 'Update My Profile' }}
+  </button>
+  <div class="s-update-p-page" *ngIf="showUserForm">
+    <h3 class="s-form-title">Update My Profile</h3>
+    <form nz-form nzLayout="vertical" [formGroup]="userForm" (ngSubmit)="onUpdate()" class="s-user-form">
+      <nz-form-label>Screen Name or NickName</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="nickname" maxlength="16" placeholder="Screen Name" />
+      </nz-form-control>
+      <nz-form-label>My Avatar URL </nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="avatar" maxlength="256" nzAutosize  placeholder="Avatar URL"></textarea>
+      </nz-form-control>
+      <nz-form-label>Email</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="email" placeholder="Email"/>
+      </nz-form-control>
+      <nz-form-label>Location</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="location" maxlength="32" placeholder="Location"/>
+      </nz-form-control>
+      <nz-form-label>Introduction</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input [nzAutosize]="{ minRows: 3 }"
+                  formControlName="intro" placeholder="Introduce Myself">
+        </textarea>
+      </nz-form-control>
+      <br>
+      <button nz-button class="s-full-width" nzType="primary">Update My Profile</button>
+    </form>
+  </div>
+  <div class="s-update-p-page" *ngIf="!showUserForm">
+    <h3 class="s-form-title">Change My Password</h3>
+    <form nz-form nzLayout="vertical" [formGroup]="pswForm" (ngSubmit)="onChangePsw()" class="s-user-form">
+        <nz-form-label>Old Password*</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="old_psw" minlength="8" nzRequired type="password" autocomplete="off" placeholder="Old Password" />
+      </nz-form-control>
+      <nz-form-label>New Password*</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="new_psw" minlength="8" nzRequired type="password" autocomplete="off" placeholder="New Password" />
+      </nz-form-control>
+      <nz-form-label>Confirm New Password*</nz-form-label>
+      <nz-form-control>
+        <input nz-input formControlName="confirm" minlength="8" nzRequired type="password" autocomplete="off" placeholder="Confirm Password" />
+      </nz-form-control>
+      <br>
+      <button nz-button class="s-full-width" nzType="primary" [disabled]="!pswForm.valid">Change Password</button>
+    </form>
+  </div>
+</div>

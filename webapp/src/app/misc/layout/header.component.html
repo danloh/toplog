@@ -1,0 +1,20 @@
+<header class="s-header">
+  <nav class="s-nav-menu">
+    <a href="{{host_url}}"><b class="s-logo">RutHub</b></a><sup class="s-logo-sup">beta</sup>
+    <div class="s-right-menu">
+      <div *ngIf="ifAuthed">
+        <button nz-button nzType="link" nz-dropdown [nzDropdownMenu]="menu">:-)</button>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <a routerLink="/rlist/new"><b style="color: orange">New List</b></a>
+            </li>
+            <li nz-menu-item><a routerLink="/item/submit"><b>New Item</b></a></li>
+            <li nz-menu-item><a [routerLink]="'/p/' + actUname"><b>My Profile</b></a></li>
+            <li nz-menu-item><a (click)="onLogOut()">Sign Out</a></li>
+          </ul>
+        </nz-dropdown-menu>
+      </div>
+    </div>
+  </nav>
+</header>

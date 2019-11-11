@@ -1,0 +1,82 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  font-family: Lato,Roboto,Open Sans,sans-serif;
+  font-size: 18px;
+  line-height: 1.8em;
+  background-color: #edf0f5;
+  overflow-wrap: break-word;
+}
+a {
+  color: #000000bf;
+  text-decoration: none;
+}
+a:hover {
+  color: #03a87c;
+}
+h2, h3, h4 {
+  margin: 8px 0;
+  line-height: 1.2em;
+  font-family: Pontano Sans, Lato, Roboto, Open Sans, serif;
+}
+p {
+  margin: 5px 0;
+}
+pre {
+  background-color: #f0f0f0;
+  padding: 5px;
+}
+blockquote {
+  border-left: 3px solid orange;
+  margin: 5px;
+  padding-left: 12px;
+}
+
+.s-full-width {
+  width: 100%;
+}
+.s-help-tips {
+  color: green;
+  font-size: 0.8em;
+}
+.s-md-img {
+  max-width: 45%;
+  max-height: 45%
+}
+.s-update-page, .s-create-page, .s-view-page {
+  padding: 20px 240px 20px 120px;
+  position: relative;
+}
+.s-update-title, .s-create-title {
+  padding-bottom: 10px;
+}
+.s-update-form, .s-create-form {
+  padding: 20px;
+  border: 1px dotted #689f38;
+}
+.s-form-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 800px) {
+  .s-update-page, .s-create-page {
+    padding: 20px;
+  }
+}
+
+/* @media (prefers-color-scheme: dark) {
+  body {
+    background-color: #282a36;
+    color: #e4e4e4;
+  }
+  pre {
+    background-color: rgb(56, 55, 55);
+  }
+  a {
+    color: #e4e4e4;
+  }
+  img {
+    filter: grayscale(30%);
+  }
+} */

@@ -1,0 +1,43 @@
+<div class="s-create-page">
+  <div class="s-create-title">
+    <span><b>Create New List:  </b></span>
+    <small class="s-help-tips">Collection of Books, Courses, etc. on a Specific Topic</small> 
+  </div>
+  <nz-steps [nzCurrent]="currentStep" nzSize="small">
+    <nz-step nzTitle="Create List:  Title, Introduction, etc." ></nz-step>
+    <nz-step nzTitle="Add Item and Provide Takeaway From It" ></nz-step>
+  </nz-steps>
+  <div class="step-div" *ngIf="stepOne">
+    <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onCreate()" class="s-create-form">
+      <nz-form-label>Title*</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="title" nzAutosize maxlength="255" nzRequired placeholder="To Name the List"></textarea>
+      </nz-form-control>
+      <nz-form-label>either Source Link</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="url" nzAutosize maxlength="255" placeholder="either URL"></textarea>
+      </nz-form-control>
+      <nz-form-label>or Text Content</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 6 }" placeholder="Type Text Content, Supports markdown"></textarea>
+      </nz-form-control>
+      <nz-form-label>Original Author (Optional)</nz-form-label>
+      <nz-form-control>
+          <input nz-input formControlName="author" maxlength="32" placeholder="Original Author"/>
+      </nz-form-control>
+      <nz-form-label>Authors' Introduction or Credential(Optional)</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="credential" nzAutosize maxlength="500" placeholder="Introduction or Credential"></textarea>
+      </nz-form-control>
+      <br>
+      <button nz-button class="s-full-width" nzType="primary" [disabled]="!createForm.valid">Create New List Now</button>
+    </form>
+  </div>
+  <div class="step-div" *ngIf="stepTwo">
+    <small>Now Add Item To List:  <b>{{ rut?.title }}</b></small>
+    <app-add-item [rutID]="rutID" [itemnum]="0" [uname]="uname"
+                  (added)="afterAddedItem()">
+    </app-add-item>
+    <a [routerLink]="'/rlist/' + rutSlug">Or Add Item Later</a>
+  </div>
+</div>

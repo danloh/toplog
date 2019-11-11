@@ -1,0 +1,31 @@
+<div class="s-update-page">
+  <div class="s-update-title">
+    <span>Update List: <small class="s-help-tips">{{ rut.title}}</small></span>
+  </div>
+  <form nz-form nzLayout="vertical" [formGroup]="rutForm" (ngSubmit)="onUpdate()" class="s-update-form">
+    <nz-form-label>Title*</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input #t formControlName="title" nzAutosize maxlength="255" nzRequired placeholder="List Name"></textarea>
+    </nz-form-control>
+    <nz-form-label>either Source Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="url" nzAutosize maxlength="255" placeholder="either URL"></textarea>
+    </nz-form-control>
+    <nz-form-label>or Text Content</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 6 }" placeholder="Type Text Content, Supports markdown"></textarea>
+    </nz-form-control>
+    <nz-form-label>Original Author (Optional)</nz-form-label>
+    <nz-form-control>
+        <input nz-input formControlName="author" maxlength="32" placeholder="Original Author"/>
+    </nz-form-control>
+    <nz-form-label>Authors' Introduction or Credential(Optional)</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="credential" nzAutosize maxlength="500" placeholder="Introduction or Credential"></textarea>
+    </nz-form-control>
+    <br>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!rutForm.valid">Update</button>
+  </form>
+  <br>
+  <a [routerLink]="'/rlist/' + rut.slug">Cancel and back</a>
+</div>

@@ -6,3 +6,9 @@ src/.DS_Store
 .env
 migrations/.gitkeep
 rut.log
+
+webapp/node_modules
+webapp/dist
+webapp/e2e
+webapp/src/assets/.gitkeep
+/spa

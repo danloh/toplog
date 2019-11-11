@@ -1,0 +1,46 @@
+<div class="s-profile-page" *ngIf="ifAuthed">
+  <div class="s-profile-head">
+    <a [routerLink]="'/p/' + uname">
+      <b style="font-size:1.6em">{{ (user.nickname || uname) | showLess: 12 }}</b>
+    </a>
+    <a *ngIf="canEditProfile" [routerLink]="'/p/update/' + uname">
+      <small> @{{ uname | showLess: 12 }}</small>
+    </a>
+    <small class="s-location"> &nbsp; {{ user.location }}</small>
+    <div class="s-aboutme">{{user.intro || '...'}}</div>
+  </div>
+  <div class="s-profile-view">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="s-profile-side">
+    <div class="s-right-avatar">
+      <app-avatar [uname]="uname" [size]="210" [src]="user.avatar"></app-avatar>
+      <small class="s-user-info"> &nbsp;{{user.join_at | date}} Joined</small>
+    </div>
+    <div class="s-right-nav">
+      <a [routerLink]="'/p/' + uname + '/create'" routerLinkActive="active">
+         Post
+      </a>
+      <a routerLink="/rlist/new">
+        <small style="color:orange">  +New</small>
+      </a><br>
+      <a [routerLink]="'/p/' + uname + '/star'" routerLinkActive="active">
+        Star
+      </a><br>
+      <a [routerLink]="'/p/' + uname + '/doings'" routerLinkActive="active">
+        Doing
+      </a><br>
+      <a [routerLink]="'/p/' + uname + '/todos'" routerLinkActive="active">
+        Todo
+      </a><br>
+      <a [routerLink]="'/p/' + uname + '/dones'" routerLinkActive="active">
+        Done
+      </a>
+      <br><br> 
+      <b># Topic: </b><br>
+      <span class="s-fo-tag" *ngFor="let tag of tags">
+        <a [href]="host_url + '/tag/' + tag.id"><small>{{ tag.tname }}&nbsp;&nbsp;</small></a>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+.s-edit-mode {
+  font-size: 15px;
+  text-align: center;
+  padding: 2px;
+  background-color: #c4c8d8;
+}
+.s-edit-mode:hover {
+  background-color: #ddd;
+}
+.s-rut-page {
+  padding: 10px 250px 10px 0px;
+  position: relative;
+}
+.s-rut-view {
+  background-color: #f5f7f8;
+  padding: auto;
+}
+.s-rut-view .s-tagbar {
+  display:inline-blcok;
+}
+.s-tagbar .s-tag {
+  padding: 2px 5px;
+  font-size: 0.85em;
+  background-color: #eef4fa;
+}
+.s-rut-view .s-rut-title {
+  padding: 0 10px;
+}
+.s-rut-title .s-rut-meta {
+  color: #828282;
+  font-size: 14px;
+}
+.s-rut-view .s-rut-content {
+  padding: 10px;
+  border-bottom: 3px solid #eee;
+}
+.s-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  background-color: white;
+  border-bottom: 3px solid #eee;
+}
+.s-add-item {
+  margin-top: 10px;
+}
+.s-rut-side {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  width: 240px;
+  background-color: #fafbfa;
+}
+.s-credential-title {
+  padding: 5px 10px;
+  background-color: #e5ebe4;
+}
+.s-credential-body {
+  padding: 0 10px;
+  font-size: 0.85em;
+}
+.s-del-tag {
+  cursor: pointer;
+  color: orangered;
+  font-size: 15px;
+}
+
+@media (max-width: 800px) {
+  .s-rut-page {
+    padding: 10px;
+  }
+  .s-rut-page .s-rut-side {
+    position: relative;
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .s-rut-view, .s-credential-title, 
+  .s-rut-side, .s-toolbar
+  {
+    background-color: #353746;
+    color: #e4e4e4;
+  }
+  .s-tagbar .s-tag {
+    background-color: #6b6a6a;
+  }
+  .s-edit-mode {
+    color: #353746;
+  }
+} */

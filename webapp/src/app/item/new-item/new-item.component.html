@@ -1,0 +1,54 @@
+<div class="s-create-page">
+  <div class="s-create-title">
+    <span><b>Submit New Item: </b></span>
+    <small class="s-help-tips"> Book, Course, Documentary, App, Podcast, etc.</small> 
+  </div>
+  <form nz-form nzLayout="vertical" [formGroup]="submitForm" (ngSubmit)="onSubmit()" class="s-create-form">
+    <nz-form-label>Title*</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="title" nzAutosize maxlength="255" nzRequired placeholder="such as: Book Title, Course Name"></textarea>
+    </nz-form-control>
+    <nz-form-label>Byline*</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="authors" nzAutosize maxlength="128" nzRequired placeholder="Author or Instructor"></textarea>
+    </nz-form-control>
+    <nz-form-label>either Item UID</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="uiid" maxlength="32" placeholder="like Book ISBN" />
+    </nz-form-control>
+    <nz-form-label>or Source Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="url" nzAutosize maxlength="255" placeholder="or Source URL"></textarea>
+    </nz-form-control>
+    <nz-form-label>Cover Image Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="cover" nzAutosize maxlength="255" placeholder="Cover Image URL"></textarea>
+    </nz-form-control>
+    <nz-form-label>Publish Date</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="pub_at" maxlength="32" placeholder="Publish Date" />
+    </nz-form-control>
+    <nz-form-label>Publisher</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="publisher" maxlength="128" placeholder="Publisher" />
+    </nz-form-control>
+    <nz-form-label>Edition</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="edition" maxlength="64" placeholder="Edition" />
+    </nz-form-control>
+    <nz-form-label>Language</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="language" maxlength="32" placeholder="Language" />
+    </nz-form-control>
+    <nz-form-label>Detail</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="detail" [nzAutosize]="{ minRows: 6 }" placeholder="Type Detail Content, Supports markdown"></textarea>
+    </nz-form-control>
+    <nz-form-label>Category</nz-form-label>
+    <nz-select nzMode="tags" formControlName="category" [nzMaxTagCount]="1" nzPlaceHolder="Category">
+      <nz-option *ngFor="let cate of cates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
+    </nz-select>
+    <br><br>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!submitForm.valid">Submit</button>
+  </form>
+</div>
