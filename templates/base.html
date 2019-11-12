@@ -6,14 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="/static/styles.css">
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico" >
-  <meta name="google-site-verification" content="keJtc375nEksTZ_RTKJYdvJTIlhpQim2wuLqVszrfvY" />
-  <meta property="og:url" content="https://ruthub.com">
-  <meta property="og:site_name" content="RutHub">
-  <meta property="og:title" content="Learning Roadmaps Aggregation">
+  <meta name="google-site-verification" content="" />
   {%- block head -%}
   <title>{%- block title -%} {{ title }}{%- endblock title -%} - {{ hostDomain }}</title>
   {%- block metaDescription -%}
-  <meta name="description" content="Aggregated, Tagged Book Reviews, Book News, MOOCs, Read Lists, Learning Roadmaps">
+  <meta name="description" content="">
   {%- endblock metaDescription -%}
   {%- endblock head -%}
 </head>
@@ -34,8 +31,6 @@
         <div class="menudown" id="menu-down" style="display: none">
           <button onclick="showMenu()" class="toolbtn">:-)</button>
           <div id="drop-menu" class="dropdown-content">
-            <li><a href="/me/rlist/new"><b style="color:orange">New List</b></a></li>
-            <li><a href="/me/item/submit"><b>New Item</b></a></li>
             <li><a href="#" id="profile-link"><b>My Profile</b></a></li>
           </div>
         </div> 
@@ -51,11 +46,6 @@
   {%- block foot -%}
     <div class="bottom">
       ©{{ hostDomain }} Since 2020 | <a href="/about.html">About</a>
-      <!-- search item -->
-      <form id="Search-item" onsubmit="onSearch('qi', 'i')" class="search-box">
-        <input type="text" id="qi" placeholder=" Search item by title or ISBN " class="search-text"/>
-      </form>
-      <!--end search item -->	
     </div><br>			
   {%- endblock foot -%}
   </footer>
@@ -63,8 +53,5 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="/static/tmpl.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-103066521-1"></script>
-<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-103066521-1');</script>
 </body>
 </html>

@@ -64,3 +64,19 @@ fn _slugify(s: &str) -> String {
     string.shrink_to_fit();
     string
 }
+
+// extract host of url
+lazy_static! {
+    static ref RE_S: Regex =
+        Regex::new(r"https?://").unwrap(); // let fail in test
+}
+lazy_static! {
+    static ref RE_P: Regex =
+        Regex::new(r"/.*").unwrap(); // let fail in test
+}
+
+pub fn get_host(s: &str) -> String {
+    let url = RE_S.replace_all(s, "");
+    let host = RE_P.replace_all(&url, "").replace("www.", "");
+    host
+}
