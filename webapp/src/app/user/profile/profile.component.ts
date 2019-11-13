@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { 
-  User, AuthUser, AuthService, TagService, Tag
+  User, AuthUser, AuthService
 } from '../../core';
 import { environment } from '../../../environments/environment';
 
@@ -18,13 +18,11 @@ export class ProfileComponent implements OnInit {
     private router: Router,
     private title: Title,
     private authService: AuthService,
-    private tagService: TagService,
   ) {}
 
   user: User;
   uname: string;
   actname: string;
-  tags: Tag[];
   ifAuthed: boolean;
   canEditProfile: boolean;  // important!!
 
@@ -45,9 +43,6 @@ export class ProfileComponent implements OnInit {
       this.uname = this.user.uname;
       this.canEditProfile = (this.actname === this.uname) && this.ifAuthed;
     
-      this.tagService.get_list('user', this.uname).subscribe(
-        res => this.tags = res.tags
-      );
       this.title.setTitle('@' + this.uname.toUpperCase() + ' - RutHub');
     });
   }

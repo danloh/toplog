@@ -7,7 +7,7 @@ import { UserResolver } from './user-resolver.service';
 import { ProfileComponent } from './profile/profile.component';
 import { UpdateUserComponent } from './update-user/update-user.component';
 import { 
-  AvatarModule, ComponentModule, RutListModule, ItemListModule 
+  AvatarModule, ComponentModule
 } from '../shared';
 
 @NgModule({
@@ -21,8 +21,6 @@ import {
     UserRoutingModule,
     AvatarModule,
     ComponentModule,
-    ItemListModule,
-    RutListModule,
   ],
   providers: [
     UserResolver

@@ -2,8 +2,7 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-const host_url = 'http://127.0.0.1:8083'; // 'https://ruthub.com';// 
-
+const host_url = 'http://127.0.0.1:8085';
 export const environment = {
   production: false,
   host_url,

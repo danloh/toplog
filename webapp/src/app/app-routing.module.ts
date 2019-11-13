@@ -13,22 +13,6 @@ const routes: Routes = [
     loadChildren: () => import('./user/user.module').then(m => m.UserModule),
   },
   {
-    path: 'item',
-    loadChildren: () => import('./item/item.module').then(m => m.ItemModule)
-  },
-  {
-    path: 'rlist',  // rut
-    loadChildren: () => import('./rut/rut.module').then(m => m.RutModule)
-  },
-  {
-    path: 'tag',
-    loadChildren: () => import('./tag/tag.module').then(m => m.TagModule)
-  },
-  {
-    path: 'author',
-    loadChildren: () => import('./author/author.module').then(m => m.AuthorModule)
-  },
-  {
     path: '404',
     component: NotFoundComponent,
   },
