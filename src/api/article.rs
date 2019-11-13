@@ -309,7 +309,7 @@ pub enum QueryArticles {
 }
 
 impl QueryArticles {
-    fn get(
+    pub fn get(
         self, 
         conn: &PooledConn,
     ) -> ServiceResult<(Vec<Article>, i64)> {

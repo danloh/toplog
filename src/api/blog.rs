@@ -296,7 +296,7 @@ pub enum QueryBlogs {
 }
 
 impl QueryBlogs {
-    fn get(
+    pub fn get(
         self, 
         conn: &PooledConn,
     ) -> ServiceResult<(Vec<Blog>, i64)> {
