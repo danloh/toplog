@@ -164,7 +164,19 @@ pub fn init_server() -> std::io::Result<()> {
                 )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
-            //.service(scope("/api")
+            .service(
+                resource("/index")
+                    .route(get().to_async(view::tmpl::index_dyn))
+            )
+            .service(
+                fs::Files::new("/static", "./static/") // static files
+                    .default_handler(route().to(|| HttpResponse::NotFound()))
+            )
+            .service(
+                fs::Files::new("/", "./www/") // for robots.txt, sitemap
+                    .index_file("index.html")
+                    .default_handler(route().to(|| HttpResponse::NotFound()))
+            )
                
             .default_service(route().to(|| HttpResponse::NotFound()))
         //.default_service(route().to(view::tmpl::not_found))

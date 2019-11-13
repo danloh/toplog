@@ -14,6 +14,8 @@ use actix_web::{
 };
 use chrono::{SecondsFormat, Utc};
 
+// GET /
+//
 pub fn index() -> Result<HttpResponse, Error> {
     let res = String::from_utf8(
         std::fs::read("www/index.html")

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="/static/styles.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico" >
+  <meta name="google-site-verification" content="" /><title>Home- RutHub</title><meta name="description" content=""></head>
+<body><header class="header"><nav class="nav-menu"><a href="/"><b class="logo">RutHub</b></a><sup class="logo-sup">beta</sup>
+      <!--google site search -->
+      <form id="Search" onsubmit="onSearch('q', 'g')" class="search-box">
+        <input type="text" id="q" placeholder=" Search using Google " class="search-text"/>
+      </form>
+      <!--end google site search -->	
+      <div class="right-menu">
+        <a href="/me/" id="login-link"><b>Log in</b></a>
+        <div class="menudown" id="menu-down" style="display: none">
+          <button onclick="showMenu()" class="toolbtn">:-)</button>
+          <div id="drop-menu" class="dropdown-content">
+            <li><a href="#" id="profile-link"><b>My Profile</b></a></li>
+          </div>
+        </div> 
+      </div></nav></header>
+  <div class="main-view"><div class="banner">
+  <h2>Aggregate Blogs of Top Contributors To</h2>
+  <a>Rust</a>
+</div>
+<div class="main-page">
+  <div class="home-view" id="ruts-in-home"></div>
+  <button class="toolbtn full-width" onclick="loadMoreIndexRuts()">More</button>
+  <div class="page-side">
+    <h4 class="right-title">Top Contributors</h4>
+    <div class="right-body"></div>
+  </div>
+</div></div>
+  <footer class="footer"><div class="bottom">
+      ©RutHub Since 2020 | <a href="/about.html">About</a>
+    </div><br></footer><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/static/tmpl.js"></script>
+</body>
+</html>
