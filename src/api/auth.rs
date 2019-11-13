@@ -600,7 +600,7 @@ pub struct Claims {
 impl Claims {
     pub fn new(uid: i32, uname: &str, permit: i16) -> Self {
         Claims {
-            iss: "ruthub".into(),
+            iss: "Newdin".into(),
             sub: "auth".into(),
             iat: Utc::now().timestamp(),
             exp: (Utc::now() + Duration::hours(24 * 5)).timestamp(),

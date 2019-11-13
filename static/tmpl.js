@@ -4,7 +4,7 @@ function paragraphParse(text) {
   return `<p>\n${text}</p>`;
 }
 function linkParse(href, title, text) {
-  const isSelf = href.includes('ruthub.com');
+  const isSelf = href.includes('newdin.com');
   const textIsImage = text.includes('<img');
   return `
   <a href="${href}" target="_blank"
@@ -204,7 +204,7 @@ function onSearch(selector, ty) {
   var q = document.getElementById(selector);
   if (q && q.value != "") {
     var openUrl = ty === "g" 
-      ? 'https://www.google.com/search?q=site:ruthub.com/%20'
+      ? 'https://www.google.com/search?q=site:newdin.com/%20'
       : '/me/item/search?q=';
     window.open(openUrl + q.value, "_blank");
   }

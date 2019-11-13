@@ -39,7 +39,7 @@ fn build_email(
     let sender = mail_config
         .as_ref()
         .map(|s| s.smtp_login.as_str())
-        .unwrap_or("test@ruthub");
+        .unwrap_or("test@Newdin");
 
     let email = Email::builder()
         .to(recipient)
@@ -98,7 +98,7 @@ pub fn try_send_confirm_email(
 ) -> Result<(), ServiceError> {
     let subject = "Please confirm your email address";
     let body = format!(
-        "Hello {}: \n\n Welcome to RutHub. Please click the link below to verify your email address. Thank you! \n\n https://ruthub.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The RutHub Team",
+        "Hello {}: \n\n Welcome to Newdin. Please click the link below to verify your email address. Thank you! \n\n https://newdin.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Newdin Team",
         user_name, base64::encode(token)
     );
 
@@ -112,7 +112,7 @@ pub fn try_send_reset_email(
 ) -> Result<(), ServiceError> {
     let subject = "Please Reset Your password";
     let body = format!(
-        "Hello {}: \n\n The Token to reset your password as below:\n\n {} \n\n This Token will expire in 2 hours. \n\n\n The RutHub Team",
+        "Hello {}: \n\n The Token to reset your password as below:\n\n {} \n\n This Token will expire in 2 hours. \n\n\n The Newdin Team",
         user_name, base64::encode(token)
     );
     //println!("reset: {:?}", token);
@@ -146,7 +146,7 @@ mod tests {
     #[test]
     fn sending_to_invalid_email_fails() {
         let result = send_email(
-            "String.Format(\"{0}.{1}@ruthub.com\", FirstName, LastName)",
+            "String.Format(\"{0}.{1}@Newdin.com\", FirstName, LastName)",
             "test",
             "test",
         );

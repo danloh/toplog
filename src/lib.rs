@@ -173,13 +173,16 @@ pub fn init_server() -> std::io::Result<()> {
                     .default_handler(route().to(|| HttpResponse::NotFound()))
             )
             .service(
+                fs::Files::new("/me", "./spa/") // spa static files
+                    .index_file("index.html")
+                    //.default_handler(route().to(view::tmpl::spa_index))
+            )
+            .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("index.html")
                     .default_handler(route().to(|| HttpResponse::NotFound()))
             )
-               
             .default_service(route().to(|| HttpResponse::NotFound()))
-        //.default_service(route().to(view::tmpl::not_found))
     })
     .bind(&bind_host)
     .expect("Can not bind to host")

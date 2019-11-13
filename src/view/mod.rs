@@ -66,10 +66,10 @@ mod tests {
     #[test]
     fn test_host() {
         let result = host(
-            &to_value("https://ruthub.com/rlist/r-when").unwrap(),
+            &to_value("https://newdin.com/rlist/r-when").unwrap(),
             &HashMap::new(),
         );
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), to_value("ruthub.com").unwrap());
+        assert_eq!(result.unwrap(), to_value("newdin.com").unwrap());
     }
 }

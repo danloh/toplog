@@ -63,7 +63,7 @@ export class MarkdownPipe implements PipeTransform {
     const paragraphParse: (text: string) => string = text => `<p>\n${text}</p>`;
     
     const linkParse = (href: string, title: string, text: string) => {
-      const isSelf = href.includes('ruthub.com');
+      const isSelf = href.includes('newdin.com');
       const textIsImage = text.includes('<img');
       return `
       <a href="${href}" target="_blank"
