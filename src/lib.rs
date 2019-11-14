@@ -175,7 +175,7 @@ pub fn init_server() -> std::io::Result<()> {
             .service(
                 fs::Files::new("/me", "./spa/") // spa static files
                     .index_file("index.html")
-                    //.default_handler(route().to(view::tmpl::spa_index))
+                    .default_handler(route().to(view::tmpl::spa_index))
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap

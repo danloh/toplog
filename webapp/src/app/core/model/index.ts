@@ -2,6 +2,7 @@
 // for type model
 
 export * from './user.model';
+export * from './blog.model';
 export * from './error.model';
 
 export interface MsgRes {

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { 
-  ApiService, AuthService, AuthGuard, UserService
+  ApiService, AuthService, AuthGuard, UserService, BlogService
 } from './service';
 import { AuthIntercept, ResponIntercept } from './interceptor/http.interceptor';
 
@@ -18,6 +18,7 @@ import { AuthIntercept, ResponIntercept } from './interceptor/http.interceptor';
     AuthService,
     AuthGuard,
     UserService,
+    BlogService,
   ]
 })
 export class CoreModule {}

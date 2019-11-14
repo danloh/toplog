@@ -218,6 +218,7 @@ pub struct UpdateBlog {
     pub tw_link: String,
     pub gh_link: String,
     pub other_link: String,
+    pub is_top: bool,
 }
 
 impl UpdateBlog {
@@ -236,7 +237,8 @@ impl UpdateBlog {
             || self.blog_link.trim() != old.blog_link.trim()
             || self.tw_link.trim() != old.tw_link.trim()
             || self.gh_link.trim() != old.gh_link.trim()
-            || self.other_link.trim() != old.other_link.trim();
+            || self.other_link.trim() != old.other_link.trim()
+            || self.is_top != old.is_top;
         if !check_changed {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }

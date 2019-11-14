@@ -49,6 +49,17 @@ pub fn index_dyn(
     })
 }
 
+pub fn spa_index() -> Result<HttpResponse, Error> {
+    let res = String::from_utf8(
+        std::fs::read("spa/index.html")
+            .unwrap_or("Not Found".to_owned().into_bytes()),
+    )
+    .unwrap_or_default();
+    Ok(HttpResponse::build(http::StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(res))
+}
+
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Home();
