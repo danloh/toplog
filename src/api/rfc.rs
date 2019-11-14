@@ -219,10 +219,12 @@ pub struct Issue {
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub topic: String,
     pub author: String,
     pub post_at: NaiveDateTime,
     pub vote: i32,
     pub is_closed: bool,
+    
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Insertable)]
@@ -231,6 +233,7 @@ pub struct NewIssue {
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub topic: String,
     pub author: String,
 }
 
@@ -265,6 +268,7 @@ pub struct UpdateIssue {
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub topic: String,
     pub author: String,
 }
 

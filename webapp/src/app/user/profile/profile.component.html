@@ -24,18 +24,6 @@
       <a routerLink="/rlist/new">
         <small style="color:orange">  +New</small>
       </a><br>
-      <a [routerLink]="'/p/' + uname + '/star'" routerLinkActive="active">
-        Star
-      </a><br>
-      <a [routerLink]="'/p/' + uname + '/doings'" routerLinkActive="active">
-        Doing
-      </a><br>
-      <a [routerLink]="'/p/' + uname + '/todos'" routerLinkActive="active">
-        Todo
-      </a><br>
-      <a [routerLink]="'/p/' + uname + '/dones'" routerLinkActive="active">
-        Done
-      </a>
       <br><br> 
       <b># Topic: </b><br>
       <span class="s-fo-tag" *ngFor="let tag of tags">

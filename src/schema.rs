@@ -82,6 +82,7 @@ table! {
         title -> Varchar,
         slug -> Varchar,
         content -> Text,
+        topic -> Varchar,
         author -> Varchar,
         post_at -> Timestamp,
         vote -> Int4,
