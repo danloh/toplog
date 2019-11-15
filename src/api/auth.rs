@@ -584,6 +584,51 @@ impl FromRequest for CheckUser {
     }
 }
 
+// return as user info w/o password
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CheckCan {
+    pub uname: String,
+    pub permission: i16,
+}
+
+impl CheckCan {
+    // check permission
+    pub fn can(&self, permission: i16) -> bool {
+        (self.permission & permission) == permission
+    }
+}
+
+impl From<CheckUser> for CheckCan {
+    fn from(user: CheckUser) -> Self {
+        CheckCan {
+            uname: user.uname,
+            permission: user.permission,
+        }
+    }
+}
+
+impl FromRequest for CheckCan {
+    type Config = ();
+    type Error = ServiceError;
+    type Future = Result<CheckCan, ServiceError>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        if let Some(auth_token) = req.headers().get("authorization") {
+            if let Ok(auth) = auth_token.to_str() {
+                let user: CheckCan = decode_token(auth)?.into();
+                // check permission, to be optimazed
+                let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
+                let check_permission: bool = 
+                    user.uname == admin_env || user.can(EIDT_PERMIT);
+                if check_permission {
+                    return Ok(user);
+                }
+            }
+        }
+        Err(ServiceError::Unauthorized.into())
+    }
+}
+
 // jwt Token auth: Claim, token
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {

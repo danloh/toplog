@@ -11,7 +11,7 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{ReqQuery};
-use crate::api::auth::CheckUser;
+use crate::api::auth::{CheckUser, CheckCan};
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{blogs};
 
@@ -19,7 +19,7 @@ use crate::schema::{blogs};
 // 
 pub fn new(
     blog: Json<NewBlog>,
-    _auth: CheckUser,
+    _can: CheckCan,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(blog.into_inner())
@@ -43,7 +43,7 @@ impl Handler<NewBlog> for Dba {
 // 
 pub fn update(
     blog: Json<UpdateBlog>,
-    _auth: CheckUser,
+    _can: CheckCan,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(blog.into_inner())
@@ -86,7 +86,7 @@ pub fn get(
 // 
 pub fn del(
     qb: Path<i32>,
-    auth: CheckUser,
+    auth: CheckCan,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let blog = QueryBlog{
@@ -274,12 +274,12 @@ impl QueryBlog {
         conn: &PooledConn,
     ) -> ServiceResult<Blog> {
         use crate::schema::blogs::dsl::{blogs, id};
-        // check permission
-        let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
-        let check_permission: bool = self.uname == admin_env;
-        if !check_permission {
-            return Err(ServiceError::Unauthorized);
-        }
+        // // check permission
+        // let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
+        // let check_permission: bool = self.uname == admin_env;
+        // if !check_permission {
+        //     return Err(ServiceError::Unauthorized);
+        // }
 
         diesel::delete(blogs.filter(id.eq(self.id))).execute(conn)?;
         Ok(Blog::default())
