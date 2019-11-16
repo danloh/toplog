@@ -340,3 +340,13 @@ impl QueryBlogs {
 impl Message for QueryBlogs {
     type Result = ServiceResult<(Vec<Blog>, i64)>;
 }
+
+// TODO
+//#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
+//#[table_name = "topics"]
+pub struct Topic {
+    pub id: i32,
+    pub tname: String,
+    pub logo: String,
+    pub intro: String,
+}

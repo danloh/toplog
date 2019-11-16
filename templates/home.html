@@ -3,10 +3,6 @@
 {%- block title -%} Home {%- endblock title -%}
 
 {%- block mainview -%}
-<div class="banner">
-  <h2>Aggregate Blogs of Top Contributors To</h2>
-  <a>Rust</a>
-</div>
 <div class="main-page">
   <div class="home-view" id="ruts-in-home">
     {%- for a in articles -%}
@@ -21,6 +17,7 @@
       {{ c.aname }}<br>
       <a href = "{{c.tw_link}}">Twitter</a>
       <a href = "{{c.blog_link}}">Blog</a>
+      <a href = "{{'/me/blog/update/' ~ c.id }}">edit</a>
       {%- endfor -%}
     </div>
   </div>

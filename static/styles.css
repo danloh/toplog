@@ -25,7 +25,7 @@ pre {
   padding: 5px;
 }
 blockquote {
-  border-left: 3px solid orange;
+  border-left: 3px solid green;
   margin: 5px;
   padding-left: 12px;
 }
@@ -38,8 +38,7 @@ blockquote {
   font-size: 0.8em;
 }
 .header {
-  background-color: #f5f5f5;
-  border-bottom: 2px solid #eee;
+  background-color: #0097a6;
   z-index: 999;
   height: 45px;
   min-width: 400px;
@@ -50,7 +49,6 @@ blockquote {
   padding: 6px 0px;
 }
 .logo {
-  color: darkorange;
   font-size: 1.2em;
   letter-spacing: 0.005em;
 }
@@ -118,6 +116,15 @@ blockquote {
   margin: 5px auto;
   font-size: 0.75em;
 }
+.banner {
+  background-color: #fafafa;
+  padding: 10px;
+}
+.banner-view {
+  box-sizing: border-box;
+  margin: 0px auto;
+  padding: 6px 0px;
+}
 .main-view {
   min-height: 42em;
   width: 100%;
@@ -127,6 +134,7 @@ blockquote {
 
 .header .nav-menu, 
 .footer .bottom, 
+.banner .banner-view,
 .main-view {
   max-width: 960px;
   min-width: 400px;
@@ -152,6 +160,10 @@ blockquote {
   padding: 5px 20px;
   font-size: 16px;
 }
+
+
+
+
 .rut-sum {
   background-color:#f5f7f8;
   line-height: 1.6em;

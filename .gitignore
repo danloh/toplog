@@ -12,5 +12,6 @@ webapp/dist
 webapp/e2e
 webapp/src/assets/.gitkeep
 /spa
+/www
 
 .DS_Store
