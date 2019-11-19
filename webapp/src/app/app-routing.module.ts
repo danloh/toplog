@@ -17,6 +17,10 @@ const routes: Routes = [
     loadChildren: () => import('./blog/blog.module').then(m => m.BlogModule),
   },
   {
+    path: 'article',
+    loadChildren: () => import('./article/article.module').then(m => m.ArticleModule),
+  },
+  {
     path: '404',
     component: NotFoundComponent,
   },

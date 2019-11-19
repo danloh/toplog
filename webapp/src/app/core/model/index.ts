@@ -3,6 +3,7 @@
 
 export * from './user.model';
 export * from './blog.model';
+export * from './article.model';
 export * from './error.model';
 
 export interface MsgRes {
