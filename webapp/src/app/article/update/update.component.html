@@ -2,7 +2,7 @@
   <div class="s-create-title">
     <span><b>Update Article: </b></span>
   </div>
-  <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
+  <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onUpdate()" class="s-create-form">
     <nz-form-label>title*</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="title" nzAutosize maxlength="64" nzRequired></textarea>
@@ -32,7 +32,7 @@
       <input nz-input formControlName="topic" maxlength="32"/>
     </nz-form-control>
     <br><br>
-    <button nz-button class="s-full-width" nzType="primary" [disabled]="!createForm.valid">Create</button>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!updateForm.valid">Create</button>
   </form>
   <button nz-button nzType="link" nzSize="small" (click)="onDel()">
     <b style="color:orangered">Delete...</b>

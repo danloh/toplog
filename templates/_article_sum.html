@@ -1,0 +1,11 @@
+<section class="article-sum">
+  {%- set a_url = a.link -%}
+  <a href ="{{ a_url }}" target="_blank" rel="noopener">
+    <b class="title">{{ a.title }}</b>
+    <span class="host"> | </span>
+    <span style="color: #37a">{{ a_url | safe | host }}</span>
+  </a>
+  <div class="a-meta">
+    <span>By  {{ a.author }}</span>
+  </div>
+</section>

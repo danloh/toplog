@@ -2,7 +2,6 @@ body {
   font-family: Lato,Roboto,Open Sans,sans-serif;
   font-size: 18px;
   line-height: 1.8em;
-  background-color: #edf0f5;
   overflow-wrap: break-word;
 }
 a {
@@ -38,7 +37,6 @@ blockquote {
   font-size: 0.8em;
 }
 .header {
-  background-color: #0097a6;
   z-index: 999;
   height: 45px;
   min-width: 400px;
@@ -107,7 +105,6 @@ blockquote {
 }
 
 .footer {
-  border-top: 2px dotted #cfc0cf;
   margin-top: 3em;
   background-color: #f5f5f5;
   min-width: 400px;
@@ -153,94 +150,47 @@ blockquote {
 }
 .right-title {
   background-color: #e5ebe4;
-  padding: 10px 15px;
+  padding: 10px;
   font-size: 16px;
 }
 .right-body {
-  padding: 5px 20px;
+  padding: 10px;
   font-size: 16px;
 }
-
-
-
-
-.rut-sum {
-  background-color:#f5f7f8;
-  line-height: 1.6em;
-  min-height: 115px;
-  padding: 10px 100px 10px 15px;
-  border-bottom: 1px dashed #ddd;
-  position: relative;
+.link-icon:hover {
+  border-bottom: 2px solid #03a87c;
 }
-section.rut-sum:hover {
+
+.article-sum {
+  background-color:#f5f7f8;
+  padding: 10px;
+  border-bottom: 1px dashed #ddd;
+}
+section.article-sum:hover {
   background-color:  #fcfdfc;
 }
-.cover {
-  position: absolute;
-  max-width: 80px;
-  max-height: 100px;
-  top: 10px;
-  right: 10px;
-}
-.rut-sum .title {
+.article-sum .title {
   font-size: 20px;
-  padding-top: 10px;
 }
-.rut-sum .less-content {
-  color: #828282;
-  font-size: 16px;
-}
-.rut-sum .meta {
+.article-sum .a-meta {
   font-size: 14px;
 }
-.rut-view {
-  background-color: #f5f7f8;
-  padding: auto;
+
+.blog-info {
+  padding-right: 45px;
+  min-height: 55px;
+  position: relative;
 }
-.rut-view .tagbar {
-  display: inline-blcok;
-  padding: 0 10px;
+.blog-thumb {
+  position: absolute;
+  max-width: 40px;
+  max-height: 50px;
+  top: 2px;
+  right: 0px;
+  border-radius: 50%;
 }
-.tagbar .tag {
-  padding: 4px;
-  margin-right: 2px;
-  font-size: 0.75em;
-  background-color: #f1f8ff;
-}
-.tag:hover {
-  background-color: #ddd;
-  padding: 5px;
-}
-.rut-view .title {
-  padding: 2px 10px;
-}
-.rut-view .title .meta {
-  color: #828282;
-  font-size: 14px;
-}
-.rut-view .rut-content {
-  padding: 10px;
-  border-bottom: 2px solid #eee;
-}
-.orgsrc {
-  font-size: 14px;
-  text-align: center;
-  padding: 1px;
-  margin-top: 5px;
-  height: 27px;
-  background-color: #f3f4f8;
-}
-.orgsrc:hover {
-  background-color: #ddd;
-}
-.hide-part-content {
-  max-height: 450px;
-  overflow: hidden;
-}
-.hide-part-intro {
-  max-height: 150px;
-  overflow: hidden;
-}
+
+
 .toolbar {
   display: flex;
   justify-content: flex-end;
@@ -251,27 +201,7 @@ section.rut-sum:hover {
   background-color: #f5f7f8;
   border-bottom: 0.5px dashed #ddd;
 }
-.item-info {
-  padding-right: 85px;
-  min-height: 88px;
-  background-color: #f3f4f8;
-  position: relative;
-}
-.item-info .indicator {
-  font-size: 0.8em;
-  color:seagreen;
-}
-.item-info .meta {
-  color: #aaa;
-  font-size: 14px;
-}
-.item-thumb {
-  position: absolute;
-  max-width: 80px;
-  max-height: 80px;
-  top: 4px;
-  right: 0px;
-}
+
 .collect-content {
   border-bottom: 0px dashed #ddd;
 }

@@ -44,7 +44,7 @@ export class NewBlogComponent implements OnInit {
         'intro': [''],
         'topic': [ ''],
         'blog_link': ['', [Validators.required, Validators.pattern(regUrl)]],
-        'blog_host': ['', [Validators.required]],
+        'blog_host': [''],
         'tw_link': [''],
         'gh_link': [''],
         'other_link': [''],
