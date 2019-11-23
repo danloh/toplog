@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ArticleService, AuthService, Article, NewArticle } from '../../core';
+import { ItemService, AuthService, Item, NewItem } from '../../core';
 import { regUrl } from '../../shared';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-new',
@@ -12,7 +13,7 @@ import { regUrl } from '../../shared';
 export class NewComponent implements OnInit {
 
   constructor(
-    private articleService: ArticleService,
+    private itemService: ItemService,
     private authService: AuthService,
     private formBuild: FormBuilder,
     private route: ActivatedRoute,
@@ -20,12 +21,13 @@ export class NewComponent implements OnInit {
   ) {}
 
   newFor: string;  // topic
-  ty: string;
+  cates: string[] = ['Article', 'Translate', 'Podcast', 'Event', 'Book'];
+  host_url: string = environment.host_url;
 
   createForm: FormGroup;
   canCreate: boolean;
   uname: string;  // post_by
-  article: Article;
+  item: Item;
 
   ngOnInit() {
     this.authService.checkAuth();
@@ -39,32 +41,33 @@ export class NewComponent implements OnInit {
 
     // extract query to check this new will be added to which topic
     this.newFor = this.route.snapshot.queryParamMap.get('for');
-    this.ty = this.route.snapshot.queryParamMap.get('ty');
 
     this.createForm = this.formBuild.group(
       { 'title': ['', [Validators.required]],
-        'slug': [''],
         'content': [''],
-        'author': [ ''],
+        'author': [''],
+        'ty': ['Article', [Validators.required]],
+        'lang': ['English'], // if ty == translate
+        'origin_link': [''], // if ty == translate
+        'logo': [''],        // required if ty == book
         'link': [''],
-        'link_host': [''],
       }
     );
   }
 
   onSubmit() {
-    const newArticle = this.createForm.value;
-    const articleData: NewArticle = Object.assign(
-      newArticle,
+    const newItem = this.createForm.value;
+    let topic = this.newFor || 'Rust';
+    const itemData: NewItem = Object.assign(
+      newItem,
       {
-        ty: Number(this.ty) || 0,
-        language: this.ty === '0' ? "English" : "Chinese",
-        topic: this.newFor,
+        slug: '',
+        topic,
         post_by: this.uname,
       }
     );
-    this.articleService.create(articleData).subscribe(
-      res => {},
+    this.itemService.create(itemData).subscribe(
+      _res => { window.location.href = this.host_url + '?t=' + topic },
       //err => console.log(err)
     );
   }

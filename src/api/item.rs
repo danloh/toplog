@@ -130,7 +130,11 @@ pub fn get_list(
     let item = match per {
         "topic" => QueryItems::Topic(kw, perpage, page),
         "author" => QueryItems::Author(kw, perpage, page),
-        _ => QueryItems::Index(kw, perpage, page),
+        "ty" => QueryItems::Ty(kw, perpage, page),
+        "index" => QueryItems::Index(kw, perpage, page),
+        // other: 
+        // kw-topic: rust|go.., per-ty: art|book|..
+        _ => QueryItems::Tt(kw, per.to_owned(), perpage, page),
     };
     db.send(item)
         .from_err()
@@ -189,7 +193,6 @@ pub struct NewItem {
     pub lang: String,
     pub topic: String,
     pub link: String,
-    pub link_host: String,
     pub origin_link: String,
     pub post_by: String,
 }
@@ -226,11 +229,13 @@ pub struct UpdateItem {
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub logo: String,
     pub author: String,
     pub ty: String, 
     pub lang: String,
     pub topic: String,
     pub link: String,
+    pub origin_link: String,
     pub post_by: String,
 }
 
@@ -310,6 +315,8 @@ impl Message for QueryItem {
 pub enum QueryItems {
     Index(String, i32, i32),
     Topic(String, i32, i32), // topic, perpage, page
+    Ty(String, i32, i32), // ty, perpage, page
+    Tt(String, String, i32, i32), // topic, ty, perpage, page
     Author(String, i32, i32),  // aname, ..
 }
 
@@ -322,8 +329,28 @@ impl QueryItems {
         let mut item_list: Vec<Item> = Vec::new();
         let mut item_count = 0;
         match self {
+            QueryItems::Tt(t, typ, o, p) => {
+                let query = items.filter(topic.eq(t)).filter(ty.eq(typ));
+                let p_o = std::cmp::max(0, p-1);
+                item_count = query.clone().count().get_result(conn)?;
+                item_list = query
+                    .order(vote.desc())
+                    .limit(o.into())
+                    .offset((o * p_o).into())
+                    .load::<Item>(conn)?;
+            }
             QueryItems::Topic(t, o, p) => {
                 let query = items.filter(topic.eq(t));
+                let p_o = std::cmp::max(0, p-1);
+                item_count = query.clone().count().get_result(conn)?;
+                item_list = query
+                    .order(vote.desc())
+                    .limit(o.into())
+                    .offset((o * p_o).into())
+                    .load::<Item>(conn)?;
+            }
+            QueryItems::Ty(t, o, p) => {
+                let query = items.filter(ty.eq(t));
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query

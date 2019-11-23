@@ -4,14 +4,14 @@
 
 {%- block mainview -%}
 <div class="main-page">
-  <div class="home-view" id="ruts-in-home">
-    {%- for a in articles -%}
-    {% include '_article_sum.html' %}
+  <div class="home-view" id="in-home">
+    {%- for a in items -%}
+    {% include '_item_sum.html' %}
     {%- endfor -%}
   </div>
   <button class="toolbtn full-width" onclick="loadMoreIndexRuts()">More</button>
   <div class="page-side">
-    <h4 class="right-title">Top Contributors</h4>
+    <h4 class="right-title">Featured Contributors</h4>
     <div class="right-body">
       {%- for c in blogs -%}
       <div class="blog-info">

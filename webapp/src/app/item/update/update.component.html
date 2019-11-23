@@ -1,0 +1,48 @@
+<div class="s-create-page">
+  <div class="s-create-title">
+    <b>Update</b>
+  </div>
+  <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onUpdate()" class="s-create-form">
+    <nz-form-label>Title*</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="title" nzAutosize maxlength="64" nzRequired></textarea>
+    </nz-form-control>
+    <nz-form-label>either Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="link" nzAutosize maxlength="255"></textarea>
+    </nz-form-control>
+    <nz-form-label>or Text Content</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 5 }"></textarea>
+    </nz-form-control>
+    <nz-form-label>Origin Author</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="author" maxlength="32"/>
+    </nz-form-control>
+    <nz-form-label>Topic</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="topic" maxlength="32"/>
+    </nz-form-control>
+    <nz-form-label>Cover Picture(Required for Book)</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="logo" nzAutosize></textarea>
+    </nz-form-control>
+    <nz-form-label>Type</nz-form-label>
+    <nz-select formControlName="ty" nzRequired>
+      <nz-option *ngFor="let cate of cates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
+    </nz-select>
+    <nz-form-label>Language</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="lang" maxlength="16"/>
+    </nz-form-control>
+    <nz-form-label>Origin Link</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255"></textarea>
+    </nz-form-control>
+    <br><br>
+    <button nz-button class="s-full-width" nzType="primary" [disabled]="!updateForm.valid">Update</button>
+  </form>
+  <button nz-button nzType="link" nzSize="small" (click)="onDel()">
+    <b style="color:orangered">Delete...</b>
+  </button>
+</div>

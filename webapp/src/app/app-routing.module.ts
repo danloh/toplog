@@ -17,8 +17,8 @@ const routes: Routes = [
     loadChildren: () => import('./blog/blog.module').then(m => m.BlogModule),
   },
   {
-    path: 'article',
-    loadChildren: () => import('./article/article.module').then(m => m.ArticleModule),
+    path: 'item',
+    loadChildren: () => import('./item/item.module').then(m => m.ItemModule),
   },
   {
     path: '404',

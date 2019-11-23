@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ArticleService, AuthService, Article, UpdateArticle } from '../../core';
+import { ItemService, AuthService, Item, UpdateItem } from '../../core';
 import { regUrl } from '../../shared';
 import { environment } from '../../../environments/environment';
 
@@ -13,7 +13,7 @@ import { environment } from '../../../environments/environment';
 export class UpdateComponent implements OnInit {
 
   constructor(
-    private articleService: ArticleService,
+    private itemService: ItemService,
     private authService: AuthService,
     private formBuild: FormBuilder,
     private route: ActivatedRoute,
@@ -22,10 +22,12 @@ export class UpdateComponent implements OnInit {
   updateForm: FormGroup;
   canUpdate: boolean;
   uname: string;
-  article: Article;
-  articleID: number;
+  item: Item;
+  itemID: number;
+  itemSlug: string;
 
   host_url: string = environment.host_url;
+  cates: string[] = ['Article', 'Translate', 'Podcast', 'Event', 'Book'];
 
   ngOnInit() {
     this.authService.checkAuth();
@@ -35,35 +37,40 @@ export class UpdateComponent implements OnInit {
       return;
     }
 
-    this.route.data.subscribe((data: { res: Article }) => {
+    this.authService.actUser$.subscribe(user => this.uname = user.uname);
+
+    this.route.data.subscribe((data: { res: Item }) => {
       const res = data.res;
-      this.article = res;
-      this.articleID = res.id;
+      this.item = res;
+      this.itemID = res.id;
+      this.itemSlug = res.slug;
     });
 
     this.updateForm = this.formBuild.group(
-      { 'title': [ this.article.title || '', [Validators.required]],
-        'slug': [ this.article.slug || ''],
-        'content': [ this.article.content || ''],
-        'author': [ this.article.author || ''],
-        'ty': [ this.article.ty === 0 ? "Origin" : "Translate" ],
-        'language': [ this.article.language || ''],
-        'topic': [ this.article.topic || ''],
-        'link': [ this.article.link || ''],
+      { 'title': [ this.item.title || '', [Validators.required]],
+        'content': [ this.item.content || ''],
+        'logo': [ this.item.logo || ''],
+        'author': [ this.item.author || ''],
+        'ty': [ this.item.ty, [Validators.required] ],
+        'lang': [ this.item.lang || 'English'],
+        'topic': [ this.item.topic || 'Rust'],
+        'link': [ this.item.link || ''],
+        'origin_link': [ this.item.origin_link || ''],
       }
     );
   }
 
   onUpdate() {
-    const article = this.updateForm.value;
-    let topic = article.topic;
-    const articleData: UpdateArticle = Object.assign(
-      article, 
-      { id: this.articleID,
+    const item = this.updateForm.value;
+    let topic = item.topic;
+    const itemData: UpdateItem = Object.assign(
+      item, 
+      { id: this.itemID,
+        slug: this.item.slug,
         post_by: this.uname,
       }
     );
-    this.articleService.update(articleData)
+    this.itemService.update(itemData)
     .subscribe(
       _res => window.location.href = this.host_url + '?t=' + topic,
       //err => console.log(err)
@@ -73,7 +80,7 @@ export class UpdateComponent implements OnInit {
   onDel() {
     let cf = confirm('Are You Sure to Delete?');
     if (!cf) return;
-    this.articleService.delete(this.articleID).subscribe(
+    this.itemService.delete(this.itemSlug).subscribe(
       () => { window.location.href = this.host_url }
     )
   }

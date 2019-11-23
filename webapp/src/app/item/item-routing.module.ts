@@ -3,20 +3,20 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from '../core';
 import { NewComponent } from './new/new.component';
 import { UpdateComponent } from './update/update.component';
-import { ArticleResolver } from './article-resolver.service';
+import { ItemResolver } from './item-resolver.service';
 
 const routes: Routes = [
   {
-    path: 'new',  // prefix '/article/', query: ?for=&ty=
+    path: 'new',  // prefix '/item/', query: ?for=&ty=
     component: NewComponent,
     canActivate: [AuthGuard]
   },
   {
-    path: 'update/:id',  // prefix '/article/'
+    path: 'update/:slug',  // prefix '/item/'
     component: UpdateComponent,
     canActivate: [AuthGuard],
     resolve: {
-      res: ArticleResolver
+      res: ItemResolver
     }
   }
 ];
@@ -25,4 +25,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ArticleRoutingModule {}
+export class ItemRoutingModule {}

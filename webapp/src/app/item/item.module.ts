@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComponentModule, PipeModule } from '../shared';
-import { ArticleRoutingModule } from './article-routing.module';
+import { ItemRoutingModule } from './item-routing.module';
 import { NewComponent } from './new/new.component';
 import { UpdateComponent } from './update/update.component';
-import { ArticleResolver } from './article-resolver.service';
+import { ItemResolver } from './item-resolver.service';
 
 @NgModule({
   declarations: [
@@ -15,10 +15,10 @@ import { ArticleResolver } from './article-resolver.service';
     CommonModule,
     ComponentModule, 
     PipeModule,
-    ArticleRoutingModule
+    ItemRoutingModule
   ],
   providers: [
-    ArticleResolver
+    ItemResolver
   ]
 })
-export class ArticleModule { }
+export class ItemModule { }

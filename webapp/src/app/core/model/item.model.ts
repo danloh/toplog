@@ -1,51 +1,55 @@
 // blog model type
 
-export interface Article {
+export interface Item {
   id: number;
   title: string;
   slug: string;
   content: string;
+  logo: string;
   author: string;
-  ty: number;
-  language: string;
+  ty: string;
+  lang: string;
   topic: string;
   link: string;
   link_host: string;
+  origin_link: string;
   post_by: string;
   post_at: string;
   pub_at: string;
+  is_top: boolean;
   vote: number;
 }
 
-export interface NewArticle {
+export interface NewItem {
   title: string;
   slug: string;
   content: string;
+  logo: string;
   author: string;
-  ty: number;
-  language: string;
+  ty: string;
+  lang: string;
   topic: string;
   link: string;
-  link_host: string;
+  origin_link: string;
   post_by: string;
 }
 
-export interface UpdateArticle {
+export interface UpdateItem {
   id: number;
   title: string;
   slug: string;
   content: string;
+  logo: string;
   author: string;
   ty: number;
-  language: string;
+  lang: string;
   topic: string;
   link: string;
-  link_host: string;
+  origin_link: string;
   post_by: string;
 }
 
-export interface ArticleListRes {
-  articles: Article[];
+export interface ItemListRes {
+  items: Item[];
   count: number;
 }
-  

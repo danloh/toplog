@@ -49,6 +49,7 @@ blockquote {
 }
 .s-update-title, .s-create-title {
   padding-bottom: 10px;
+  text-align: center;
 }
 .s-update-form, .s-create-form {
   padding: 20px;
