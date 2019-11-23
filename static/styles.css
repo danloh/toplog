@@ -138,6 +138,10 @@ blockquote {
   min-width: 400px;
 }
 
+.search-box {
+  width: 200px;
+}
+
 .main-page {
   padding: 10px 235px 10px 0px;
   position: relative;
@@ -162,18 +166,18 @@ blockquote {
   border-bottom: 2px solid #03a87c;
 }
 
-.article-sum {
+.item-sum {
   background-color:#f5f7f8;
   padding: 10px;
   border-bottom: 1px dashed #ddd;
 }
-section.article-sum:hover {
+section.item-sum:hover {
   background-color:  #fcfdfc;
 }
-.article-sum .title {
+.item-sum .title {
   font-size: 20px;
 }
-.article-sum .a-meta {
+.item-sum .a-meta {
   font-size: 14px;
 }
 
@@ -189,131 +193,6 @@ section.article-sum:hover {
   top: 2px;
   right: 0px;
   border-radius: 50%;
-}
-
-
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 0.85em;
-}
-.collect-sum {
-  padding: 5px 10px;
-  background-color: #f5f7f8;
-  border-bottom: 0.5px dashed #ddd;
-}
-
-.collect-content {
-  border-bottom: 0px dashed #ddd;
-}
-#raw-rut-content a, .collect-content a {
-  color:seagreen;
-}
-
-#social-share-bar > .share-link {
-  cursor: pointer;
-  display: inline-block;
-  font-size: 12px;
-  line-height: 24px;
-  text-align: center;
-}
-a.tw:hover {
-  background-color: #1da1f2;
-}
-a.rd:hover {
-  background-color: #ff4500;
-}
-a.fb:hover {
-  background-color: #3c5a98;
-}
-a.wb:hover {
-  background-color: #e6162d;
-}
-a.wx:hover {
-  background-color: #83dc42;
-}
-.share-link:hover {
-  color: white;
-}
-.icon {
-  padding: 1px;
-}
-#edit-link, #create-link, #addurl-link {
-  color: #3498db;
-  padding: 2px;
-  font-size: 12px;
-}
-.tagmeta, .authormeta {
-  background-color: #fcfcfa;
-  min-height: 125px;
-  padding: 5px 120px 5px 10px;
-  margin-bottom: 5px;
-  position: relative;
-}
-.fobtn, .avatar-thumb {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  text-align: right;
-}
-.taglogo {
-  max-width: 100px;
-  max-height: 100px;
-}
-.author-avatar {
-  max-width: 115px;
-  max-height: 120px;
-}
-.item-sum {
-  background-color: #fcfcfa;
-  min-height: 145px;
-  padding: 5px 85px 5px 115px;
-  border-bottom: 1px solid #eee;
-  position: relative;
-}
-.thumb-box {
-  position: absolute;
-  top: 5px;
-  left: 2px;
-}
-.item-cover {
-  max-width: 110px;
-  max-height: 135px;
-}
-.item-thumb:hover, .item-cover:hover {
-  max-width: 210px;
-  max-height: 210px;
-  z-index: 999;
-}
-.iteminfo {
-  font-size: 14px;
-  line-height: 1.6em;
-}
-.iteminfo .title {
-  font-size: 18px;
-}
-.iteminfo .indicator {
-  font-size: 14px;
-  color: #777;
-}
-.iteminfo .flag-note {
-  color: grey;
-}
-.operate {
-  position: absolute;
-  top: 0px;
-  right: 2px;
-}
-.item-main {
-  margin: 5px 0;
-}
-.item-detail {
-  background-color: #fcfcfa;
-  padding: 10px;
-}
-
-.search-box {
-  width: 200px;
 }
 
 @media (max-width: 800px) {
