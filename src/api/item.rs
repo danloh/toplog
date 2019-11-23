@@ -14,16 +14,16 @@ use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{ReqQuery, auth::CheckUser};
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
-use crate::schema::{articles};
+use crate::schema::{items};
 
-// POST: /api/articles
+// POST: /api/items
 // 
 pub fn new(
-    article: Json<NewArticle>,
+    item: Json<NewItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(article.into_inner())
+    db.send(item.into_inner())
         .from_err()
         .and_then(move |res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -31,23 +31,23 @@ pub fn new(
         })
 }
 
-impl Handler<NewArticle> for Dba {
-    type Result = ServiceResult<Article>;
+impl Handler<NewItem> for Dba {
+    type Result = ServiceResult<Item>;
 
-    fn handle(&mut self, na: NewArticle, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, na: NewItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         na.new(conn)
     }
 }
 
-// PUT: /api/articles
+// PUT: /api/items
 // 
 pub fn update(
-    article: Json<UpdateArticle>,
+    item: Json<UpdateItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(article.into_inner())
+    db.send(item.into_inner())
         .from_err()
         .and_then(move |res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -55,27 +55,27 @@ pub fn update(
         })
 }
 
-impl Handler<UpdateArticle> for Dba {
-    type Result = ServiceResult<Article>;
+impl Handler<UpdateItem> for Dba {
+    type Result = ServiceResult<Item>;
 
-    fn handle(&mut self, b: UpdateArticle, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, b: UpdateItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         b.update(conn)
     }
 }
 
-// GET: /api/articles/{slug}
+// GET: /api/items/{slug}
 // 
 pub fn get(
     qb: Path<String>,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    let article = QueryArticle{
+    let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("GET"),
         uname: String::new()
     };
-    db.send(article)
+    db.send(item)
         .from_err()
         .and_then(move |res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -83,19 +83,19 @@ pub fn get(
         })
 }
 
-// DELETE: /api/articles/{slug}
+// DELETE: /api/items/{slug}
 // 
 pub fn del(
     qb: Path<String>,
     auth: CheckUser,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    let article = QueryArticle{
+    let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("DELETE"),
         uname: auth.uname
     };
-    db.send(article)
+    db.send(item)
         .from_err()
         .and_then(move |res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -103,10 +103,10 @@ pub fn del(
         })
 }
 
-impl Handler<QueryArticle> for Dba {
-    type Result = ServiceResult<Article>;
+impl Handler<QueryItem> for Dba {
+    type Result = ServiceResult<Item>;
 
-    fn handle(&mut self, qb: QueryArticle, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, qb: QueryItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         let method: &str = &qb.method.trim();
         if method == "GET" {
@@ -117,7 +117,7 @@ impl Handler<QueryArticle> for Dba {
     }
 }
 
-// GET: api/articles?per=topic|author&kw=&perpage=42&page=p
+// GET: api/items?per=topic|author&kw=&perpage=42&page=p
 // 
 pub fn get_list(
     pq: Query<ReqQuery>,
@@ -127,12 +127,12 @@ pub fn get_list(
     let page = pq.page;
     let kw = pq.clone().kw;
     let per = pq.per.trim();
-    let article = match per {
-        "topic" => QueryArticles::Topic(kw, perpage, page),
-        "author" => QueryArticles::Author(kw, perpage, page),
-        _ => QueryArticles::Index(kw, perpage, page),
+    let item = match per {
+        "topic" => QueryItems::Topic(kw, perpage, page),
+        "author" => QueryItems::Author(kw, perpage, page),
+        _ => QueryItems::Index(kw, perpage, page),
     };
-    db.send(article)
+    db.send(item)
         .from_err()
         .and_then(move |res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -140,10 +140,10 @@ pub fn get_list(
         })
 }
 
-impl Handler<QueryArticles> for Dba {
-    type Result = ServiceResult<(Vec<Article>, i64)>;
+impl Handler<QueryItems> for Dba {
+    type Result = ServiceResult<(Vec<Item>, i64)>;
 
-    fn handle(&mut self, qbs: QueryArticles, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, qbs: QueryItems, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         qbs.get(conn)
     }
@@ -156,87 +156,92 @@ impl Handler<QueryArticles> for Dba {
 // =================================================================================
 
 #[derive(Clone, Debug, Serialize, Deserialize, Identifiable, Queryable)]
-#[table_name = "articles"]
-pub struct Article {
+#[table_name = "items"]
+pub struct Item {
     pub id: i32,
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub logo: String,
     pub author: String,
-    pub ty: i32,        // from article or translate
-    pub language: String,
+    pub ty: String,      // 1-item,2-translate,3-podcast,4-event,5-book
+    pub lang: String,
     pub topic: String,
     pub link: String,
     pub link_host: String,
+    pub origin_link: String, // for translate
     pub post_by: String,
     pub post_at: NaiveDateTime,
     pub pub_at: NaiveDateTime,
+    pub is_top: bool,
     pub vote: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Insertable)]
-#[table_name = "articles"]
-pub struct NewArticle {
+#[table_name = "items"]
+pub struct NewItem {
     pub title: String,
     pub slug: String,
     pub content: String,
+    pub logo: String,
     pub author: String,
-    pub ty: i32,        // from article or translate
-    pub language: String,
+    pub ty: String, 
+    pub lang: String,
     pub topic: String,
     pub link: String,
     pub link_host: String,
+    pub origin_link: String,
     pub post_by: String,
 }
 
-impl NewArticle {
+impl NewItem {
     fn new(
         self, 
         conn: &PooledConn,
-    ) -> ServiceResult<Article> {
-        use crate::schema::articles::dsl::articles;
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::items;
         let a_slug = gen_slug(&self.title);
-        let new_article = NewArticle {
+        let new_item = NewItem {
             slug: a_slug,
             ..self
         };
-        let article_new = diesel::insert_into(articles)
-            .values(&new_article)
+        let item_new = diesel::insert_into(items)
+            .values(&new_item)
             .on_conflict_do_nothing()
-            .get_result::<Article>(conn)?;
+            .get_result::<Item>(conn)?;
 
-        Ok(article_new)
+        Ok(item_new)
     }
 }
 
-impl Message for NewArticle {
-    type Result = ServiceResult<Article>;
+impl Message for NewItem {
+    type Result = ServiceResult<Item>;
 }
 
 
 #[derive(Clone, Debug, Serialize, Deserialize, AsChangeset)]
-#[table_name = "articles"]
-pub struct UpdateArticle {
+#[table_name = "items"]
+pub struct UpdateItem {
     pub id: i32,
     pub title: String,
     pub slug: String,
     pub content: String,
     pub author: String,
-    pub ty: i32,        // from article or translate
-    pub language: String,
+    pub ty: String, 
+    pub lang: String,
     pub topic: String,
     pub link: String,
     pub post_by: String,
 }
 
-impl UpdateArticle {
+impl UpdateItem {
     fn update(
         mut self, 
         conn: &PooledConn,
-    ) -> ServiceResult<Article> {
-        use crate::schema::articles::dsl::*;
-        let old = articles.filter(id.eq(self.id))
-            .get_result::<Article>(conn)?;
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::*;
+        let old = items.filter(id.eq(self.id))
+            .get_result::<Item>(conn)?;
         // check if title changed
         let check_title_changed: bool = &self.title.trim() == &old.title.trim();
         let a_slug = if check_title_changed {
@@ -244,46 +249,46 @@ impl UpdateArticle {
         } else {
             gen_slug(&self.title)
         };
-        let up = UpdateArticle {
+        let up = UpdateItem {
             slug: a_slug,
             ..self
         };
 
-        let article_update = diesel::update(&old)
+        let item_update = diesel::update(&old)
             .set(up)
-            .get_result::<Article>(conn)?;
+            .get_result::<Item>(conn)?;
 
-        Ok(article_update)
+        Ok(item_update)
     }
 }
 
-impl Message for UpdateArticle {
-    type Result = ServiceResult<Article>;
+impl Message for UpdateItem {
+    type Result = ServiceResult<Item>;
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct QueryArticle {
+pub struct QueryItem {
     pub slug: String,
     pub method: String, // get|delete
     pub uname: String,
 }
 
-impl QueryArticle {
+impl QueryItem {
     fn get(
         &self, 
         conn: &PooledConn,
-    ) -> ServiceResult<Article> {
-        use crate::schema::articles::dsl::{articles, slug};
-        let article = articles.filter(slug.eq(&self.slug))
-            .get_result::<Article>(conn)?;
-        Ok(article)
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::{items, slug};
+        let item = items.filter(slug.eq(&self.slug))
+            .get_result::<Item>(conn)?;
+        Ok(item)
     }
 
     fn del(
         &self, 
         conn: &PooledConn,
-    ) -> ServiceResult<Article> {
-        use crate::schema::articles::dsl::{articles, slug};
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::{items, slug};
         // check permission
         let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
         let check_permission: bool = self.uname == admin_env;
@@ -291,64 +296,64 @@ impl QueryArticle {
             return Err(ServiceError::Unauthorized);
         }
 
-        let article = diesel::delete(articles.filter(slug.eq(&self.slug)))
-            .get_result::<Article>(conn)?;
-        Ok(article)
+        let item = diesel::delete(items.filter(slug.eq(&self.slug)))
+            .get_result::<Item>(conn)?;
+        Ok(item)
     }
 }
 
-impl Message for QueryArticle {
-    type Result = ServiceResult<Article>;
+impl Message for QueryItem {
+    type Result = ServiceResult<Item>;
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub enum QueryArticles {
+pub enum QueryItems {
     Index(String, i32, i32),
     Topic(String, i32, i32), // topic, perpage, page
     Author(String, i32, i32),  // aname, ..
 }
 
-impl QueryArticles {
+impl QueryItems {
     pub fn get(
         self, 
         conn: &PooledConn,
-    ) -> ServiceResult<(Vec<Article>, i64)> {
-        use crate::schema::articles::dsl::*;
-        let mut article_list: Vec<Article> = Vec::new();
-        let mut article_count = 0;
+    ) -> ServiceResult<(Vec<Item>, i64)> {
+        use crate::schema::items::dsl::*;
+        let mut item_list: Vec<Item> = Vec::new();
+        let mut item_count = 0;
         match self {
-            QueryArticles::Topic(t, o, p) => {
-                let query = articles.filter(topic.eq(t));
+            QueryItems::Topic(t, o, p) => {
+                let query = items.filter(topic.eq(t));
                 let p_o = std::cmp::max(0, p-1);
-                article_count = query.clone().count().get_result(conn)?;
-                article_list = query
+                item_count = query.clone().count().get_result(conn)?;
+                item_list = query
                     .order(vote.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
-                    .load::<Article>(conn)?;
+                    .load::<Item>(conn)?;
             }
-            QueryArticles::Author(a, o, p) => {
-                let query = articles.filter(author.eq(a));
+            QueryItems::Author(a, o, p) => {
+                let query = items.filter(author.eq(a));
                 let p_o = std::cmp::max(0, p-1);
-                article_count = query.clone().count().get_result(conn)?;
-                article_list = query
+                item_count = query.clone().count().get_result(conn)?;
+                item_list = query
                     .order(vote.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
-                    .load::<Article>(conn)?;
+                    .load::<Item>(conn)?;
             }
             _ => {
-                article_list = articles
+                item_list = items
                     .order(vote.desc())
                     .limit(42)
-                    .load::<Article>(conn)?;
-                article_count = article_list.len() as i64;
+                    .load::<Item>(conn)?;
+                item_count = item_list.len() as i64;
             }
         }
-        Ok((article_list, article_count))
+        Ok((item_list, item_count))
     }
 }
 
-impl Message for QueryArticles {
-    type Result = ServiceResult<(Vec<Article>, i64)>;
+impl Message for QueryItems {
+    type Result = ServiceResult<(Vec<Item>, i64)>;
 }

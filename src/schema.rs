@@ -1,39 +1,4 @@
 table! {
-    articlecomments (article_id, comment_id) {
-        article_id -> Int4,
-        comment_id -> Int4,
-    }
-}
-
-table! {
-    articles (id) {
-        id -> Int4,
-        title -> Varchar,
-        slug -> Varchar,
-        content -> Text,
-        author -> Varchar,
-        ty -> Int4,
-        language -> Varchar,
-        topic -> Varchar,
-        link -> Varchar,
-        link_host -> Varchar,
-        post_by -> Varchar,
-        post_at -> Timestamp,
-        pub_at -> Timestamp,
-        vote -> Int4,
-    }
-}
-
-table! {
-    articletrans (origin_slug, trans_slug) {
-        origin_slug -> Varchar,
-        trans_slug -> Varchar,
-        trans_lang -> Varchar,
-        trans_at -> Timestamp,
-    }
-}
-
-table! {
     blogs (id) {
         id -> Int4,
         aname -> Varchar,
@@ -91,6 +56,44 @@ table! {
 }
 
 table! {
+    itemcomments (item_id, comment_id) {
+        item_id -> Int4,
+        comment_id -> Int4,
+    }
+}
+
+table! {
+    items (id) {
+        id -> Int4,
+        title -> Varchar,
+        slug -> Varchar,
+        content -> Text,
+        logo -> Varchar,
+        author -> Varchar,
+        ty -> Varchar,
+        lang -> Varchar,
+        topic -> Varchar,
+        link -> Varchar,
+        link_host -> Varchar,
+        origin_link -> Varchar,
+        post_by -> Varchar,
+        post_at -> Timestamp,
+        pub_at -> Timestamp,
+        is_top -> Bool,
+        vote -> Int4,
+    }
+}
+
+table! {
+    itemtrans (origin_slug, trans_slug) {
+        origin_slug -> Varchar,
+        trans_slug -> Varchar,
+        trans_lang -> Varchar,
+        trans_at -> Timestamp,
+    }
+}
+
+table! {
     users (id) {
         id -> Int4,
         uname -> Varchar,
@@ -113,20 +116,20 @@ table! {
     }
 }
 
-joinable!(articlecomments -> articles (article_id));
-joinable!(articlecomments -> comments (comment_id));
 joinable!(issuecomments -> comments (comment_id));
 joinable!(issuecomments -> issues (issue_id));
 joinable!(issuelabels -> issues (issue_id));
+joinable!(itemcomments -> comments (comment_id));
+joinable!(itemcomments -> items (item_id));
 
 allow_tables_to_appear_in_same_query!(
-    articlecomments,
-    articles,
-    articletrans,
     blogs,
     comments,
     issuecomments,
     issuelabels,
     issues,
+    itemcomments,
+    items,
+    itemtrans,
     users,
 );

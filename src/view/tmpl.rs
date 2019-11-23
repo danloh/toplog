@@ -3,7 +3,7 @@ use futures::Future;
 use actix::{Handler, Message};
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::auth::{verify_token, CheckUser};
-use crate::api::article::{Article, QueryArticles};
+use crate::api::item::{Item, QueryItems};
 use crate::api::blog::{Blog, QueryBlogs};
 use crate::view::TEMPLATE as tmpl;
 use crate::{Dba, DbAddr, PooledConn};
@@ -36,7 +36,7 @@ pub fn index_dyn(
     db.send(home_msg).from_err().and_then(|res| match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
-            ctx.insert("articles", &msg.articles);
+            ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
@@ -73,7 +73,7 @@ impl Message for Home {
 pub struct HomeMsg {
     pub status: i32,
     pub message: String,
-    pub articles: Vec<Article>,
+    pub items: Vec<Item>,
     pub blogs: Vec<Blog>,
 }
 
@@ -85,17 +85,17 @@ impl Handler<Home> for Dba {
         _home: Home,
         _: &mut Self::Context,
     ) -> Self::Result {
-        use crate::schema::articles::dsl::*;
+        use crate::schema::items::dsl::*;
         use crate::schema::blogs::dsl::{blogs};
         let conn = &self.0.get()?;
 
-        let (a_list, _) = QueryArticles::Index("index".into(), 42, 1).get(conn)?;
+        let (a_list, _) = QueryItems::Index("index".into(), 42, 1).get(conn)?;
         let (b_list, _) = QueryBlogs::Index("index".into(), 42, 1).get(conn)?;
 
         Ok(HomeMsg {
             status: 201,
             message: String::from("Success"),
-            articles: a_list,
+            items: a_list,
             blogs: b_list,
         })
     }

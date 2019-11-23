@@ -134,16 +134,16 @@ pub fn init_server() -> std::io::Result<()> {
                         .route(delete().to_async(api::blog::del))
                 )
                 .service(
-                    resource("/articles")
-                        .route(post().to_async(api::article::new))
-                        .route(put().to_async(api::article::update))
+                    resource("/items")
+                        .route(post().to_async(api::item::new))
+                        .route(put().to_async(api::item::update))
                         // get_list: ?per=topic&kw=&perpage=20&page=p
-                        .route(get().to_async(api::article::get_list)) 
+                        .route(get().to_async(api::item::get_list)) 
                 )
                 .service(
-                    resource("/articles/{slug}")
-                        .route(get().to_async(api::article::get))
-                        .route(delete().to_async(api::article::del))
+                    resource("/items/{slug}")
+                        .route(get().to_async(api::item::get))
+                        .route(delete().to_async(api::item::del))
                 )
                 .service(
                     resource("/issues")

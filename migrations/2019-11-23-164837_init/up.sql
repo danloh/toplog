@@ -44,24 +44,27 @@ CREATE TABLE blogs (
   UNIQUE (aname, blog_link)
 );
 
-CREATE TABLE articles (
+CREATE TABLE items (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
   title VARCHAR UNIQUE NOT NULL,
   slug VARCHAR UNIQUE NOT NULL,
   content TEXT NOT NULL DEFAULT '',
+  logo VARCHAR NOT NULL DEFAULT '',
   author VARCHAR NOT NULL,
-  ty INTEGER NOT NULL DEFAULT 0,
-  language VARCHAR NOT NULL DEFAULT 'English',
+  ty VARCHAR NOT NULL, -- article|podcast|event|book|course|tuorial etc..
+  lang VARCHAR NOT NULL DEFAULT 'English',
   topic VARCHAR NOT NULL DEFAULT '',
   link VARCHAR NOT NULL DEFAULT '',
   link_host VARCHAR NOT NULL DEFAULT '',
+  origin_link VARCHAR NOT NULL DEFAULT '',
   post_by VARCHAR NOT NULL DEFAULT '',
   post_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   pub_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  is_top BOOLEAN NOT NULL DEFAULT true,
   vote INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE INDEX articles_author_idx ON articles (author);
+CREATE INDEX items_author_idx ON items (author);
 
 CREATE TABLE issues (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
@@ -97,15 +100,15 @@ CREATE TABLE issuecomments (
   PRIMARY KEY (issue_id, comment_id)
 );
 
-CREATE TABLE articlecomments (
-  article_id INTEGER NOT NULL REFERENCES articles (id) ON UPDATE CASCADE ON DELETE CASCADE,
+CREATE TABLE itemcomments (
+  item_id INTEGER NOT NULL REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
   comment_id INTEGER NOT NULL REFERENCES comments (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY (article_id, comment_id)
+  PRIMARY KEY (item_id, comment_id)
 );
 
-CREATE TABLE articletrans (
-  origin_slug VARCHAR NOT NULL REFERENCES articles (slug) ON UPDATE CASCADE ON DELETE CASCADE,
-  trans_slug VARCHAR NOT NULL REFERENCES articles (slug) ON UPDATE CASCADE ON DELETE CASCADE,
+CREATE TABLE itemtrans (
+  origin_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
+  trans_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
   trans_lang VARCHAR NOT NULL, -- language
   trans_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (origin_slug, trans_slug)
