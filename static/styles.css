@@ -24,7 +24,7 @@ pre {
   padding: 5px;
 }
 blockquote {
-  border-left: 3px solid green;
+  border-left: 3px solid #03a87c;
   margin: 5px;
   padding-left: 12px;
 }
@@ -58,6 +58,7 @@ blockquote {
 .search-box {
   display: inline-block; 
   margin-left: 10px;
+  width: 200px;
 }
 .search-box .search-text {
   width: 12rem;
@@ -121,7 +122,7 @@ blockquote {
 .banner-view {
   box-sizing: border-box;
   margin: 0px auto;
-  padding: 6px 0px;
+  padding: 5px;
 }
 .main-view {
   min-height: 42em;
@@ -138,17 +139,13 @@ blockquote {
   min-width: 400px;
 }
 
-.search-box {
-  width: 200px;
-}
-
 .main-page {
   padding: 10px 235px 10px 0px;
   position: relative;
 }
 .page-side {
   position: absolute;
-  top: 2px;
+  top: 10px;
   right: 0;
   width: 225px;
   background-color: #fafbfa;
@@ -173,14 +170,16 @@ blockquote {
 
 .item-sum {
   background-color:#f5f7f8;
-  padding: 10px;
+  padding: 10px 75px 10px 10px;
+  min-height: 75px;
   border-bottom: 1px dashed #ddd;
+  position: relative;
 }
 section.item-sum:hover {
   background-color:  #fcfdfc;
 }
 .item-sum .title {
-  font-size: 20px;
+  font-size: 22px;
 }
 .item-sum .a-meta {
   font-size: 14px;
@@ -192,9 +191,22 @@ section.item-sum:hover {
   color: #828282;
   font-size: 16px;
 }
+.item-thumb {
+  position: absolute;
+  max-width: 70px;
+  max-height: 70px;
+  top: 4px;
+  right: 2px;
+}
+.item-thumb:hover {
+  max-width: 180px;
+  max-height: 180px;
+  z-index: 999;
+}
 
-.badge, .Rust, .Go,
-.Article {
+.badge, 
+.Rust, .Go, .TypeScript, .Dart, .JavaScript,
+.Article, .Book, .Event, .Podcast, .Translate {
   flex: 0 0 auto;
   width: 8px;
   height: 10px;
@@ -208,9 +220,30 @@ section.item-sum:hover {
 .Go {
   background-color: #00add8;
 }
+.TypeScript {
+  background-color: #2b7489;
+}
+.JavaScript {
+  background-color: #f1e05a;
+}
+.Dart {
+  background-color: #00b4ab;
+}
 
 .Article {
   background-color: #3ab54a;
+}
+.Book {
+  background-color: #5a4129;
+}
+.Event {
+  background-color: #f7941d;
+}
+.Podcast {
+  background-color: #c372f1;
+}
+.Translate {
+  background-color: #b3e5fc;
 }
 
 .blog-info {
@@ -244,10 +277,10 @@ section.item-sum:hover {
 }
 
 @media (max-width: 480px) {
-  .item-sum, .tagmeta, .authormeta, .item-info {
+  .item-sum {
     padding: 10px;
   }
-  .thumb-box, .operate, .item-thumb {
+  .item-thumb {
     position: relative;
   }
   .fobtn, .avatar-thumb {
@@ -261,24 +294,16 @@ section.item-sum:hover {
     background-color: #282a36;
     color: #e4e4e4;
   }
-  .page-side, .right-title, .dropdown-content,
-  .rut-sum, .rut-view, .collect-sum, .item-info,
-  .tagmeta, .authormeta, .item-sum, .item-detail
+  .page-side, .right-title, .dropdown-content, .item-sum
   {
     background-color: #353746;
     color: #e4e4e4;
   }
-  .header, .item-sum, .rut-view .rut-content {
+  .header, .item-sum {
     border-bottom: 2px solid #282827;
   }
-  .toolbtn, .orgsrc {
+  .toolbtn {
     background-color: #2e2f3b;
-  }
-  .tagbar .tag {
-    background-color: #6b6a6a;
-  }
-  section.rut-sum:hover {
-    background-color:  #3a3d4e;
   }
   pre {
     background-color: rgb(56, 55, 55);

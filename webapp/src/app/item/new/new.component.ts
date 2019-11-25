@@ -21,6 +21,7 @@ export class NewComponent implements OnInit {
   ) {}
 
   newFor: string;  // topic
+  itemCates: string[] = itemCates;
   host_url: string = environment.host_url;
 
   createForm: FormGroup;
@@ -56,6 +57,15 @@ export class NewComponent implements OnInit {
 
   onSubmit() {
     const newItem = this.createForm.value;
+    const url_or_ctn = Boolean(newItem.content.trim()) || Boolean(newItem.link.trim());
+    const notValid = this.createForm.invalid || !Boolean(newItem.title.trim());
+    if ( notValid || !url_or_ctn || !this.canCreate ) {
+      alert(notValid
+        ? "Invalid Input" 
+        : (!url_or_ctn ? "Should input either Source Link or Text Content" : "No Permission!")
+      );
+      return;
+    }
     let topic = this.newFor || 'Rust';
     const itemData: NewItem = Object.assign(
       newItem,

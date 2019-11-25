@@ -27,7 +27,7 @@ export class UpdateComponent implements OnInit {
   itemSlug: string;
 
   host_url: string = environment.host_url;
-  cates: string[] = ['Article', 'Translate', 'Podcast', 'Event', 'Book'];
+  itemCates: string[] = itemCates;
 
   ngOnInit() {
     this.authService.checkAuth();
@@ -62,6 +62,15 @@ export class UpdateComponent implements OnInit {
 
   onUpdate() {
     const item = this.updateForm.value;
+    const url_or_ctn = Boolean(item.content.trim()) || Boolean(item.link.trim());
+    const notValid = this.updateForm.invalid || !Boolean(item.title.trim());
+    if ( notValid || !url_or_ctn || !this.canUpdate ) {
+      alert(notValid
+        ? "Invalid Input" 
+        : (!url_or_ctn ? "Should input either Source Link or Text Content" : "No Permission!")
+      );
+      return;
+    }
     let topic = item.topic;
     const itemData: UpdateItem = Object.assign(
       item, 

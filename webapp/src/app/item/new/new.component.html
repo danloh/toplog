@@ -5,15 +5,15 @@
   <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
     <nz-form-label>Title*</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="title" nzAutosize maxlength="64" nzRequired></textarea>
+      <textarea nz-input formControlName="title" nzRequired nzAutosize maxlength="64"></textarea>
     </nz-form-control>
-    <nz-form-label>either Link</nz-form-label>
+    <nz-form-label>Source Link*</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="link" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
-    <nz-form-label>or Text Content</nz-form-label>
+    <nz-form-label>Content Summary</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 5 }"></textarea>
+      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
     </nz-form-control>
     <nz-form-label>Origin Author(Optional)</nz-form-label>
     <nz-form-control>

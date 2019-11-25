@@ -7,13 +7,13 @@
     <nz-form-control>
       <textarea nz-input formControlName="title" nzAutosize maxlength="64" nzRequired></textarea>
     </nz-form-control>
-    <nz-form-label>either Link</nz-form-label>
+    <nz-form-label>Source Link*</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="link" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
-    <nz-form-label>or Text Content</nz-form-label>
+    <nz-form-label>Content Summary</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 5 }"></textarea>
+      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
     </nz-form-control>
     <nz-form-label>Origin Author</nz-form-label>
     <nz-form-control>
@@ -23,10 +23,6 @@
     <nz-form-control>
       <input nz-input formControlName="topic" maxlength="32"/>
     </nz-form-control>
-    <nz-form-label>Cover Picture(Required for Book)</nz-form-label>
-    <nz-form-control>
-      <textarea nz-input formControlName="logo" nzAutosize></textarea>
-    </nz-form-control>
     <nz-form-label>Type</nz-form-label>
     <nz-select formControlName="ty" nzRequired>
       <nz-option *ngFor="let cate of itemCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
@@ -35,9 +31,15 @@
     <nz-form-control>
       <input nz-input formControlName="lang" maxlength="16"/>
     </nz-form-control>
-    <nz-form-label>Origin Link</nz-form-label>
+    <div *ngIf="updateForm.value.ty === 'Translate'">
+      <nz-form-label>Origin Link(Required for Translate)</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255"></textarea>
+      </nz-form-control>
+    </div>
+    <nz-form-label>Cover Picture(Required for Book)</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255"></textarea>
+      <textarea nz-input formControlName="logo" nzAutosize></textarea>
     </nz-form-control>
     <br><br>
     <button nz-button class="s-full-width" nzType="primary" [disabled]="!updateForm.valid">Update</button>

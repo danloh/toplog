@@ -6,6 +6,12 @@
     <span style="color: #37a">{{ a_url | safe | host }}</span>
     <div class="meta-sum">{{ a.content | showless(least=256) }}</div>
   </a>
+  {%- set logo = a.logo -%}
+  {%- if logo -%}
+  <span>
+    <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
+  </span>
+  {%- endif -%}
   <div class="a-meta">
     <span class="{{ a.ty }}"></span>
     <span class="meta-tag">{{ a.ty }}</span> 

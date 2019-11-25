@@ -58,6 +58,10 @@ export class NewBlogComponent implements OnInit {
 
   onSubmit() {
     const newBlog: NewBlog = this.createForm.value;
+    if ( !newBlog.aname.trim() ) {
+      alert("Invalid Input");
+      return;
+    }
     let topic = newBlog.topic;
     this.blogService.create(newBlog).subscribe(
       _res => window.location.href = this.host_url + '/' + topic,

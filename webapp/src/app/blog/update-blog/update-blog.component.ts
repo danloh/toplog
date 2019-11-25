@@ -58,6 +58,10 @@ export class UpdateBlogComponent implements OnInit {
 
   onUpdate() {
     const blog = this.updateForm.value;
+    if ( !blog.aname.trim() ) {
+      alert("Invalid Input");
+      return;
+    }
     let topic = blog.topic;
     const blogData: UpdateBlog = Object.assign(blog, { id: this.blogID });
     this.blogService.update(blogData)
