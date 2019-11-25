@@ -1,7 +1,7 @@
 // database pool
 
 use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
+use diesel::r2d2::{self, ConnectionManager, CustomizeConnection};
 use parking_lot::{ReentrantMutex, ReentrantMutexGuard};
 use std::ops::Deref;
 use std::sync::Arc;
@@ -65,4 +65,29 @@ pub fn diesel_pool(
 ) -> DieselPool {
     let manager = ConnectionManager::new(url);
     DieselPool::Pool(config.build(manager).unwrap())
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ConnectionConfig {
+    pub statement_timeout: u64,
+    pub read_only: bool,
+}
+
+impl CustomizeConnection<PgConnection, r2d2::Error> for ConnectionConfig {
+    fn on_acquire(&self, conn: &mut PgConnection) -> Result<(), r2d2::Error> {
+        use diesel::sql_query;
+
+        sql_query(format!(
+            "SET statement_timeout = {}",
+            self.statement_timeout * 1000
+        ))
+        .execute(conn)
+        .map_err(r2d2::Error::QueryError)?;
+        if self.read_only {
+            sql_query("SET default_transaction_read_only = 't'")
+                .execute(conn)
+                .map_err(r2d2::Error::QueryError)?;
+        }
+        Ok(())
+    }
 }

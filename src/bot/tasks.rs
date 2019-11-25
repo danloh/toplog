@@ -26,10 +26,10 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
 
     // new WebPages and get all links
     let mut links: Vec<String> = Vec::new();
-    let npr = WebPage::new("https://www.npr.org/books/");
-    links.append(&mut npr.clean_links());
+    let babystep = WebPage::new("http://smallcultfollowing.com/babysteps/");
+    links.append(&mut babystep.clean_links());
+    // println!("{:?}", links);
     
-
     // diff the links w/ db
     use std::collections::HashSet;
     let mut links_set = HashSet::new();
@@ -51,16 +51,10 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     let diff_links = links_set.difference(&db_links_set);
     //println!("{:#?}", diff_links);
     // spider the diff_links and build Rut
-    use crate::util::helper::gen_slug;
     let mut new_items: Vec<NewItem> = Vec::new();
     for l in diff_links {
         let sp_item = WebPage::new(l).into_item();
-        let i_slug = gen_slug(&sp_item.title);
-        let new_item = NewItem {
-            slug: i_slug,
-            ..sp_item
-        };
-        new_items.push(new_item);
+        new_items.push(sp_item);
     }
     // save to db
     diesel::insert_into(items)

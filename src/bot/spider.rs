@@ -179,10 +179,11 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
     let raw_links = page.extract_links();
     let mut links: Vec<String> = Vec::new();
     match domain.trim() {
-        "npr.org" => {
+        "smallcultfollowing.com" => {
             for link in raw_links {
-                if link.starts_with("https://www.npr.org/2") {
-                    links.push(link.to_owned())
+                if link.starts_with("/babysteps/blog/2") {
+                    let f_link = "http://smallcultfollowing.com".to_string() + &link;
+                    links.push(f_link)
                 }
             }
         }
