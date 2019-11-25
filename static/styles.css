@@ -180,6 +180,30 @@ section.item-sum:hover {
 .item-sum .a-meta {
   font-size: 14px;
 }
+.item-sum .content-sum {
+  color: #828282;
+  font-size: 16px;
+}
+
+.badge, .Rust, .Go,
+.Article {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 10px;
+  margin-right: 1px;
+  display: inline-block;
+}
+
+.Rust {
+  background-color: #dea584;
+}
+.Go {
+  background-color: #00add8;
+}
+
+.Article {
+  background-color: #3ab54a;
+}
 
 .blog-info {
   padding-right: 45px;

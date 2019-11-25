@@ -334,7 +334,7 @@ impl QueryItems {
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
-                    .order(vote.desc())
+                    .order(post_at.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
                     .load::<Item>(conn)?;
@@ -344,7 +344,7 @@ impl QueryItems {
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
-                    .order(vote.desc())
+                    .order(post_at.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
                     .load::<Item>(conn)?;
@@ -354,7 +354,7 @@ impl QueryItems {
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
-                    .order(vote.desc())
+                    .order(post_at.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
                     .load::<Item>(conn)?;
@@ -364,14 +364,14 @@ impl QueryItems {
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
-                    .order(vote.desc())
+                    .order(post_at.desc())
                     .limit(o.into())
                     .offset((o * p_o).into())
                     .load::<Item>(conn)?;
             }
             _ => {
                 item_list = items
-                    .order(vote.desc())
+                    .order(post_at.desc())
                     .limit(42)
                     .load::<Item>(conn)?;
                 item_count = item_list.len() as i64;
