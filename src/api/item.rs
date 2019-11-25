@@ -181,7 +181,7 @@ pub struct Item {
     pub vote: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Insertable)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Default)]
 #[table_name = "items"]
 pub struct NewItem {
     pub title: String,

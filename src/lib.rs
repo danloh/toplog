@@ -26,11 +26,12 @@ use diesel::r2d2::{ConnectionManager, Pool};
 // pub mod macros;
 
 pub mod api;
-pub mod bot;
 pub mod errors;
 pub mod schema;
 pub mod util;
 pub mod view;
+pub mod bot;
+pub mod db;
 
 // some type alias
 pub type PoolConn = Pool<ConnectionManager<PgConnection>>;
