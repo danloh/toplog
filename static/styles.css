@@ -148,7 +148,7 @@ blockquote {
 }
 .page-side {
   position: absolute;
-  top: 10px;
+  top: 2px;
   right: 0;
   width: 225px;
   background-color: #fafbfa;
@@ -157,13 +157,18 @@ blockquote {
   background-color: #e5ebe4;
   padding: 10px;
   font-size: 16px;
+  border-left: 5px solid #03a87c;
 }
 .right-body {
   padding: 10px;
   font-size: 16px;
 }
+
+.link-icon {
+  margin-right: 4px;
+}
 .link-icon:hover {
-  border-bottom: 2px solid #03a87c;
+  border-top: 2px solid #03a87c;
 }
 
 .item-sum {
@@ -180,7 +185,10 @@ section.item-sum:hover {
 .item-sum .a-meta {
   font-size: 14px;
 }
-.item-sum .content-sum {
+.meta-tag {
+  margin-right: 8px;
+}
+.meta-sum {
   color: #828282;
   font-size: 16px;
 }
@@ -209,6 +217,11 @@ section.item-sum:hover {
   padding-right: 45px;
   min-height: 55px;
   position: relative;
+}
+.blog-intro {
+  color: #828282;
+  font-size: 14px;
+  line-height: 1.5em;
 }
 .blog-thumb {
   position: absolute;

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ItemService, AuthService, Item, UpdateItem } from '../../core';
-import { regUrl } from '../../shared';
+import { regUrl, itemCates, topicCates } from '../../shared';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -51,9 +51,9 @@ export class UpdateComponent implements OnInit {
         'content': [ this.item.content || ''],
         'logo': [ this.item.logo || ''],
         'author': [ this.item.author || ''],
-        'ty': [ this.item.ty, [Validators.required] ],
+        'ty': [ this.item.ty, [Validators.required]],
         'lang': [ this.item.lang || 'English'],
-        'topic': [ this.item.topic || 'Rust'],
+        'topic': [ this.item.topic || 'Rust', [Validators.required]],
         'link': [ this.item.link || ''],
         'origin_link': [ this.item.origin_link || ''],
       }
@@ -72,7 +72,7 @@ export class UpdateComponent implements OnInit {
     );
     this.itemService.update(itemData)
     .subscribe(
-      _res => window.location.href = this.host_url + '?t=' + topic,
+      _res => window.location.href = this.host_url + '/' + topic,
       //err => console.log(err)
     );
   }

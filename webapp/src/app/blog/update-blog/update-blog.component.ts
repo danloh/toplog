@@ -62,7 +62,7 @@ export class UpdateBlogComponent implements OnInit {
     const blogData: UpdateBlog = Object.assign(blog, { id: this.blogID });
     this.blogService.update(blogData)
     .subscribe(
-      _res => window.location.href = this.host_url + '?t=' + topic,
+      _res => window.location.href = this.host_url + '/' + topic,
       //err => console.log(err)
     );
   }

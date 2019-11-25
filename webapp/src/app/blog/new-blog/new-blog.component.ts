@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BlogService, AuthService, Blog, NewBlog } from '../../core';
 import { regUrl } from '../../shared';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-new-blog',
@@ -24,6 +25,8 @@ export class NewBlogComponent implements OnInit {
   canCreate: boolean;
   uname: string;
   blog: Blog;
+
+  host_url: string = environment.host_url;
 
   ngOnInit() {
     this.authService.checkAuth();
@@ -55,8 +58,9 @@ export class NewBlogComponent implements OnInit {
 
   onSubmit() {
     const newBlog: NewBlog = this.createForm.value;
+    let topic = newBlog.topic;
     this.blogService.create(newBlog).subscribe(
-      res => {},
+      _res => window.location.href = this.host_url + '/' + topic,
       //err => console.log(err)
     );
   }

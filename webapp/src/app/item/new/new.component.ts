@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ItemService, AuthService, Item, NewItem } from '../../core';
-import { regUrl } from '../../shared';
+import { regUrl, itemCates } from '../../shared';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -21,7 +21,6 @@ export class NewComponent implements OnInit {
   ) {}
 
   newFor: string;  // topic
-  cates: string[] = ['Article', 'Translate', 'Podcast', 'Event', 'Book'];
   host_url: string = environment.host_url;
 
   createForm: FormGroup;
@@ -67,7 +66,7 @@ export class NewComponent implements OnInit {
       }
     );
     this.itemService.create(itemData).subscribe(
-      _res => { window.location.href = this.host_url + '?t=' + topic },
+      _res => { window.location.href = this.host_url + '/' + topic },
       //err => console.log(err)
     );
   }

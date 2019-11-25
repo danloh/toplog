@@ -4,17 +4,15 @@
     <b class="title">{{ a.title }}</b>
     <span class="host"> | </span>
     <span style="color: #37a">{{ a_url | safe | host }}</span>
-    <div class="content-sum">{{ a.content | showless(least=256) }}</div>
+    <div class="meta-sum">{{ a.content | showless(least=256) }}</div>
   </a>
   <div class="a-meta">
     <span class="{{ a.ty }}"></span>
-    <span>{{ a.ty }}</span> &nbsp;&nbsp;
+    <span class="meta-tag">{{ a.ty }}</span> 
     <span class="badge" style="background-color: #03a87c;"></span>
-    <span>{{ a.author }}</span> &nbsp;&nbsp;
+    <span class="meta-tag">{{ a.author }}</span>
     <span class="{{ a.topic }}"></span>
-    <span>{{ a.topic }}</span> &nbsp;&nbsp;
+    <span class="meta-tag">{{ a.topic }}</span> &nbsp;&nbsp;
     <a href = "{{'/me/item/update/' ~ a.slug }}">..</a>
   </div>
 </section>
-
-

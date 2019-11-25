@@ -21,14 +21,9 @@
       <a [routerLink]="'/p/' + uname + '/create'" routerLinkActive="active">
          Post
       </a>
-      <a routerLink="/rlist/new">
+      <a routerLink="/item/new">
         <small style="color:orange">  +New</small>
       </a><br>
-      <br><br> 
-      <b># Topic: </b><br>
-      <span class="s-fo-tag" *ngFor="let tag of tags">
-        <a [href]="host_url + '/tag/' + tag.id"><small>{{ tag.tname }}&nbsp;&nbsp;</small></a>
-      </span>
     </div>
   </div>
 </div>
