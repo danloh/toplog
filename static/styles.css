@@ -34,7 +34,7 @@ blockquote {
 }
 .help-tips {
   color: green;
-  font-size: 0.8em;
+  font-size: 0.5em;
 }
 .header {
   z-index: 999;
@@ -134,22 +134,25 @@ blockquote {
 }
 .menu-bar {
   margin: 10px auto -15px auto;
+  border-top: 2px solid #eaf7f3;
 }
 .topic-tab, .ty-tab,
 .topic-tab-active, .ty-tab-active {
   margin-right: 10px;
 }
 .topic-tab{
-  font-size: 22px;
+  font-size: 20px;
 } 
 .ty-tab{
-  font-size: 16px;
+  font-size: 15px;
 }
 .topic-tab-active {
-  background-color: #ddd;
-  padding: 5px;
-  font-size: 24px;
-  border-radius: 15%;
+  background-color: #2980b9;
+  padding: 5px 8px;
+  font-size: 22px;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 3px;
 }
 .ty-tab-active {
   border-bottom: 3px solid #03a87c;
@@ -237,7 +240,6 @@ section.item-sum:hover {
 }
 
 .badge, 
-.Rust, .Go, .TypeScript, .Dart, .JavaScript,
 .Article, .Book, .Event, .Podcast, .Translate {
   flex: 0 0 auto;
   width: 8px;
@@ -246,19 +248,19 @@ section.item-sum:hover {
   display: inline-block;
 }
 
-.Rust {
+.tab-Rust {
   background-color: #dea584;
 }
-.Go {
+.tab-Go {
   background-color: #00add8;
 }
-.TypeScript {
+.tab-TypeScript {
   background-color: #2b7489;
 }
-.JavaScript {
+.tab-JavaScript {
   background-color: #f1e05a;
 }
-.Dart {
+.tab-Dart {
   background-color: #00b4ab;
 }
 

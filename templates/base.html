@@ -10,7 +10,7 @@
   {%- block head -%}
   <title>{%- block title -%} {{ title }}{%- endblock title -%} - {{ hostDomain }}</title>
   {%- block metaDescription -%}
-  <meta name="description" content="">
+  <meta name="description" content="Aggregated Blogs of Top Contributors To Rust, Golang, TypeScript, Angular ...">
   {%- endblock metaDescription -%}
   {%- endblock head -%}
 </head>
@@ -41,13 +41,14 @@
   </header>
   <div class="banner">
     <div class="banner-view">
-      {%- for t in ["Rust", "Go"] -%}
+      {%- for t in ["Rust", "Go", "TypeScript", "Angular", "Vue", "React"] -%}
         {%- if t == topic -%}
-        <a class="topic-tab-active" href="{{ '/t/' ~ t ~ '/Article?page=1&perpage=42' }}">{{ t }}</a>
+        <a class="{{ 'topic-tab-active tab-' ~ topic }}" href="{{ '/t/' ~ t ~ '/Article?page=1&perpage=42' }}">{{ t }}</a>
         {%- else -%}
         <a class="topic-tab" href="{{ '/t/' ~ t ~ '/Article?page=1&perpage=42' }}">{{ t }}</a>
         {%- endif -%}
       {%- endfor -%}
+      <small class="help-tips">More coming soon...</small>
       <div class="menu-bar">
         {%- for t in ["Article", "Book", "Event", "Podcast", "Misc"] -%}
           {%- if t == ty -%}
