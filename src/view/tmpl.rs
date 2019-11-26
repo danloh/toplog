@@ -233,9 +233,9 @@ impl Handler<Topic> for Dba {
         let tp = tpc.trim().to_lowercase();
         let te = typ.trim().to_lowercase();
 
-        let query_item = if tp == "all" && te == "all" {
+        let query_item = if tp == "all" && te == "misc" {
             QueryItems::Index("index".into(), 42, 1)
-        } else if te == "all" {
+        } else if te == "misc" {
             QueryItems::Topic(tpc.clone(), 42, t.page)
         } else {
             QueryItems::Tt(tpc.clone(), typ.clone(), 42, t.page)

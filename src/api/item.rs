@@ -11,7 +11,10 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 use chrono::{NaiveDateTime, Utc};
 
 use crate::errors::{ServiceError, ServiceResult};
-use crate::api::{ReqQuery, auth::CheckUser};
+use crate::api::{
+    ReqQuery, ActionQuery, 
+    auth::{CheckUser, CheckCan},
+};
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{items};
@@ -83,13 +86,55 @@ pub fn get(
         })
 }
 
+// PUT: /api/items/{slug}
+// 
+pub fn toggle_top(
+    qb: Path<String>,
+    auth: CheckCan,
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let item = QueryItem{
+        slug: qb.into_inner(), 
+        method: String::from("PUT"),
+        uname: auth.uname
+    };
+    db.send(item)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Err(err) => Ok(err.error_response()),
+        })
+}
+
+// POST: /api/items/{slug}?action=vote|veto
+// 
+pub fn vote_or_veto(
+    qb: Path<String>,
+    aq: Query<ActionQuery>,
+    auth: CheckUser,
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let item = QueryItem{
+        slug: qb.into_inner(), 
+        method: aq.action.to_uppercase(),
+        uname: auth.uname
+    };
+    db.send(item)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Err(err) => Ok(err.error_response()),
+        })
+}
+
 // DELETE: /api/items/{slug}
 // 
 pub fn del(
     qb: Path<String>,
-    auth: CheckUser,
+    auth: CheckCan,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
+    
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("DELETE"),
@@ -109,10 +154,14 @@ impl Handler<QueryItem> for Dba {
     fn handle(&mut self, qb: QueryItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         let method: &str = &qb.method.trim();
-        if method == "GET" {
-            qb.get(conn)
-        } else {
-            qb.del(conn)
+
+        match method {
+            "GET" => { qb.get(conn) }
+            "PUT" => { qb.toggle_top(conn) }
+            "VOTE" => { qb.vote_or_veto(conn, "VOTE") }
+            "VETO" => { qb.vote_or_veto(conn, "VETO") }
+            "DELETE" => { qb.del(conn) }
+            _ => { qb.get(conn) },
         }
     }
 }
@@ -274,7 +323,7 @@ impl Message for UpdateItem {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct QueryItem {
     pub slug: String,
-    pub method: String, // get|delete
+    pub method: String, // get|put|delete|vote
     pub uname: String,
 }
 
@@ -286,6 +335,48 @@ impl QueryItem {
         use crate::schema::items::dsl::{items, slug};
         let item = items.filter(slug.eq(&self.slug))
             .get_result::<Item>(conn)?;
+        Ok(item)
+    }
+
+    fn vote_or_veto(
+        &self, 
+        conn: &PooledConn,
+        action: &str,
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::{items, slug, vote};
+
+        let old = items
+            .filter(slug.eq(&self.slug))
+            .get_result::<Item>(conn)?;
+        let old_vote = old.vote;
+
+        let incr = if action.to_uppercase() == "VOTE" {
+            1 
+        } else if old_vote >= 1 {
+            -1 
+        } else {
+            0
+        };
+        let item = diesel::update(&old)
+            .set(vote.eq(vote + incr))
+            .get_result::<Item>(conn)?;
+
+        Ok(item)
+    }
+
+    fn toggle_top(
+        &self, 
+        conn: &PooledConn,
+    ) -> ServiceResult<Item> {
+        use crate::schema::items::dsl::{items, slug, is_top};
+        let old = items
+            .filter(slug.eq(&self.slug))
+            .get_result::<Item>(conn)?;
+        let check_top: bool = old.is_top;
+        let item = diesel::update(&old)
+            .set(is_top.eq(!check_top))
+            .get_result::<Item>(conn)?;
+
         Ok(item)
     }
 

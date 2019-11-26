@@ -584,7 +584,7 @@ impl FromRequest for CheckUser {
     }
 }
 
-// return as user info w/o password
+// return as user info w/o password  // if can HKT, would be good
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CheckCan {
     pub uname: String,

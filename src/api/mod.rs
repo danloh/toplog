@@ -13,6 +13,11 @@ pub struct ReqQuery {
     page: i32,
 }
 
+#[derive(Deserialize, Clone)]
+pub struct ActionQuery {
+    action: String,
+}
+
 use crate::api::auth::CheckUser;
 
 // general response msg struct

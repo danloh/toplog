@@ -82,6 +82,26 @@ pub fn get(
         })
 }
 
+// PUT: /api/blogs/{id}
+// 
+pub fn toggle_top(
+    qb: Path<i32>,
+    auth: CheckCan,
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let blog = QueryBlog{
+        id: qb.into_inner(), 
+        method: String::from("PUT"),
+        uname: auth.uname
+    };
+    db.send(blog)
+        .from_err()
+        .and_then(move |res| match res {
+            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Err(err) => Ok(err.error_response()),
+        })
+}
+
 // DELETE: /api/blogs/{id}
 // 
 pub fn del(
@@ -108,10 +128,12 @@ impl Handler<QueryBlog> for Dba {
     fn handle(&mut self, qb: QueryBlog, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
         let method: &str = &qb.method.trim();
-        if method == "GET" {
-            qb.get(conn)
-        } else {
-            qb.del(conn)
+
+        match method {
+            "GET" => { qb.get(conn) }
+            "PUT" => { qb.toggle_top(conn) }
+            "DELETE" => { qb.del(conn) }
+            _ => { qb.get(conn) },
         }
     }
 }
@@ -266,6 +288,22 @@ impl QueryBlog {
     ) -> ServiceResult<Blog> {
         use crate::schema::blogs::dsl::{blogs, id};
         let blog = blogs.filter(id.eq(self.id)).get_result::<Blog>(conn)?;
+        Ok(blog)
+    }
+
+    fn toggle_top(
+        &self, 
+        conn: &PooledConn,
+    ) -> ServiceResult<Blog> {
+        use crate::schema::blogs::dsl::{blogs, id, is_top};
+        let old = blogs
+            .filter(id.eq(&self.id))
+            .get_result::<Blog>(conn)?;
+        let check_top: bool = old.is_top;
+        let blog = diesel::update(&old)
+            .set(is_top.eq(!check_top))
+            .get_result::<Blog>(conn)?;
+
         Ok(blog)
     }
 

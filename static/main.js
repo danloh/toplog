@@ -112,13 +112,13 @@ window.onclick = function(event) {
 const PerPage = 42; 
 var idxPage = 1;
 var hasMoreIdx = true;
-function loadMoreItems() {
+function loadMoreItems(topic, ty) {
   if (!hasMoreIdx) { return; }
   idxPage += 1;
-  let tpc = document.getElementById("get-topic");
-  let typ = document.getElementById("get-ty");
-  let topic = tpc ? tpc.innerText : "All";
-  let ty = typ ? typ.innerText : "Article";
+  // let tpc = document.getElementById("get-topic");
+  // let typ = document.getElementById("get-ty");
+  // let topic = tpc ? tpc.innerText : "All";
+  // let ty = typ ? typ.innerText : "Article";
   axios.get(`/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`)
   .then(function(resp) {
     let data = resp.data || "";
@@ -129,4 +129,15 @@ function loadMoreItems() {
     document.getElementById('item-list').innerHTML += data;
   });
   window.scrollTo(0, document.body.scrollHeight);
+}
+
+function toggleTop(slug) {
+  var omg = getCookie("oMg");
+  if (omg !== 'true') return;
+  var tok = getCookie(TOK);
+  axios.defaults.headers.common['Authorization'] = tok;
+  axios.put(`/api/items/${slug}`)
+  .then(
+    console.log("Done")
+  );
 }

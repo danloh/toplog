@@ -9,9 +9,13 @@
     {%- include '_item_sum.html' -%}
     {%- endfor -%}
   </div>
-  <span id="get-topic" style="display: none;">{{ topic }}</span>
-  <span id="get-ty" style="display: none;">{{ ty }}</span>
-  <button class="toolbtn full-width" onclick="loadMoreItems()">More</button>
+  <!-- <span id="get-topic" style="display: none;">{{ topic }}</span>
+  <span id="get-ty" style="display: none;">{{ ty }}</span> -->
+  <button class="toolbtn full-width" 
+    onclick="loadMoreItems('{{ topic }}', '{{ ty }}')"
+  >
+    More
+  </button>
   <div class="page-side">
     <h4 class="right-title">Featured Contributors</h4>
     <div class="right-body">

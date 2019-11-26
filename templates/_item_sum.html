@@ -19,6 +19,8 @@
     <span class="meta-tag">{{ a.author }}</span>
     <span class="{{ 'badge tab-' ~ a.topic }}"></span>
     <span class="meta-tag">{{ a.topic }}</span> &nbsp;&nbsp;
-    <a href = "{{'/me/item/update/' ~ a.slug }}">..</a>
+    {%- set a_slug = a.slug -%}
+    <a href = "{{'/me/item/update/' ~ a_slug }}">..</a>
+    <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">...</a>
   </div>
 </section>

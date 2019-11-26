@@ -132,6 +132,7 @@ pub fn init_server() -> std::io::Result<()> {
                 .service(
                     resource("/blogs/{id}")
                         .route(get().to_async(api::blog::get))
+                        .route(put().to_async(api::blog::toggle_top))
                         .route(delete().to_async(api::blog::del))
                 )
                 .service(
@@ -144,6 +145,9 @@ pub fn init_server() -> std::io::Result<()> {
                 .service(
                     resource("/items/{slug}")
                         .route(get().to_async(api::item::get))
+                        .route(put().to_async(api::item::toggle_top))
+                        // vote or veto: ?action=vote|veto
+                        .route(post().to_async(api::item::vote_or_veto))
                         .route(delete().to_async(api::item::del))
                 )
                 .service(
