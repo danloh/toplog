@@ -27,17 +27,23 @@ pub fn index() -> Result<HttpResponse, Error> {
         .body(res))
 }
 
-// GET /index
+// GET /{ty} // special: /index, /Misc
 //
 pub fn index_dyn(
     db: Data<DbAddr>,
+    p: Path<String>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    let home_msg = Home();
+    let home_msg = Home{
+        ty: p.into_inner(),
+        page: 1,
+    };
+    
     db.send(home_msg).from_err().and_then(|res| match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
+            ctx.insert("base", "all");
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::InternalServerError("template failed".into())
@@ -49,16 +55,6 @@ pub fn index_dyn(
     })
 }
 
-pub fn spa_index() -> Result<HttpResponse, Error> {
-    let res = String::from_utf8(
-        std::fs::read("spa/index.html")
-            .unwrap_or("Not Found".to_owned().into_bytes()),
-    )
-    .unwrap_or_default();
-    Ok(HttpResponse::build(http::StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(res))
-}
 
 #[derive(Deserialize, Clone)]
 pub struct PageQuery {
@@ -91,6 +87,8 @@ pub fn topic(
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
+            let base = (&msg.message).split("-").collect::<Vec<&str>>()[0];
+            ctx.insert("base", base);
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::InternalServerError("template failed".into())
@@ -103,39 +101,41 @@ pub fn topic(
     })
 }
 
-
+// result struct in response
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct Home();
-
-impl Message for Home {
-    type Result = ServiceResult<HomeMsg>;
-}
-
-// result struct in response rut list
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct HomeMsg {
+pub struct ItemBlogMsg {
     pub status: i32,
     pub message: String,
     pub items: Vec<Item>,
     pub blogs: Vec<Blog>,
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct Home{
+    pub ty: String,
+    pub page: i32,
+}
+
+impl Message for Home {
+    type Result = ServiceResult<ItemBlogMsg>;
+}
+
 impl Handler<Home> for Dba {
-    type Result = ServiceResult<HomeMsg>;
+    type Result = ServiceResult<ItemBlogMsg>;
 
     fn handle(
         &mut self,
-        _home: Home,
+        h: Home,
         _: &mut Self::Context,
     ) -> Self::Result {
         use crate::schema::items::dsl::*;
         use crate::schema::blogs::dsl::{blogs};
         let conn = &self.0.get()?;
 
-        let (a_list, _) = QueryItems::Index("index".into(), 42, 1).get(conn)?;
+        let (a_list, _) = QueryItems::Index(h.ty, 42, h.page).get(conn)?;
         let (b_list, _) = QueryBlogs::Index("index".into(), 42, 1).get(conn)?;
 
-        Ok(HomeMsg {
+        Ok(ItemBlogMsg {
             status: 201,
             message: String::from("Success"),
             items: a_list,
@@ -153,16 +153,17 @@ pub struct Topic{
 
 impl Topic {
     fn validate(&self) -> ServiceResult<()> {
-        let tp = &self.topic.trim().to_lowercase();
-        let ty = &self.ty.trim().to_lowercase();
+        let tp: &str = &self.topic.trim();
+        let ty: &str = &self.ty.trim();
         let page = &self.page;
     
-        let check = ty == "all" 
-        || ty == "article" 
-        || ty == "book" 
-        || ty == "event" 
-        || ty == "podcast" 
-        || ty == "translate";
+        let check = ty == "All" 
+        || ty == "Article" 
+        || ty == "Book" 
+        || ty == "Event" 
+        || ty == "Podcast" 
+        || ty == "Translate"
+        || ty == "Misc";;
 
         if check {
             Ok(())
@@ -173,20 +174,11 @@ impl Topic {
 }
 
 impl Message for Topic {
-    type Result = ServiceResult<TopicMsg>;
-}
-
-// result struct in response rut list
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct TopicMsg {
-    pub status: i32,
-    pub message: String,
-    pub items: Vec<Item>,
-    pub blogs: Vec<Blog>,
+    type Result = ServiceResult<ItemBlogMsg>;
 }
 
 impl Handler<Topic> for Dba {
-    type Result = ServiceResult<TopicMsg>;
+    type Result = ServiceResult<ItemBlogMsg>;
 
     fn handle(
         &mut self,
@@ -207,18 +199,32 @@ impl Handler<Topic> for Dba {
         } else if te == "all" {
             QueryItems::Topic(tpc.clone(), 42, t.page)
         } else {
-            QueryItems::Tt(tpc.clone(), typ, 42, t.page)
+            QueryItems::Tt(tpc.clone(), typ.clone(), 42, t.page)
         };
-        let query_blog = QueryBlogs::Topic(tpc, 42, 1);
+        let query_blog = QueryBlogs::Topic(tpc.clone(), 42, 1);
 
         let (i_list, _) = query_item.get(conn)?;
         let (b_list, _) = query_blog.get(conn)?;
 
-        Ok(TopicMsg {
+        Ok(ItemBlogMsg {
             status: 201,
-            message: tp + "-" + &te,
+            message: tpc + "-" + &typ,
             items: i_list,
             blogs: b_list,
         })
     }
+}
+
+
+// try_uri for spa
+// 
+pub fn spa_index() -> Result<HttpResponse, Error> {
+    let res = String::from_utf8(
+        std::fs::read("spa/index.html")
+            .unwrap_or("Not Found".to_owned().into_bytes()),
+    )
+    .unwrap_or_default();
+    Ok(HttpResponse::build(http::StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(res))
 }

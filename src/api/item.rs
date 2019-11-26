@@ -329,18 +329,67 @@ impl QueryItems {
         let mut item_list: Vec<Item> = Vec::new();
         let mut item_count = 0;
         match self {
+            QueryItems::Index(t, o, p) => {
+                if t.trim() == "index" {
+                    item_list = items
+                        .filter(is_top.eq(true))
+                        .order(post_at.desc())
+                        .limit(42)
+                        .load::<Item>(conn)?;
+                    item_count = item_list.len() as i64;
+                } else {
+                    let p_o = std::cmp::max(0, p-1);
+                    if t.trim() == "Misc" {
+                        let query = items
+                            .filter(is_top.eq(false));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(post_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    } else {
+                        let query = items
+                            .filter(is_top.eq(true))
+                            .filter(ty.eq(t));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(post_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
+                }
+            }
             QueryItems::Tt(t, typ, o, p) => {
-                let query = items.filter(topic.eq(t)).filter(ty.eq(typ));
                 let p_o = std::cmp::max(0, p-1);
-                item_count = query.clone().count().get_result(conn)?;
-                item_list = query
-                    .order(post_at.desc())
-                    .limit(o.into())
-                    .offset((o * p_o).into())
-                    .load::<Item>(conn)?;
+                if typ.trim() == "Misc" {
+                    let query = items
+                        .filter(is_top.eq(false))
+                        .filter(topic.eq(t));
+                    item_count = query.clone().count().get_result(conn)?;
+                    item_list = query
+                        .order(post_at.desc())
+                        .limit(o.into())
+                        .offset((o * p_o).into())
+                        .load::<Item>(conn)?;
+                } else {
+                    let query = items
+                        .filter(is_top.eq(true))
+                        .filter(topic.eq(t))
+                        .filter(ty.eq(typ));
+                    item_count = query.clone().count().get_result(conn)?;
+                    item_list = query
+                        .order(post_at.desc())
+                        .limit(o.into())
+                        .offset((o * p_o).into())
+                        .load::<Item>(conn)?;
+                }
             }
             QueryItems::Topic(t, o, p) => {
-                let query = items.filter(topic.eq(t));
+                let query = items
+                    .filter(is_top.eq(true))
+                    .filter(topic.eq(t));
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
@@ -350,7 +399,9 @@ impl QueryItems {
                     .load::<Item>(conn)?;
             }
             QueryItems::Ty(t, o, p) => {
-                let query = items.filter(ty.eq(t));
+                let query = items
+                    .filter(is_top.eq(true))
+                    .filter(ty.eq(t));
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
@@ -360,7 +411,9 @@ impl QueryItems {
                     .load::<Item>(conn)?;
             }
             QueryItems::Author(a, o, p) => {
-                let query = items.filter(author.eq(a));
+                let query = items
+                    .filter(is_top.eq(true))
+                    .filter(author.eq(a));
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;
                 item_list = query
@@ -371,6 +424,7 @@ impl QueryItems {
             }
             _ => {
                 item_list = items
+                    .filter(is_top.eq(true))
                     .order(post_at.desc())
                     .limit(42)
                     .load::<Item>(conn)?;

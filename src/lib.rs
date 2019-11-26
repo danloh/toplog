@@ -166,10 +166,10 @@ pub fn init_server() -> std::io::Result<()> {
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
-                resource("/index")
+                resource("/{ty}")  // special case: /index
                     .route(get().to_async(view::tmpl::index_dyn))
             )
-            .service(
+            .service( 
                 resource("/t/{topic}/{ty}") // ?page=&perpage=42
                     .route(get().to_async(view::tmpl::topic))
             )
