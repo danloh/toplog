@@ -43,7 +43,8 @@ pub fn index_dyn(
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
-            ctx.insert("base", "all");
+            ctx.insert("ty", &msg.message);
+            ctx.insert("topic", "all");
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::InternalServerError("template failed".into())
@@ -87,14 +88,51 @@ pub fn topic(
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
-            let base = (&msg.message).split("-").collect::<Vec<&str>>()[0];
-            ctx.insert("base", base);
+            let mesg: Vec<&str> = (&msg.message).split("-").collect();
+            let tpc = mesg[0];
+            let typ = mesg[1];
+            ctx.insert("ty", typ);
+            ctx.insert("topic", tpc);
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::InternalServerError("template failed".into())
             })?;
             let t_dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(&t_dir, h.as_bytes())?;
+            Ok(HttpResponse::Ok().content_type("text/html").body(h))
+        }
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
+// GET /more/{topic}/{ty}?page=&perpage=42
+//
+pub fn more_item(
+    db: Data<DbAddr>,
+    p: Path<(String, String)>,
+    pq: Query<PageQuery>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let pa = p.into_inner();
+    let topic = pa.0;
+    let ty = pa.1;
+    // extract Query
+    let page = std::cmp::max(pq.page, 1);
+    let perpage = pq.clone().perpage;
+
+    let topic_msg = Topic{ topic, ty, page };
+    result(
+        topic_msg.validate()
+    )
+    .from_err()
+    .and_then(move |_| db.send(topic_msg).from_err())
+    .and_then(|res| match res {
+        Ok(msg) => {
+            let mut ctx = tera::Context::new();
+            ctx.insert("items", &msg.items);
+
+            let h = tmpl.render("more_item.html", &ctx).map_err(|_| {
+                ServiceError::InternalServerError("template failed".into())
+            })?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
@@ -132,12 +170,13 @@ impl Handler<Home> for Dba {
         use crate::schema::blogs::dsl::{blogs};
         let conn = &self.0.get()?;
 
-        let (a_list, _) = QueryItems::Index(h.ty, 42, h.page).get(conn)?;
+        let typ = h.ty;
+        let (a_list, _) = QueryItems::Index(typ.clone(), 42, h.page).get(conn)?;
         let (b_list, _) = QueryBlogs::Index("index".into(), 42, 1).get(conn)?;
 
         Ok(ItemBlogMsg {
             status: 201,
-            message: String::from("Success"),
+            message: typ,  // back the ty info
             items: a_list,
             blogs: b_list,
         })
@@ -208,7 +247,7 @@ impl Handler<Topic> for Dba {
 
         Ok(ItemBlogMsg {
             status: 201,
-            message: tpc + "-" + &typ,
+            message: tpc + "-" + &typ, // send back the ty and topic info
             items: i_list,
             blogs: b_list,
         })

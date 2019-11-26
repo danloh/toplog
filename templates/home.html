@@ -4,12 +4,14 @@
 
 {%- block mainview -%}
 <div class="main-page">
-  <div class="home-view" id="in-home">
+  <div class="home-view" id="item-list">
     {%- for a in items -%}
     {%- include '_item_sum.html' -%}
     {%- endfor -%}
   </div>
-  <button class="toolbtn full-width" onclick="loadMoreIndexRuts()">More</button>
+  <span id="get-topic" style="display: none;">{{ topic }}</span>
+  <span id="get-ty" style="display: none;">{{ ty }}</span>
+  <button class="toolbtn full-width" onclick="loadMoreItems()">More</button>
   <div class="page-side">
     <h4 class="right-title">Featured Contributors</h4>
     <div class="right-body">

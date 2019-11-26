@@ -173,6 +173,10 @@ pub fn init_server() -> std::io::Result<()> {
                 resource("/t/{topic}/{ty}") // ?page=&perpage=42
                     .route(get().to_async(view::tmpl::topic))
             )
+            .service( 
+                resource("/more/{topic}/{ty}") // ?page=&perpage=42
+                    .route(get().to_async(view::tmpl::more_item))
+            )
             .service(
                 fs::Files::new("/static", "./static/") // static files
                     .default_handler(route().to(|| HttpResponse::NotFound()))

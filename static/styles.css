@@ -116,14 +116,46 @@ blockquote {
   font-size: 0.75em;
 }
 .banner {
-  background-color: #fafafa;
-  padding: 10px;
+  background-color: #f6f9f8;
+  padding: 5px;
 }
 .banner-view {
   box-sizing: border-box;
   margin: 0px auto;
-  padding: 5px;
+  padding: 5px 145px 5px 5px;
+  position: relative;
 }
+.banner-thumb {
+  position: absolute;
+  max-width: 80px;
+  max-height: 80px;
+  top: 1px;
+  right: 1px;
+}
+.menu-bar {
+  margin: 10px auto -15px auto;
+}
+.topic-tab, .ty-tab,
+.topic-tab-active, .ty-tab-active {
+  margin-right: 10px;
+}
+.topic-tab{
+  font-size: 22px;
+} 
+.ty-tab{
+  font-size: 16px;
+}
+.topic-tab-active {
+  background-color: #ddd;
+  padding: 5px;
+  font-size: 24px;
+  border-radius: 15%;
+}
+.ty-tab-active {
+  border-bottom: 3px solid #03a87c;
+  padding: 2px;
+}
+
 .main-view {
   min-height: 42em;
   width: 100%;
@@ -277,15 +309,14 @@ section.item-sum:hover {
 }
 
 @media (max-width: 480px) {
-  .item-sum {
+  .item-sum, .banner-view {
     padding: 10px;
   }
-  .item-thumb {
+  .item-thumb, .banner-thumb {
     position: relative;
   }
-  .fobtn, .avatar-thumb {
-    position: relative;
-    text-align: left;
+  .banner-thumb {
+    display: none;
   }
 }
 

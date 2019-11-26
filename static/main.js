@@ -40,10 +40,6 @@ marked.setOptions({
   renderer: renderer
 })
 
-const PerPage = 20; 
-const WPM = 300;
-const mapFlag = {'1': 'Todo', '2': 'Doing', '3': 'Done', 'Options': 'Options'};
-
 //## show dropdown
 function showMenu() { 
   showDrop("drop-menu"); 
@@ -111,4 +107,26 @@ window.onclick = function(event) {
       }
     }
   }
+}
+
+const PerPage = 42; 
+var idxPage = 1;
+var hasMoreIdx = true;
+function loadMoreItems() {
+  if (!hasMoreIdx) { return; }
+  idxPage += 1;
+  let tpc = document.getElementById("get-topic");
+  let typ = document.getElementById("get-ty");
+  let topic = tpc ? tpc.innerText : "All";
+  let ty = typ ? typ.innerText : "Article";
+  axios.get(`/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`)
+  .then(function(resp) {
+    let data = resp.data || "";
+    if ( !Boolean(data) ) {
+      console.log("No More");
+      hasMoreIdx = false;
+    }
+    document.getElementById('item-list').innerHTML += data;
+  });
+  window.scrollTo(0, document.body.scrollHeight);
 }
