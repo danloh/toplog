@@ -17,7 +17,7 @@ use crate::api::{
 };
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
-use crate::schema::{items};
+use crate::schema::{items, voteitems};
 
 // POST: /api/items
 // 
@@ -86,7 +86,7 @@ pub fn get(
         })
 }
 
-// PUT: /api/items/{slug}
+// PATCH: /api/items/{slug}
 // 
 pub fn toggle_top(
     qb: Path<String>,
@@ -101,12 +101,12 @@ pub fn toggle_top(
     db.send(item)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
             Err(err) => Ok(err.error_response()),
         })
 }
 
-// POST: /api/items/{slug}?action=vote|veto
+// PUT: /api/items/{slug}?action=vote|veto
 // 
 pub fn vote_or_veto(
     qb: Path<String>,
@@ -122,7 +122,7 @@ pub fn vote_or_veto(
     db.send(item)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => Ok(HttpResponse::Ok().json(b.vote)),
             Err(err) => Ok(err.error_response()),
         })
 }
@@ -143,7 +143,7 @@ pub fn del(
     db.send(item)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => Ok(HttpResponse::Ok().json(b.slug)),
             Err(err) => Ok(err.error_response()),
         })
 }
@@ -344,22 +344,33 @@ impl QueryItem {
         conn: &PooledConn,
         action: &str,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::{items, slug, vote};
+        use crate::schema::items::dsl::{items, slug, vote, is_top};
 
         let old = items
             .filter(slug.eq(&self.slug))
             .get_result::<Item>(conn)?;
         let old_vote = old.vote;
+        let old_is_top = old.is_top;
+        let act = action.to_uppercase();
 
-        let incr = if action.to_uppercase() == "VOTE" {
-            1 
-        } else if old_vote >= 1 {
-            -1 
-        } else {
-            0
+        use crate::schema::voteitems::dsl::{voteitems};
+        let itemid = old.id;
+        let new_vote = VoteItem {
+            uname: self.uname.to_owned(),
+            item_id: itemid,
+            vote_at: Utc::now().naive_utc(),
+            vote_as: if act == "VOTE" { 1 } else { -1 },
         };
+        let as_vote = new_vote.new(conn).unwrap_or(0) as i32;
+
+        let incr = if act == "VOTE" { as_vote } else { 0 - as_vote };
+        let if_top = old_vote > 100 || old_is_top;
+
         let item = diesel::update(&old)
-            .set(vote.eq(vote + incr))
+            .set((
+                vote.eq(vote + incr),
+                is_top.eq(if_top)
+            ))
             .get_result::<Item>(conn)?;
 
         Ok(item)
@@ -532,4 +543,47 @@ impl QueryItems {
 
 impl Message for QueryItems {
     type Result = ServiceResult<(Vec<Item>, i64)>;
+}
+
+#[derive(
+    Clone, Debug, Serialize, Deserialize, 
+    Identifiable, Queryable, Insertable, AsChangeset
+)]
+#[primary_key(uname, item_id)]
+#[table_name = "voteitems"]
+pub struct VoteItem {
+    pub uname: String,
+    pub item_id: i32,
+    pub vote_at: NaiveDateTime,
+    pub vote_as: i16,
+}
+
+impl VoteItem {
+    fn new(
+        &self, 
+        conn: &PooledConn,
+    ) -> ServiceResult<usize> {
+        use crate::schema::voteitems::dsl::{voteitems};
+        let vote_count = diesel::insert_into(voteitems)
+            .values(self)
+            .on_conflict_do_nothing()
+            .execute(conn)?;
+
+        Ok(vote_count)
+    }
+
+    fn del(
+        &self, 
+        conn: &PooledConn,
+    ) -> ServiceResult<usize> {
+        use crate::schema::voteitems::dsl::{voteitems, uname, item_id};
+
+        let unvote = diesel::delete(
+            voteitems
+                .filter(uname.eq(&self.uname))
+                .filter(item_id.eq(&self.item_id))
+            ).execute(conn)?;
+
+        Ok(unvote)
+    }
 }

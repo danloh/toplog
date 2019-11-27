@@ -127,11 +127,31 @@ table! {
     }
 }
 
+table! {
+    votecomments (uname, comment_id) {
+        uname -> Varchar,
+        comment_id -> Int4,
+        vote_at -> Timestamp,
+        vote_as -> Int2,
+    }
+}
+
+table! {
+    voteitems (uname, item_id) {
+        uname -> Varchar,
+        item_id -> Int4,
+        vote_at -> Timestamp,
+        vote_as -> Int2,
+    }
+}
+
 joinable!(issuecomments -> comments (comment_id));
 joinable!(issuecomments -> issues (issue_id));
 joinable!(issuelabels -> issues (issue_id));
 joinable!(itemcomments -> comments (comment_id));
 joinable!(itemcomments -> items (item_id));
+joinable!(votecomments -> comments (comment_id));
+joinable!(voteitems -> items (item_id));
 
 allow_tables_to_appear_in_same_query!(
     background_jobs,
@@ -144,4 +164,6 @@ allow_tables_to_appear_in_same_query!(
     items,
     itemtrans,
     users,
+    votecomments,
+    voteitems,
 );

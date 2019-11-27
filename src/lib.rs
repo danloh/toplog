@@ -15,7 +15,7 @@ use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{
     middleware::{Compress, Logger},
-    web::{delete, get, post, put, resource, route, scope},
+    web::{delete, get, post, put, patch, resource, route, scope},
     App, HttpResponse, HttpServer,
 };
 
@@ -145,9 +145,9 @@ pub fn init_server() -> std::io::Result<()> {
                 .service(
                     resource("/items/{slug}")
                         .route(get().to_async(api::item::get))
-                        .route(put().to_async(api::item::toggle_top))
+                        .route(patch().to_async(api::item::toggle_top))
                         // vote or veto: ?action=vote|veto
-                        .route(post().to_async(api::item::vote_or_veto))
+                        .route(put().to_async(api::item::vote_or_veto))
                         .route(delete().to_async(api::item::del))
                 )
                 .service(

@@ -18,8 +18,11 @@
     <span class="badge" style="background-color: #03a87c;"></span>
     <span class="meta-tag">{{ a.author }}</span>
     <span class="{{ 'badge tab-' ~ a.topic }}"></span>
-    <span class="meta-tag">{{ a.topic }}</span> &nbsp;&nbsp;
+    <span class="meta-tag">{{ a.topic }}</span> 
     {%- set a_slug = a.slug -%}
+    <a onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
+      <span class="triangle-up"></span>
+    </a> &nbsp;&nbsp;
     <a href = "{{'/me/item/update/' ~ a_slug }}">..</a>
     <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
       {%- if a.is_top -%} ... {%- else -%} ::: {%- endif -%}

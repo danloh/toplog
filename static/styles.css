@@ -280,6 +280,18 @@ section.item-sum:hover {
   background-color: #b3e5fc;
 }
 
+.triangle-up {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #999999;
+  margin-right: 1px;
+  display: inline-block;
+  text-align: justify;
+}
+
 .blog-info {
   padding-right: 45px;
   min-height: 55px;

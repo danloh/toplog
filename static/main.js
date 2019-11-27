@@ -132,8 +132,18 @@ function toggleTop(slug) {
   if (omg !== 'true') return;
   var tok = getCookie(TOK);
   axios.defaults.headers.common['Authorization'] = tok;
-  axios.put(`/api/items/${slug}`)
+  axios.patch(`/api/items/${slug}`)
   .then(
-    console.log("Done")
+    res => console.log(res.data)
+  );
+}
+
+function upVote(slug) {
+  var tok = getCookie(TOK);
+  if (!tok) return;
+  axios.defaults.headers.common['Authorization'] = tok;
+  axios.put(`/api/items/${slug}?action=vote`)
+  .then(
+    res => console.log(res.data)
   );
 }

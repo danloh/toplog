@@ -97,7 +97,7 @@ pub fn toggle_top(
     db.send(blog)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
             Err(err) => Ok(err.error_response()),
         })
 }
@@ -117,7 +117,7 @@ pub fn del(
     db.send(blog)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => Ok(HttpResponse::Ok().json(b.aname)),
             Err(err) => Ok(err.error_response()),
         })
 }
