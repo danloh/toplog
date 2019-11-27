@@ -171,11 +171,19 @@ pub fn init_server() -> std::io::Result<()> {
             )
             .service(
                 resource("/{ty}")  // special case: /index
-                    .route(get().to_async(view::tmpl::index_dyn))
+                    .route(get().to_async(view::tmpl::index_either))
             )
             .service( 
                 resource("/t/{topic}/{ty}")
-                    .route(get().to_async(view::tmpl::topic))
+                    .route(get().to_async(view::tmpl::topic_either))
+            )
+            .service(
+                resource("/{ty}/dyn")
+                    .route(get().to_async(view::tmpl::index_dyn))
+            )
+            .service( 
+                resource("/t/{topic}/{ty}/dyn")
+                    .route(get().to_async(view::tmpl::topic_dyn))
             )
             .service( 
                 resource("/more/{topic}/{ty}") // ?page=&perpage=42
@@ -192,7 +200,7 @@ pub fn init_server() -> std::io::Result<()> {
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
-                    .index_file("index.html")
+                    .index_file("all-index.html")
                     .default_handler(route().to(|| HttpResponse::NotFound()))
             )
             .default_service(route().to(|| HttpResponse::NotFound()))

@@ -18,13 +18,54 @@ use chrono::{SecondsFormat, Utc};
 //
 pub fn index() -> Result<HttpResponse, Error> {
     let res = String::from_utf8(
-        std::fs::read("www/index.html")
+        std::fs::read("www/all-index.html")
             .unwrap_or("Not Found".to_owned().into_bytes()), // handle not found
     )
     .unwrap_or_default();
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(res))
+}
+
+// GET /{ty} // special: /index, /Misc
+//
+// static file default, otherwise generate
+pub fn index_either(
+    db: Data<DbAddr>,
+    p: Path<String>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let home_msg = TopicEither { 
+        topic: String::from("all"), 
+        ty: p.into_inner(),
+    };
+    
+    db.send(home_msg).from_err().and_then(|res| match res {
+        Ok(msg) => {
+            if msg.status == 201 {
+                let mut ctx = tera::Context::new();
+                ctx.insert("items", &msg.items.unwrap_or(Vec::new()));
+                ctx.insert("blogs", &msg.blogs.unwrap_or(Vec::new()));
+
+                let mesg: Vec<&str> = (&msg.message).split("-").collect();
+                let typ = mesg[1];
+                ctx.insert("ty", &typ);
+                ctx.insert("topic", "all");
+
+                let h = tmpl.render("home.html", &ctx).map_err(|_| {
+                    ServiceError::InternalServerError("template failed".into())
+                })?;
+                let dir = "www/".to_owned() + &msg.message + ".html";
+                std::fs::write(dir, h.as_bytes())?;
+                Ok(HttpResponse::Ok().content_type("text/html").body(h))
+            } else {
+                let html = msg.html.unwrap_or_default();
+                Ok(HttpResponse::build(http::StatusCode::OK)
+                    .content_type("text/html; charset=utf-8")
+                    .body(html))
+            }
+        }
+        Err(e) => Ok(e.error_response()),
+    })
 }
 
 // GET /{ty} // special: /index, /Misc
@@ -64,7 +105,8 @@ pub fn index_dyn(
 
 // GET /t/{topic}/{ty}
 //
-pub fn topic(
+// response dynamically
+pub fn topic_dyn(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
@@ -95,6 +137,53 @@ pub fn topic(
             let t_dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
+        }
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
+// GET /t/{topic}/{ty}
+//
+// static file default, otherwise generate
+pub fn topic_either(
+    db: Data<DbAddr>,
+    p: Path<(String, String)>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let pa = p.into_inner();
+    let topic = pa.0;
+    let ty = pa.1;
+
+    let topic_msg = TopicEither{ topic, ty };
+    result(
+        topic_msg.validate()
+    )
+    .from_err()
+    .and_then(move |_| db.send(topic_msg).from_err())
+    .and_then(|res| match res {
+        Ok(msg) => {
+            if msg.status == 201 {
+                let mut ctx = tera::Context::new();
+                ctx.insert("items", &msg.items.unwrap_or(Vec::new()));
+                ctx.insert("blogs", &msg.blogs.unwrap_or(Vec::new()));
+
+                let mesg: Vec<&str> = (&msg.message).split("-").collect();
+                let tpc = mesg[0];
+                let typ = mesg[1];
+                ctx.insert("topic", tpc);
+                ctx.insert("ty", typ);
+
+                let h = tmpl.render("home.html", &ctx).map_err(|_| {
+                    ServiceError::InternalServerError("template failed".into())
+                })?;
+                let t_dir = "www/".to_owned() + &msg.message + ".html";
+                std::fs::write(&t_dir, h.as_bytes())?;
+                Ok(HttpResponse::Ok().content_type("text/html").body(h))
+            } else {
+                let html = msg.html.unwrap_or_default();
+                Ok(HttpResponse::build(http::StatusCode::OK)
+                    .content_type("text/html; charset=utf-8")
+                    .body(html))
+            }
         }
         Err(e) => Ok(e.error_response()),
     })
@@ -213,20 +302,22 @@ impl Handler<Topic> for Dba {
         use crate::schema::items::dsl::*;
         use crate::schema::blogs::dsl::{blogs};
         let conn = &self.0.get()?;
+
         let tpc = t.topic;
         let typ = t.ty;
+        let msg = tpc.clone() + "-" + &typ;
 
         let tp = tpc.trim().to_lowercase();
 
         let (query_item, query_blog) = if tp == "all" {
             (
-                QueryItems::Index(typ.clone(), 42, t.page),
+                QueryItems::Index(typ, 42, t.page),
                 QueryBlogs::Index("index".into(), 42, 1)
             )
         } else {
             (
-                QueryItems::Tt(tpc.clone(), typ.clone(), 42, t.page),
-                QueryBlogs::Topic(tpc.clone(), 42, 1)
+                QueryItems::Tt(tpc.clone(), typ, 42, t.page),
+                QueryBlogs::Topic(tpc, 42, 1)
             )
         };
 
@@ -235,9 +326,112 @@ impl Handler<Topic> for Dba {
 
         Ok(ItemBlogMsg {
             status: 201,
-            message: tpc + "-" + &typ, // send back the ty and topic info
+            message: msg, // send back the ty and topic info
             items: i_list,
             blogs: b_list,
         })
+    }
+}
+
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct TopicEither{
+    pub topic: String,
+    pub ty: String,
+}
+
+impl TopicEither {
+    fn validate(&self) -> ServiceResult<()> {
+        let tp: &str = &self.topic.trim();
+        let ty: &str = &self.ty.trim();
+    
+        let check = ty == "index" 
+        || ty == "Article" 
+        || ty == "Book" 
+        || ty == "Event" 
+        || ty == "Podcast" 
+        || ty == "Translate"
+        || ty == "Misc";
+
+        if check {
+            Ok(())
+        } else {
+            Err(ServiceError::BadRequest("Invalid Input".into()))
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct EitherMsg {
+    pub status: i32,
+    pub message: String,
+    pub items: Option<Vec<Item>>,
+    pub blogs: Option<Vec<Blog>>,
+    pub html: Option<String>,
+}
+
+impl Message for TopicEither {
+    type Result = ServiceResult<EitherMsg>;
+}
+
+// per topic and ty
+impl Handler<TopicEither> for Dba {
+    type Result = ServiceResult<EitherMsg>;
+
+    fn handle(
+        &mut self,
+        t: TopicEither,
+        _: &mut Self::Context,
+    ) -> Self::Result {
+        let tpc = t.topic;
+        let typ = t.ty;
+        let msg = tpc.clone() + "-" + &typ;
+
+        let dir = "www/".to_owned() + &tpc + &typ + ".html";
+        let i_html = std::fs::read(dir);
+
+        match i_html {
+            Ok(s) => {
+                let html = String::from_utf8(s).unwrap_or_default();
+                // println!("via static");
+                Ok(EitherMsg {
+                    status: 200,
+                    message: msg,
+                    items: None,
+                    blogs: None,
+                    html: Some(html),
+                })
+            }
+            _ => {
+                use crate::schema::items::dsl::*;
+                use crate::schema::blogs::dsl::{blogs};
+                let conn = &self.0.get()?;
+
+                let tp = tpc.trim().to_lowercase();
+
+                let (query_item, query_blog) = if tp == "all" {
+                    (
+                        QueryItems::Index(typ, 42, 1),
+                        QueryBlogs::Index("index".into(), 42, 1)
+                    )
+                } else {
+                    (
+                        QueryItems::Tt(tpc.clone(), typ, 42, 1),
+                        QueryBlogs::Topic(tpc, 42, 1)
+                    )
+                };
+
+                let (i_list, _) = query_item.get(conn)?;
+                let (b_list, _) = query_blog.get(conn)?;
+
+                Ok(EitherMsg {
+                    status: 201,
+                    message: msg,
+                    items: Some(i_list),
+                    blogs: Some(b_list),
+                    html: None
+                })
+            }
+        }
     }
 }
