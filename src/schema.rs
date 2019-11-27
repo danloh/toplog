@@ -89,7 +89,7 @@ table! {
         origin_link -> Varchar,
         post_by -> Varchar,
         post_at -> Timestamp,
-        pub_at -> Timestamp,
+        pub_at -> Date,
         is_top -> Bool,
         vote -> Int4,
     }

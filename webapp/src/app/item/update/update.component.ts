@@ -56,6 +56,7 @@ export class UpdateComponent implements OnInit {
         'topic': [ this.item.topic || 'Rust', [Validators.required]],
         'link': [ this.item.link || ''],
         'origin_link': [ this.item.origin_link || ''],
+        'pub_at': [ this.item.pub_at || ''],
       }
     );
   }

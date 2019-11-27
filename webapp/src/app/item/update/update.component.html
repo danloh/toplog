@@ -23,7 +23,11 @@
     <nz-form-control>
       <input nz-input formControlName="topic" maxlength="32"/>
     </nz-form-control>
-    <nz-form-label>Type</nz-form-label>
+    <nz-form-label>Publish Date (YYYY-MM-DD)</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="pub_at" maxlength="16"/>
+    </nz-form-control>
+    <nz-form-label>Category</nz-form-label>
     <nz-select formControlName="ty" nzRequired>
       <nz-option *ngFor="let cate of itemCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
     </nz-select>

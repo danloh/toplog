@@ -8,7 +8,7 @@ use actix_web::{
 use base64::decode;
 use diesel::prelude::*;
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
-use chrono::{NaiveDateTime, Utc};
+use chrono::{NaiveDateTime, NaiveDate, Utc};
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{
@@ -225,7 +225,7 @@ pub struct Item {
     pub origin_link: String, // for translate
     pub post_by: String,
     pub post_at: NaiveDateTime,
-    pub pub_at: NaiveDateTime,
+    pub pub_at: NaiveDate,
     pub is_top: bool,
     pub vote: i32,
 }
@@ -286,6 +286,7 @@ pub struct UpdateItem {
     pub link: String,
     pub origin_link: String,
     pub post_by: String,
+    pub pub_at: NaiveDate,
 }
 
 impl UpdateItem {

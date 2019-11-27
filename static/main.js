@@ -112,13 +112,9 @@ window.onclick = function(event) {
 const PerPage = 42; 
 var idxPage = 1;
 var hasMoreIdx = true;
-function loadMoreItems(topic, ty) {
+function loadMoreItems(topic='all', ty='Article') {
   if (!hasMoreIdx) { return; }
   idxPage += 1;
-  // let tpc = document.getElementById("get-topic");
-  // let typ = document.getElementById("get-ty");
-  // let topic = tpc ? tpc.innerText : "All";
-  // let ty = typ ? typ.innerText : "Article";
   axios.get(`/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`)
   .then(function(resp) {
     let data = resp.data || "";
