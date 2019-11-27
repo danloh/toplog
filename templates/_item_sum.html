@@ -21,6 +21,8 @@
     <span class="meta-tag">{{ a.topic }}</span> &nbsp;&nbsp;
     {%- set a_slug = a.slug -%}
     <a href = "{{'/me/item/update/' ~ a_slug }}">..</a>
-    <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">...</a>
+    <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
+      {%- if a.is_top -%} ... {%- else -%} ::: {%- endif -%}
+    </a>
   </div>
 </section>

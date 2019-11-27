@@ -43,18 +43,18 @@
     <div class="banner-view">
       {%- for t in ["Rust", "Go", "TypeScript", "Angular", "Vue", "React"] -%}
         {%- if t == topic -%}
-        <a class="{{ 'topic-tab-active tab-' ~ topic }}" href="{{ '/t/' ~ t ~ '/Article?page=1&perpage=42' }}">{{ t }}</a>
+        <a class="{{ 'topic-tab-active tab-' ~ topic }}" href="{{ '/t/' ~ t ~ '/Article' }}">{{ t }}</a>
         {%- else -%}
-        <a class="topic-tab" href="{{ '/t/' ~ t ~ '/Article?page=1&perpage=42' }}">{{ t }}</a>
+        <a class="topic-tab" href="{{ '/t/' ~ t ~ '/Article' }}">{{ t }}</a>
         {%- endif -%}
       {%- endfor -%}
       <small class="help-tips">More coming soon...</small>
       <div class="menu-bar">
         {%- for t in ["Article", "Book", "Event", "Podcast", "Misc"] -%}
           {%- if t == ty -%}
-          <a class="ty-tab-active" href="{{ t ~ '?page=1&perpage=42' }}">{{ t }}</a>
+          <a class="ty-tab-active" href="{{ t }}">{{ t }}</a>
           {%- else -%}
-          <a class="ty-tab" href="{{ t ~ '?page=1&perpage=42' }}">{{ t }}</a>
+          <a class="ty-tab" href="{{ t }}">{{ t }}</a>
           {%- endif -%}
         {%- endfor -%}
       </div>

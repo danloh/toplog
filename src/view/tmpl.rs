@@ -29,13 +29,15 @@ pub fn index() -> Result<HttpResponse, Error> {
 
 // GET /{ty} // special: /index, /Misc
 //
+// response dynamically
 pub fn index_dyn(
     db: Data<DbAddr>,
     p: Path<String>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    let home_msg = Home{
+    let home_msg = Topic { 
+        topic: String::from("all"), 
         ty: p.into_inner(),
-        page: 1,
+        page: 1, 
     };
     
     db.send(home_msg).from_err().and_then(|res| match res {
@@ -43,41 +45,34 @@ pub fn index_dyn(
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
             ctx.insert("blogs", &msg.blogs);
-            ctx.insert("ty", &msg.message);
+
+            let mesg: Vec<&str> = (&msg.message).split("-").collect();
+            let typ = mesg[1];
+            ctx.insert("ty", &typ);
             ctx.insert("topic", "all");
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::InternalServerError("template failed".into())
             })?;
-            std::fs::write("www/index.html", h.as_bytes())?;
+            let dir = "www/".to_owned() + &msg.message + ".html";
+            std::fs::write(dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
     })
 }
 
-
-#[derive(Deserialize, Clone)]
-pub struct PageQuery {
-    page: i32,
-    perpage: i32,
-}
-
-// GET /t/{topic}/{ty}?page=&perpage=42
+// GET /t/{topic}/{ty}
 //
 pub fn topic(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
-    pq: Query<PageQuery>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let pa = p.into_inner();
     let topic = pa.0;
     let ty = pa.1;
-    // extract Query
-    let page = std::cmp::max(pq.page, 1);
-    let perpage = pq.clone().perpage;
 
-    let topic_msg = Topic{ topic, ty, page };
+    let topic_msg = Topic{ topic, ty, page: 1 };
     result(
         topic_msg.validate()
     )
@@ -139,6 +134,31 @@ pub fn more_item(
     })
 }
 
+// GET /me/index.html // spa
+// try_uri for spa
+// 
+pub fn spa_index() -> Result<HttpResponse, Error> {
+    let res = String::from_utf8(
+        std::fs::read("spa/index.html")
+            .unwrap_or("Not Found".to_owned().into_bytes()),
+    )
+    .unwrap_or_default();
+    Ok(HttpResponse::build(http::StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(res))
+}
+
+// =====================================================================
+// type model
+// =====================================================================
+
+// for extrct query param
+#[derive(Deserialize, Clone)]
+pub struct PageQuery {
+    page: i32,
+    perpage: i32,
+}
+
 // result struct in response
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ItemBlogMsg {
@@ -146,41 +166,6 @@ pub struct ItemBlogMsg {
     pub message: String,
     pub items: Vec<Item>,
     pub blogs: Vec<Blog>,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct Home{
-    pub ty: String,
-    pub page: i32,
-}
-
-impl Message for Home {
-    type Result = ServiceResult<ItemBlogMsg>;
-}
-
-impl Handler<Home> for Dba {
-    type Result = ServiceResult<ItemBlogMsg>;
-
-    fn handle(
-        &mut self,
-        h: Home,
-        _: &mut Self::Context,
-    ) -> Self::Result {
-        use crate::schema::items::dsl::*;
-        use crate::schema::blogs::dsl::{blogs};
-        let conn = &self.0.get()?;
-
-        let typ = h.ty;
-        let (a_list, _) = QueryItems::Index(typ.clone(), 42, h.page).get(conn)?;
-        let (b_list, _) = QueryBlogs::Index("index".into(), 42, 1).get(conn)?;
-
-        Ok(ItemBlogMsg {
-            status: 201,
-            message: typ,  // back the ty info
-            items: a_list,
-            blogs: b_list,
-        })
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -196,13 +181,13 @@ impl Topic {
         let ty: &str = &self.ty.trim();
         let page = &self.page;
     
-        let check = ty == "All" 
+        let check = ty == "index" 
         || ty == "Article" 
         || ty == "Book" 
         || ty == "Event" 
         || ty == "Podcast" 
         || ty == "Translate"
-        || ty == "Misc";;
+        || ty == "Misc";
 
         if check {
             Ok(())
@@ -216,6 +201,7 @@ impl Message for Topic {
     type Result = ServiceResult<ItemBlogMsg>;
 }
 
+// per topic and ty
 impl Handler<Topic> for Dba {
     type Result = ServiceResult<ItemBlogMsg>;
 
@@ -231,16 +217,18 @@ impl Handler<Topic> for Dba {
         let typ = t.ty;
 
         let tp = tpc.trim().to_lowercase();
-        let te = typ.trim().to_lowercase();
 
-        let query_item = if tp == "all" && te == "misc" {
-            QueryItems::Index("index".into(), 42, 1)
-        } else if te == "misc" {
-            QueryItems::Topic(tpc.clone(), 42, t.page)
+        let (query_item, query_blog) = if tp == "all" {
+            (
+                QueryItems::Index(typ.clone(), 42, t.page),
+                QueryBlogs::Index("index".into(), 42, 1)
+            )
         } else {
-            QueryItems::Tt(tpc.clone(), typ.clone(), 42, t.page)
+            (
+                QueryItems::Tt(tpc.clone(), typ.clone(), 42, t.page),
+                QueryBlogs::Topic(tpc.clone(), 42, 1)
+            )
         };
-        let query_blog = QueryBlogs::Topic(tpc.clone(), 42, 1);
 
         let (i_list, _) = query_item.get(conn)?;
         let (b_list, _) = query_blog.get(conn)?;
@@ -252,18 +240,4 @@ impl Handler<Topic> for Dba {
             blogs: b_list,
         })
     }
-}
-
-
-// try_uri for spa
-// 
-pub fn spa_index() -> Result<HttpResponse, Error> {
-    let res = String::from_utf8(
-        std::fs::read("spa/index.html")
-            .unwrap_or("Not Found".to_owned().into_bytes()),
-    )
-    .unwrap_or_default();
-    Ok(HttpResponse::build(http::StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(res))
 }

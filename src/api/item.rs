@@ -420,17 +420,18 @@ impl QueryItems {
         let mut item_list: Vec<Item> = Vec::new();
         let mut item_count = 0;
         match self {
-            QueryItems::Index(t, o, p) => {
-                if t.trim() == "index" {
-                    item_list = items
-                        .filter(is_top.eq(true))
-                        .order(post_at.desc())
-                        .limit(42)
-                        .load::<Item>(conn)?;
-                    item_count = item_list.len() as i64;
-                } else {
-                    let p_o = std::cmp::max(0, p-1);
-                    if t.trim() == "Misc" {
+            QueryItems::Index(t, o, p) => {  // topic = all
+                let p_o = std::cmp::max(0, p-1);
+                match t.to_lowercase().trim() {
+                    "index" => {
+                        item_list = items
+                            .filter(is_top.eq(true))
+                            .order(post_at.desc())
+                            .limit(42)
+                            .load::<Item>(conn)?;
+                        item_count = item_list.len() as i64;
+                    }
+                    "misc" => {
                         let query = items
                             .filter(is_top.eq(false));
                         item_count = query.clone().count().get_result(conn)?;
@@ -439,7 +440,8 @@ impl QueryItems {
                             .limit(o.into())
                             .offset((o * p_o).into())
                             .load::<Item>(conn)?;
-                    } else {
+                    }
+                    _ => {
                         let query = items
                             .filter(is_top.eq(true))
                             .filter(ty.eq(t));
@@ -450,11 +452,12 @@ impl QueryItems {
                             .offset((o * p_o).into())
                             .load::<Item>(conn)?;
                     }
+
                 }
             }
             QueryItems::Tt(t, typ, o, p) => {
                 let p_o = std::cmp::max(0, p-1);
-                if typ.trim() == "Misc" {
+                if typ.trim().to_lowercase() == "misc" {
                     let query = items
                         .filter(is_top.eq(false))
                         .filter(topic.eq(t));

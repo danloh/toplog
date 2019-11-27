@@ -174,7 +174,7 @@ pub fn init_server() -> std::io::Result<()> {
                     .route(get().to_async(view::tmpl::index_dyn))
             )
             .service( 
-                resource("/t/{topic}/{ty}") // ?page=&perpage=42
+                resource("/t/{topic}/{ty}")
                     .route(get().to_async(view::tmpl::topic))
             )
             .service( 
