@@ -139,11 +139,19 @@ function toggleTop(slug) {
 }
 
 function upVote(slug) {
-  var tok = getCookie(TOK);
-  if (!tok) return;
+  var check = Boolean(getCookie(TOK));
+  if (!check) return;
   axios.defaults.headers.common['Authorization'] = tok;
   axios.put(`/api/items/${slug}?action=vote`)
   .then(
     res => console.log(res.data)
   );
+}
+
+function openLink(link, admin=false) {
+  var check = admin 
+    ? getCookie("oMg") === "true" 
+    : Boolean(getCookie(TOK));
+  if (!check) return;
+  window.location.href = link;
 }

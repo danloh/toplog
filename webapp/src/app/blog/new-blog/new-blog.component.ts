@@ -45,7 +45,7 @@ export class NewBlogComponent implements OnInit {
       { 'aname': ['', [Validators.required]],
         'avatar': [''],
         'intro': [''],
-        'topic': [ ''],
+        'topic': [this.newFor || ''],
         'blog_link': ['', [Validators.required, Validators.pattern(regUrl)]],
         'blog_host': [''],
         'tw_link': [''],
@@ -64,7 +64,7 @@ export class NewBlogComponent implements OnInit {
     }
     let topic = newBlog.topic;
     this.blogService.create(newBlog).subscribe(
-      _res => window.location.href = this.host_url + '/' + topic,
+      res => window.location.href = this.host_url + '/t/' + res.topic + '/Article',
       //err => console.log(err)
     );
   }

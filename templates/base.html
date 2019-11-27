@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico" >
   <meta name="google-site-verification" content="" />
   {%- block head -%}
-  <title>{%- block title -%} {{ title }}{%- endblock title -%} - {{ hostDomain }}</title>
+  <title>{{ hostDomain }}&nbsp; | &nbsp;{%- block title -%} {{ title }} {%- endblock title -%}</title>
   {%- block metaDescription -%}
   <meta name="description" content="Aggregated Blogs of Top Contributors To Rust, Golang, TypeScript, Angular ...">
   {%- endblock metaDescription -%}
@@ -57,6 +57,9 @@
           <a class="ty-tab" href="{{ t }}">{{ t }}</a>
           {%- endif -%}
         {%- endfor -%}
+        <a onclick="openLink('{{ `/me/item/new?for=` ~ topic }}')" href="javascript:void(0);" style="float:right">
+          <small class="help-tips">Submit...</small>
+        </a>
       </div>
       <span>
         <img class="banner-thumb" src="{{ '/static/logo/' ~ topic ~ '.svg' }}" referrerPolicy="no-referrer">

@@ -1,5 +1,6 @@
 <section class="blog-info">
-  <b>{{ c.aname }}</b> <a href = "{{'/me/blog/update/' ~ c.id }}">..</a><br>
+  <b>{{ c.aname }}</b> 
+  <a onclick= "openLink('{{`/me/blog/update/` ~ c.id }}', true)" href="javascript:void(0);">..</a><br>
   {%- set c_intro = c.intro -%}
   {%- if c_intro -%}
   <div class="blog-intro">{{ c_intro | showless(least=256) }}</div>

@@ -51,7 +51,7 @@ export class UpdateBlogComponent implements OnInit {
         'tw_link': [ this.blog.tw_link || ''],
         'gh_link': [ this.blog.gh_link || ''],
         'other_link': [ this.blog.other_link || ''],
-        'is_top': [this.blog.is_top || false],
+        'is_top': [this.blog.is_top],
       }
     );
   }
@@ -66,7 +66,7 @@ export class UpdateBlogComponent implements OnInit {
     const blogData: UpdateBlog = Object.assign(blog, { id: this.blogID });
     this.blogService.update(blogData)
     .subscribe(
-      _res => window.location.href = this.host_url + '/' + topic,
+      res => window.location.href = this.host_url + '/t/' + res.topic + '/Article',
       //err => console.log(err)
     );
   }

@@ -23,7 +23,7 @@
     <a onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
       <span class="triangle-up"></span>
     </a> &nbsp;&nbsp;
-    <a href = "{{'/me/item/update/' ~ a_slug }}">..</a>
+    <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" href="javascript:void(0);">..</a>
     <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
       {%- if a.is_top -%} ... {%- else -%} ::: {%- endif -%}
     </a>

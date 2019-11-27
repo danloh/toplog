@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ItemService, AuthService, Item, NewItem } from '../../core';
-import { regUrl, itemCates } from '../../shared';
+import { regUrl, itemCates, topicCates } from '../../shared';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -22,6 +22,7 @@ export class NewComponent implements OnInit {
 
   newFor: string;  // topic
   itemCates: string[] = itemCates;
+  topicCates: string[] = topicCates;
   host_url: string = environment.host_url;
 
   createForm: FormGroup;
@@ -45,12 +46,13 @@ export class NewComponent implements OnInit {
     this.createForm = this.formBuild.group(
       { 'title': ['', [Validators.required]],
         'content': [''],
+        'link': [''],
         'author': [''],
+        'topic': [ this.newFor || '', [Validators.required]],
         'ty': ['Article', [Validators.required]],
         'lang': ['English'], // if ty == translate
         'origin_link': [''], // if ty == translate
         'logo': [''],        // required if ty == book
-        'link': [''],
       }
     );
   }
@@ -76,7 +78,7 @@ export class NewComponent implements OnInit {
       }
     );
     this.itemService.create(itemData).subscribe(
-      _res => { window.location.href = this.host_url + '/' + topic },
+      res => { window.location.href = this.host_url + '/t/' + res.topic + '/Misc' },
       //err => console.log(err)
     );
   }

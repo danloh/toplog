@@ -170,6 +170,15 @@ pub fn init_server() -> std::io::Result<()> {
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
+                fs::Files::new("/static", "./static/") // static files
+                    .default_handler(route().to(|| HttpResponse::NotFound()))
+            )
+            .service(
+                fs::Files::new("/me", "./spa/") // spa static files
+                    .index_file("index.html")
+                    .default_handler(route().to(view::tmpl::spa_index))
+            )
+            .service(
                 resource("/{ty}")  // special case: /index
                     .route(get().to_async(view::tmpl::index_either))
             )
@@ -188,15 +197,6 @@ pub fn init_server() -> std::io::Result<()> {
             .service( 
                 resource("/more/{topic}/{ty}") // ?page=&perpage=42
                     .route(get().to_async(view::tmpl::more_item))
-            )
-            .service(
-                fs::Files::new("/static", "./static/") // static files
-                    .default_handler(route().to(|| HttpResponse::NotFound()))
-            )
-            .service(
-                fs::Files::new("/me", "./spa/") // spa static files
-                    .index_file("index.html")
-                    .default_handler(route().to(view::tmpl::spa_index))
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
