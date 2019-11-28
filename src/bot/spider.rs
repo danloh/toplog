@@ -85,21 +85,23 @@ impl WebPage {
         let url = self.get_url();
         let html = self.get_html();
         let domain = self.get_domain();
-        match domain.trim() {
+        let dmn = domain.trim();
+        match dmn {
             _ => {
-                let page = parse_other_page(url, html);
-                let title = page.title;
+                let page = parse_common_page(url, html);
+                let title = page.title.trim();
                 NewItem {
-                    title: title.clone(),
-                    slug: gen_slug(&title),
-                    content: page.content,
-                    logo: page.img,
+                    title: replace_space(title, " "),
+                    slug: gen_slug(title),
+                    content: page.content.trim().to_owned(),
+                    logo: page.img.trim().to_owned(),
+                    author: get_author_topic(dmn).0,
                     ty: "Article".to_owned(),
                     lang: "English".to_owned(),
-                    topic: "Rust".to_owned(),  // ?
-                    link: page.url,
+                    topic: get_author_topic(dmn).1,
+                    link: page.url.trim().to_owned(),
+                    origin_link: "".to_owned(),
                     post_by: "bot".to_owned(),
-                    ..NewItem::default()
                 }
             }
         }
@@ -108,7 +110,7 @@ impl WebPage {
 }
 
 
-pub fn parse_other_page(url: String, html: Html) -> PageInfo {
+pub fn parse_common_page(url: String, html: Html) -> PageInfo {
     let title_selector = Selector::parse("head > title").unwrap();
     let img_selector = Selector::parse("img").unwrap();
     let meta_selector = Selector::parse(r#"meta[name="description"]"#).unwrap();
@@ -179,10 +181,133 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
     let raw_links = page.extract_links();
     let mut links: Vec<String> = Vec::new();
     match domain.trim() {
+        // Rust: Nicholas Matsakis 
         "smallcultfollowing.com" => {
             for link in raw_links {
                 if link.starts_with("/babysteps/blog/2") {
                     let f_link = "http://smallcultfollowing.com".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: async-std
+        "async.rs" => {
+            for link in raw_links {
+                if link.starts_with("/blog/") && !(link.contains("/tags/")) && !(link.contains("/page/")) {
+                    let f_link = "https://async.rs".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: tokio
+        "tokio.rs" => {
+            for link in raw_links {
+                if link.starts_with("https://tokio.rs/blog/2") && !(link.contains("/#")) {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Guillaume Gomez 
+        "blog.guillaume-gomez.fr" => {
+            for link in raw_links {
+                if link.starts_with("https://blog.guillaume-gomez.fr/articles/2") {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Ralf Jung
+        "ralfj.de" => {
+            for link in raw_links {
+                if link.starts_with("/blog/2") {
+                    let f_link = "https://www.ralfj.de".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Steve Klabnik
+        "words.steveklabnik.com" => {
+            for link in raw_links {
+                if link.starts_with("https://words.steveklabnik.com/") {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Jorge Aparicio
+        "blog.japaric.io" => {
+            for link in raw_links {
+                if link.starts_with("https://blog.japaric.io/") && link.len() > 25 {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Nick Cameron
+        "ncameron.org" => {
+            for link in raw_links {
+                if link.starts_with("/blog/") && !(link.contains("/author/")) {
+                    let f_link = "https://www.ncameron.org".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Manish Goregaokar
+        "manishearth.github.io" => {
+            for link in raw_links {
+                if link.starts_with("/blog/2") {
+                    let f_link = "https://manishearth.github.io".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Simonas Kazlauskas
+        "kazlauskas.me" => {
+            for link in raw_links {
+                if link.starts_with("./entries/") {
+                    let f_link = "https://kazlauskas.me".to_string() 
+                        + &link.replacen("./", "/", 1);
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Jan-Erik Rediger
+        "fnordig.de" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                    let f_link = "https://fnordig.de".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Pietro Albini
+        "pietroalbini.org" => {
+            for link in raw_links {
+                if link.starts_with("/blog/") {
+                    let f_link = "https://www.pietroalbini.org".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Without Boats
+        "boats.gitlab.io" => {
+            for link in raw_links {
+                if link.starts_with("https://boats.gitlab.io/blog/post/") {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Pascal Hertleif
+        "deterministic.space" => {
+            for link in raw_links {
+                if link.starts_with("/") && !(link.contains(".xml")) {
+                    let f_link = "https://deterministic.space".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Nick Fitzgerald
+        "fitzgeraldnick.com" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                    let f_link = "https://fitzgeraldnick.com".to_string() + &link;
                     links.push(f_link)
                 }
             }
@@ -193,8 +318,55 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
     
     links.sort();
     links.dedup();
+    links.reverse();
     links
 }
 
 
 // TODO: more specific parse
+
+
+// some helpers
+// 
+// maintain a hashmap to map {host: (author, topic)}
+use std::collections::HashMap;
+
+lazy_static! {
+    pub static ref MAP_HOST: HashMap<&'static str, (&'static str, &'static str)> = {
+        let mut map = HashMap::new();
+        map.insert("smallcultfollowing.com", ("Nicholas Matsakis", "Rust"));
+        map.insert("tokio.rs", ("Tokio Team", "Rust"));
+        map.insert("async.rs", ("async-std", "Rust"));
+        map.insert("blog.guillaume-gomez.fr", ("Guillaume Gomez", "Rust"));
+        map.insert("ralfj.de", ("Ralf Jung", "Rust"));
+        map.insert("words.steveklabnik.com", ("Steve Klabnik", "Rust"));
+        map.insert("blog.japaric.io", ("Jorge Aparicio", "Rust"));
+        map.insert("ncameron.org", ("Nick Cameron", "Rust"));
+        map.insert("manishearth.github.io", ("Manish Goregaokar", "Rust"));
+        map.insert("kazlauskas.me", ("Simonas Kazlauskas", "Rust"));
+        map.insert("fnordig.de", ("Jan-Erik Rediger", "Rust"));
+        map.insert("pietroalbini.org", ("Pietro Albini", "Rust"));
+        map.insert("boats.gitlab.io", ("Without Boats", "Rust"));
+        map.insert("deterministic.space", ("Pascal Hertleif", "Rust"));
+        map.insert("fitzgeraldnick.com", ("Nick Fitzgerald", "Rust"));
+
+        map
+    };
+}
+
+fn get_author_topic(host: &str) -> (String, String) {
+    let map = &MAP_HOST;
+    let default = &(host,"Rust");
+    let tup = map.get(host).unwrap_or(default);
+
+    (tup.0.to_owned(), tup.1.to_owned())
+}
+
+// replace whitespance, \n \t \r \f...
+pub fn replace_space(text: &str, rep: &str) -> String {
+    lazy_static! {
+        static ref RE: Regex =
+            Regex::new(r"\s").unwrap(); // let fail in test
+    }
+    RE.replace_all(text, rep).into_owned()
+}

@@ -27,8 +27,39 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
 
     // new WebPages and get all links
     let mut links: Vec<String> = Vec::new();
+    let url_list = vec!(
+        "http://smallcultfollowing.com/babysteps/"
+    );
     let babystep = WebPage::new("http://smallcultfollowing.com/babysteps/");
     links.append(&mut babystep.clean_links());
+    let tokio = WebPage::new("https://tokio.rs/blog/2019-11-tokio-0-2/");
+    links.append(&mut tokio.clean_links());
+    let asystd = WebPage::new("https://async.rs/blog/");
+    links.append(&mut asystd.clean_links());
+    let ggomez = WebPage::new("https://blog.guillaume-gomez.fr/");
+    links.append(&mut ggomez.clean_links());
+    let ralf = WebPage::new("https://www.ralfj.de/blog/");
+    links.append(&mut ralf.clean_links());
+    let steve = WebPage::new("https://words.steveklabnik.com/");
+    links.append(&mut steve.clean_links());
+    let jorge = WebPage::new("https://blog.japaric.io/");
+    links.append(&mut jorge.clean_links());
+    let nrc = WebPage::new("https://www.ncameron.org/blog/");
+    links.append(&mut nrc.clean_links());
+    let mg = WebPage::new("https://manishearth.github.io/");
+    links.append(&mut mg.clean_links());
+    let nagisa = WebPage::new("https://kazlauskas.me/");
+    links.append(&mut nagisa.clean_links());
+    let badboy = WebPage::new("https://fnordig.de/posts/");
+    links.append(&mut badboy.clean_links());
+    let pietroalbini = WebPage::new("https://www.pietroalbini.org/");
+    links.append(&mut pietroalbini.clean_links());
+    let boats = WebPage::new("https://boats.gitlab.io/blog/");
+    links.append(&mut boats.clean_links());
+    let pascal = WebPage::new("https://deterministic.space/");
+    links.append(&mut pascal.clean_links());
+    let fitz = WebPage::new("https://fitzgeraldnick.com/");
+    links.append(&mut fitz.clean_links());
     // println!("{:?}", links);
     
     // diff the links w/ db
