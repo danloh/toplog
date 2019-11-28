@@ -408,6 +408,34 @@ impl Handler<ResetPsw> for Dba {
     }
 }
 
+// GET /confirm/{token}
+//
+// confirm user email
+pub fn confirm_email(
+    p_info: Path<String>,
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    use base64::decode;
+    let tok = p_info.into_inner();
+    let de_tok =
+        String::from_utf8(decode(&tok).unwrap_or(Vec::new())).unwrap_or("".into());
+    let tc = verify_token(&de_tok);
+
+    db.send(tc).from_err().and_then(|res| match res {
+        Ok(check) => {
+            let mut ctx = tera::Context::new();
+            let res = if check { "Success!" } else { "Failed!" };
+            ctx.insert("res", res);
+            use crate::view::TEMPLATE as tmpl;
+            let cfm = tmpl.render("confirm.html", &ctx).map_err(|_| {
+                ServiceError::InternalServerError("template failed".into())
+            })?;
+            Ok(HttpResponse::Ok().content_type("text/html").body(cfm))
+        }
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
 // handle msg from tmpl.confirm_email
 // only signed up user need to confirm email
 impl Handler<TokClaim> for Dba {

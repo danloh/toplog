@@ -170,6 +170,10 @@ pub fn init_server() -> std::io::Result<()> {
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
+                resource("/confirm/{token}")
+                    .route(get().to_async(api::auth::confirm_email))
+            )
+            .service(
                 fs::Files::new("/static", "./static/") // static files
                     .default_handler(route().to(|| HttpResponse::NotFound()))
             )
