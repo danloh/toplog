@@ -9,6 +9,10 @@ fn main() -> SrvResult<()> {
     tasks::spider_items()
         .enqueue(&conn)
         .map_err(|e| SrvError::from_std_error(e))?;
+    
+    tasks::cal_blogs_karma()
+        .enqueue(&conn)
+        .map_err(|e| SrvError::from_std_error(e))?;
 
     Ok(())
 }

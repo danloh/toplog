@@ -1,9 +1,10 @@
 use crate::bot::jobs::Environment;
 use crate::errors::{SrvErrToStdErr, SrvError, SrvResult};
 use crate::api::{
-    item::{NewItem},
+    item::{NewItem, Item},
+    blog::{Blog},
 };
-use diesel::dsl::any;
+use diesel::dsl::{any, sum};
 use diesel::prelude::*;
 use std::error::Error;
 use swirl::PerformError;
@@ -61,6 +62,35 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         .values(&new_items)
         .on_conflict_do_nothing()
         .execute(conn)?;
+
+    Ok(())
+}
+
+
+// Cal 
+//
+// cal blog karma
+#[swirl::background_job]
+pub fn cal_blogs_karma(env: &Environment) -> Result<(), PerformError> {
+    let conn = env.connection()?;
+    update_blogs_karma(&conn)?;
+
+    Ok(())
+}
+
+pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
+    use crate::schema::blogs::dsl::*;
+    use crate::schema::items::dsl::{items, author, vote};
+    let blog_list = blogs.load::<Blog>(conn)?;
+    for b in blog_list {
+        let bname = &b.aname;
+        let votes: Vec<i32> = items
+            .filter(author.eq(bname))
+            .select(vote)
+            .load::<i32>(conn)?;
+        let k: i32 = votes.iter().sum();
+        diesel::update(&b).set(karma.eq(k)).execute(conn)?;
+    }
 
     Ok(())
 }

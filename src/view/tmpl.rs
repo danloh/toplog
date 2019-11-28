@@ -335,7 +335,7 @@ impl Handler<Topic> for Dba {
         } else {
             (
                 QueryItems::Tt(tpc.clone(), typ, 42, t.page),
-                QueryBlogs::Topic(tpc, 42, 1)
+                QueryBlogs::Top(tpc, 42, 1)
             )
         };
 
@@ -428,7 +428,7 @@ impl Handler<TopicEither> for Dba {
                 } else {
                     (
                         QueryItems::Tt(tpc.clone(), typ, 42, 1),
-                        QueryBlogs::Topic(tpc, 42, 1)
+                        QueryBlogs::Top(tpc, 42, 1)
                     )
                 };
 
