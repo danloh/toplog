@@ -21,11 +21,6 @@
     <nav class="nav-menu">
     {%- block nav -%}
       <a href="/"><b class="logo">{{ hostDomain }}</b></a><sup class="logo-sup">beta</sup>
-      <!--google site search -->
-      <form id="Search" onsubmit="onSearch('q', 'g')" class="search-box">
-        <input type="text" id="q" placeholder=" Search using Google " class="search-text"/>
-      </form>
-      <!--end google site search -->	
       <div class="right-menu">
         <a href="/me/" id="login-link"><b>Log in</b></a>
         <div class="menudown" id="menu-down" style="display: none">
@@ -50,7 +45,7 @@
       {%- endfor -%}
       <small class="help-tips">More coming soon...</small>
       <div class="menu-bar">
-        {%- for t in ["Article", "Book", "Event", "Podcast", "Misc"] -%}
+        {%- for t in ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate', 'Misc'] -%}
           {%- if t == ty -%}
           <a class="ty-tab-active" href="{{ t }}">{{ t }}</a>
           {%- else -%}
@@ -73,7 +68,12 @@
   {%- block foot -%}
     <div class="bottom">
       ©{{ hostDomain }} Since 2020 | <a href="/about.html">About</a>
-    </div><br>			
+      <!--google site search -->
+      <form id="Search" onsubmit="onSearch('q', 'g')" class="search-box">
+        <input type="text" id="q" placeholder=" Search " class="search-text"/>
+      </form>
+      <!--end google site search -->	
+    </div><br>
   {%- endblock foot -%}
   </footer>
 {%- endblock body -%}

@@ -10,5 +10,5 @@ export const regHashTag = /[\n|\r|\s]#(\w+)/g; // /(?<=[\n|\r|\s])#(\w+)/g N/A S
 export const regSpecialcn = /[`~!@#$%^&*()+=|{}\]\['":;,.\\?\/<>《》；：。，、“‘’”【】「」——（）……¥！～·]/g;
 export const regSpecial = /[^a-zA-Z0-9]/g;
 
-export const itemCates: string[] = ['Article', 'Book', 'Event', 'Podcast', 'Translate' ];
+export const itemCates: string[] = ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate' ];
 export const topicCates: string[] = ['Rust', 'Go', 'TypeScript', 'Angular', 'Vue', 'React', 'Dart'];

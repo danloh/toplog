@@ -264,20 +264,15 @@ pub struct Topic{
     pub page: i32,
 }
 
+
+
 impl Topic {
     fn validate(&self) -> ServiceResult<()> {
         let tp: &str = &self.topic.trim();
         let ty: &str = &self.ty.trim();
         let page = &self.page;
     
-        let check = ty == "index" 
-        || ty == "Article" 
-        || ty == "Book" 
-        || ty == "Event" 
-        || ty == "Podcast" 
-        || ty == "Translate"
-        || ty == "Misc";
-
+        let check = checker(&ty);
         if check {
             Ok(())
         } else {
@@ -345,14 +340,7 @@ impl TopicEither {
         let tp: &str = &self.topic.trim();
         let ty: &str = &self.ty.trim();
     
-        let check = ty == "index" 
-        || ty == "Article" 
-        || ty == "Book" 
-        || ty == "Event" 
-        || ty == "Podcast" 
-        || ty == "Translate"
-        || ty == "Misc";
-
+        let check = checker(&ty);
         if check {
             Ok(())
         } else {
@@ -434,4 +422,20 @@ impl Handler<TopicEither> for Dba {
             }
         }
     }
+}
+
+//
+// a checker
+fn checker(ty: &str) -> bool {
+    let check = ty == "index" 
+        || ty == "Article" 
+        || ty == "Book" 
+        || ty == "Event" 
+        || ty == "Job" 
+        || ty == "Podcast" 
+        || ty == "Product" 
+        || ty == "Translate"
+        || ty == "Misc";
+
+    check
 }
