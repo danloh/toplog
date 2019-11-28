@@ -42,7 +42,7 @@ export class NewBlogComponent implements OnInit {
     this.newFor = this.route.snapshot.queryParamMap.get('for');
 
     this.createForm = this.formBuild.group(
-      { 'aname': ['', [Validators.required]],
+      { 'aname': [null, [Validators.required]],
         'avatar': [''],
         'intro': [''],
         'topic': [this.newFor || ''],

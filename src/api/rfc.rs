@@ -121,7 +121,7 @@ impl Handler<QueryIssue> for Dba {
     }
 }
 
-// GET: api/issues?per=topic&kw=&perpage=20&page=p
+// GET: api/issues?per=topic&kw=&page=p&perpage=42
 // 
 pub fn get_list(
     pq: Query<ReqQuery>,

@@ -9,8 +9,8 @@ pub mod rfc;
 pub struct ReqQuery {
     per: String,
     kw: String,
-    perpage: i32,
     page: i32,
+    perpage: i32,
 }
 
 #[derive(Deserialize, Clone)]

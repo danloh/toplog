@@ -138,7 +138,7 @@ impl Handler<QueryBlog> for Dba {
     }
 }
 
-// GET: api/blogs?per=topic&kw=&perpage=20&page=p
+// GET: api/blogs?per=topic&kw=&page=p&perpage=42
 // 
 pub fn get_list(
     pq: Query<ReqQuery>,
@@ -221,6 +221,18 @@ impl NewBlog {
 
         Ok(blog_new)
     }
+
+    pub fn save_name_as_blog(
+        name: &str,
+        conn: &PooledConn,
+    ) -> ServiceResult<Blog> {
+        let new_blog = NewBlog {
+            aname: name.to_owned(),
+            is_top: false,
+            ..NewBlog::default()
+        };
+        new_blog.new(conn)
+    }
 }
 
 impl Message for NewBlog {
@@ -252,7 +264,8 @@ impl UpdateBlog {
         let old = blogs.filter(id.eq(self.id))
             .get_result::<Blog>(conn)?;
         // check if anything chenged
-        let check_changed: bool = self.aname.trim() != old.aname.trim()
+        let new_aname = self.aname.trim();
+        let check_changed: bool = new_aname != old.aname.trim()
             || self.avatar.trim() != old.avatar.trim()
             || self.intro.trim() != old.intro.trim()
             || self.topic.trim() != old.topic.trim()
@@ -265,7 +278,19 @@ impl UpdateBlog {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
 
+        // update item's author if aname chenged
+        if new_aname != old.aname.trim() && new_aname != "" {
+            use crate::api::item::Item;
+            use crate::schema::items::dsl::{items, author};
+            diesel::update(
+                items.filter(author.eq(old.aname.trim()))
+            )
+            .set(author.eq(new_aname))
+            .execute(conn)?;
+        }
+
         let blog_update = diesel::update(&old).set(&self).get_result::<Blog>(conn)?;
+
         Ok(blog_update)
     }
 }

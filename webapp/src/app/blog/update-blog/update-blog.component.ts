@@ -42,12 +42,12 @@ export class UpdateBlogComponent implements OnInit {
     });
 
     this.updateForm = this.formBuild.group(
-      { 'aname': [ this.blog.aname || '', [Validators.required]],
+      { 'aname': [ this.blog.aname || null, [Validators.required]],
         'avatar': [ this.blog.avatar || ''],
         'intro': [ this.blog.intro || ''],
         'topic': [ this.blog.topic || ''],
         'blog_link': [ this.blog.blog_link ||'', [Validators.required, Validators.pattern(regUrl)]],
-        'blog_host': [ this.blog.blog_host || '', [Validators.required]],
+        'blog_host': [ this.blog.blog_host || ''],
         'tw_link': [ this.blog.tw_link || ''],
         'gh_link': [ this.blog.gh_link || ''],
         'other_link': [ this.blog.other_link || ''],

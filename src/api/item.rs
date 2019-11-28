@@ -166,7 +166,7 @@ impl Handler<QueryItem> for Dba {
     }
 }
 
-// GET: api/items?per=topic|author&kw=&perpage=42&page=p
+// GET: api/items?per=topic|author&kw=&page=p&perpage=42
 // 
 pub fn get_list(
     pq: Query<ReqQuery>,
@@ -257,11 +257,19 @@ impl NewItem {
             slug: a_slug,
             ..self
         };
+
+        // save item's author to blog, for reference
+        let aname = new_item.author.trim();
+        if aname != "" {
+            use crate::api::blog::NewBlog;
+            NewBlog::save_name_as_blog(aname, conn);  // ignore potential error
+        }
+
         let item_new = diesel::insert_into(items)
             .values(&new_item)
             .on_conflict_do_nothing()
             .get_result::<Item>(conn)?;
-
+        
         Ok(item_new)
     }
 }
@@ -297,6 +305,23 @@ impl UpdateItem {
         use crate::schema::items::dsl::*;
         let old = items.filter(id.eq(self.id))
             .get_result::<Item>(conn)?;
+        
+        // check if anything changed
+        let new_title = self.title.trim();
+        let check_changed: bool = new_title != old.title.trim()
+            || self.content.trim() != old.content.trim()
+            || self.logo.trim() != old.logo.trim()
+            || self.author.trim() != old.author.trim()
+            || self.ty.trim() != old.ty.trim()
+            || self.lang.trim() != old.lang.trim()
+            || self.topic.trim() != old.topic.trim()
+            || self.link.trim() != old.link.trim()
+            || self.origin_link.trim() != old.origin_link.trim()
+            || self.pub_at != old.pub_at;
+        if !check_changed {
+            return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
+        }
+        
         // check if title changed
         let check_title_changed: bool = &self.title.trim() == &old.title.trim();
         let a_slug = if check_title_changed {
@@ -309,10 +334,17 @@ impl UpdateItem {
             ..self
         };
 
+        // save item's author to blog, for referenc
+        let aname = up.author.trim();
+        if aname != "" && aname != old.author.trim() {
+            use crate::api::blog::NewBlog;
+            NewBlog::save_name_as_blog(aname, conn);  // ignore potential error
+        }
+
         let item_update = diesel::update(&old)
             .set(up)
             .get_result::<Item>(conn)?;
-
+        
         Ok(item_update)
     }
 }

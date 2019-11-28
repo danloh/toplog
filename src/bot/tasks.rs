@@ -89,7 +89,13 @@ pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
             .select(vote)
             .load::<i32>(conn)?;
         let k: i32 = votes.iter().sum();
-        diesel::update(&b).set(karma.eq(k)).execute(conn)?;
+        let if_top = k > 100 || b.is_top;
+        diesel::update(&b)
+            .set((
+                karma.eq(k), 
+                is_top.eq(if_top)
+            ))
+            .execute(conn)?;
     }
 
     Ok(())
