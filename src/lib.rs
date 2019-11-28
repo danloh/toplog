@@ -203,6 +203,10 @@ pub fn init_server() -> std::io::Result<()> {
                     .route(get().to_async(view::tmpl::more_item))
             )
             .service(
+                resource("/site/{name}")
+                    .route(get().to_async(view::tmpl::site))
+            )
+            .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("all-index.html")
                     .default_handler(route().to(|| HttpResponse::NotFound()))

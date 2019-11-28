@@ -428,7 +428,7 @@ pub fn confirm_email(
             ctx.insert("res", res);
             use crate::view::TEMPLATE as tmpl;
             let cfm = tmpl.render("confirm.html", &ctx).map_err(|_| {
-                ServiceError::InternalServerError("template failed".into())
+                ServiceError::NotFound("failed".into())
             })?;
             Ok(HttpResponse::Ok().content_type("text/html").body(cfm))
         }
@@ -716,7 +716,7 @@ fn get_secret() -> String {
 pub fn encode_token(data: &CheckUser) -> Result<String, ServiceError> {
     let claims = Claims::new(data.id, data.uname.as_str(), data.permission);
     encode(&Header::default(), &claims, get_secret().as_ref())
-        .map_err(|_err| ServiceError::InternalServerError("encode".into()))
+        .map_err(|_err| ServiceError::BadRequest("encode".into()))
 }
 
 pub fn decode_token(token: &str) -> Result<CheckUser, ServiceError> {
@@ -732,7 +732,7 @@ pub fn hash_password(plain: &str) -> Result<String, ServiceError> {
         _ => DEFAULT_COST,
     };
     hash(plain, hashing_cost)
-        .map_err(|_| ServiceError::InternalServerError("hash".into()))
+        .map_err(|_| ServiceError::BadRequest("hash".into()))
 }
 
 // # modle for api/handler
@@ -1061,7 +1061,7 @@ pub fn generate_token(
         email: email.to_string(),
     };
     encode(&Header::default(), &claim, get_secret().as_ref())
-        .map_err(|_err| ServiceError::InternalServerError("encode".into()))
+        .map_err(|_err| ServiceError::BadRequest("encode".into()))
 }
 
 pub fn verify_token(token: &str) -> TokClaim {

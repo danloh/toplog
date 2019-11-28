@@ -52,7 +52,7 @@ pub fn index_either(
                 ctx.insert("topic", "all");
 
                 let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                    ServiceError::InternalServerError("template failed".into())
+                    ServiceError::NotFound("failed".into())
                 })?;
                 let dir = "www/".to_owned() + &msg.message + ".html";
                 std::fs::write(dir, h.as_bytes())?;
@@ -93,7 +93,7 @@ pub fn index_dyn(
             ctx.insert("topic", "all");
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                ServiceError::InternalServerError("template failed".into())
+                ServiceError::NotFound("failed".into())
             })?;
             let dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(dir, h.as_bytes())?;
@@ -132,7 +132,7 @@ pub fn topic_dyn(
             ctx.insert("topic", tpc);
 
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                ServiceError::InternalServerError("template failed".into())
+                ServiceError::NotFound("failed".into())
             })?;
             let t_dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(&t_dir, h.as_bytes())?;
@@ -173,7 +173,7 @@ pub fn topic_either(
                 ctx.insert("ty", typ);
 
                 let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                    ServiceError::InternalServerError("template failed".into())
+                    ServiceError::NotFound("failed".into())
                 })?;
                 let t_dir = "www/".to_owned() + &msg.message + ".html";
                 std::fs::write(&t_dir, h.as_bytes())?;
@@ -215,7 +215,7 @@ pub fn more_item(
             ctx.insert("items", &msg.items);
 
             let h = tmpl.render("more_item.html", &ctx).map_err(|_| {
-                ServiceError::InternalServerError("template failed".into())
+                ServiceError::NotFound("failed".into())
             })?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
@@ -235,6 +235,31 @@ pub fn spa_index() -> Result<HttpResponse, Error> {
     Ok(HttpResponse::build(http::StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(res))
+}
+
+// GET /site/{name}
+//
+// site: about, help, terms, etc.
+pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
+    let p = p_info.into_inner();
+    let tpl_dir = p + ".html";
+    let dir = "www/".to_owned() + &tpl_dir;
+    let s_html = std::fs::read(&dir);
+
+    let html = match s_html {
+        Ok(s) => {
+            String::from_utf8(s).unwrap_or_default()
+        }
+        _ => {
+            let t = tmpl.render(&tpl_dir, &tera::Context::new())
+                .map_err(|_| ServiceError::NotFound("404".into()))?;
+            std::fs::write(dir, t.as_bytes())?;
+            t
+        }
+    };
+    Ok(HttpResponse::build(http::StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }
 
 // =====================================================================
@@ -263,8 +288,6 @@ pub struct Topic{
     pub ty: String,
     pub page: i32,
 }
-
-
 
 impl Topic {
     fn validate(&self) -> ServiceResult<()> {

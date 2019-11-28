@@ -35,6 +35,7 @@
   {%- endblock header -%}
   </header>
   <div class="banner">
+    {%- block banner -%}
     <div class="banner-view">
       {%- for t in ["Rust", "Go", "TypeScript", "Angular", "Vue", "React"] -%}
         {%- if t == topic -%}
@@ -60,6 +61,7 @@
         <img class="banner-thumb" src="{{ '/static/logo/' ~ topic ~ '.svg' }}" referrerPolicy="no-referrer">
       </span>
     </div>
+    {%- endblock banner -%}
   </div>
   <div class="main-view">
     {%- block mainview -%}{%- endblock mainview -%}
@@ -67,7 +69,7 @@
   <footer class="footer">
   {%- block foot -%}
     <div class="bottom">
-      ©{{ hostDomain }} Since 2020 | <a href="/about.html">About</a>
+      ©{{ hostDomain }} Since 2020 | <a href="/site/about">About</a>
       <!--google site search -->
       <form id="Search" onsubmit="onSearch('q', 'g')" class="search-box">
         <input type="text" id="q" placeholder=" Search " class="search-text"/>
