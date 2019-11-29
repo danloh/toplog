@@ -49,7 +49,7 @@ export class RegComponent implements OnInit {
       return
     }
     // just base64 encode, todo: encrypt
-    let pswd = Base64.encode(authdata.password);
+    let pswd = Base64.encode(authdata.password, true);
     authdata.password = pswd;
     authdata.confirm = pswd;
     authdata.uname = authdata.uname.trim();

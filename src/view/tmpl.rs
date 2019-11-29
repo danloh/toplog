@@ -189,6 +189,49 @@ pub fn topic_either(
     })
 }
 
+// GET /from?by=
+//
+// response dynamically
+pub fn item_from(
+    db: Data<DbAddr>,
+    bq: Query<ByQuery>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    // extract Query
+    let bq_by = bq.into_inner().by;
+    use crate::util::helper::de_base64;
+    let by = de_base64(&bq_by);
+
+    let topic_msg = Topic { 
+        topic: String::from("from"),
+        ty: by,
+        page: 1, 
+    };
+    result(
+        topic_msg.validate()
+    )
+    .from_err()
+    .and_then(move |_| db.send(topic_msg).from_err())
+    .and_then(|res| match res {
+        Ok(msg) => {
+            let mut ctx = tera::Context::new();
+            ctx.insert("items", &msg.items);
+            ctx.insert("blogs", &msg.blogs);
+            let mesg: Vec<&str> = (&msg.message).split("-").collect();
+            let by = mesg[1];
+            ctx.insert("ty", by);
+            ctx.insert("topic", "from");
+
+            let h = tmpl.render("home.html", &ctx).map_err(|_| {
+                ServiceError::NotFound("failed".into())
+            })?;
+            let t_dir = "www/".to_owned() + &msg.message + ".html";
+            std::fs::write(&t_dir, h.as_bytes())?;
+            Ok(HttpResponse::Ok().content_type("text/html").body(h))
+        }
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
 // GET /more/{topic}/{ty}?page=&perpage=42
 //
 pub fn more_item(
@@ -198,7 +241,13 @@ pub fn more_item(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let pa = p.into_inner();
     let topic = pa.0;
-    let ty = pa.1;
+    let p_ty = pa.1;
+    let ty = if topic.trim() == "from" { 
+        use crate::util::helper::de_base64;
+        de_base64(&p_ty)
+    } else { 
+        p_ty 
+    };
     // extract Query
     let page = std::cmp::max(pq.page, 1);
     let perpage = pq.clone().perpage;
@@ -273,6 +322,12 @@ pub struct PageQuery {
     perpage: i32,
 }
 
+// for extrct query param
+#[derive(Deserialize, Clone)]
+pub struct ByQuery {
+    by: String,
+}
+
 // result struct in response
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ItemBlogMsg {
@@ -284,8 +339,8 @@ pub struct ItemBlogMsg {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Topic{
-    pub topic: String,
-    pub ty: String,
+    pub topic: String,  // special case: all, from
+    pub ty: String,     // special case: index, Misc, Author
     pub page: i32,
 }
 
@@ -295,7 +350,7 @@ impl Topic {
         let ty: &str = &self.ty.trim();
         let page = &self.page;
     
-        let check = checker(&ty);
+        let check = if tp != "from" { checker(&ty) } else { true };
         if check {
             Ok(())
         } else {
@@ -327,16 +382,25 @@ impl Handler<Topic> for Dba {
 
         let tp = tpc.trim().to_lowercase();
 
-        let (query_item, query_blog) = if tp == "all" {
-            (
-                QueryItems::Index(typ, 42, t.page),
-                QueryBlogs::Index("index".into(), 42, 1)
-            )
-        } else {
-            (
-                QueryItems::Tt(tpc.clone(), typ, 42, t.page),
-                QueryBlogs::Top(tpc, 42, 1)
-            )
+        let (query_item, query_blog) = match tp.trim() {
+            "all" => {
+                (
+                    QueryItems::Index(typ, 42, t.page),
+                    QueryBlogs::Index("index".into(), 42, 1)
+                )
+            }
+            "from" => {
+                (
+                    QueryItems::Author(typ.clone(), 42, t.page),
+                    QueryBlogs::Name(typ, 42, 1)
+                )
+            } 
+            _ => {
+                (
+                    QueryItems::Tt(tpc.clone(), typ, 42, t.page),
+                    QueryBlogs::Top(tpc, 42, 1)
+                )
+            }
         };
 
         let (i_list, _) = query_item.get(conn)?;
@@ -450,7 +514,7 @@ impl Handler<TopicEither> for Dba {
 //
 // a checker
 fn checker(ty: &str) -> bool {
-    let check = ty == "index" 
+    let check = ty == "index"
         || ty == "Article" 
         || ty == "Book" 
         || ty == "Event" 

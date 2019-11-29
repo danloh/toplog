@@ -65,6 +65,21 @@ fn _slugify(s: &str) -> String {
     string
 }
 
+// base64 en_decode
+pub fn de_base64(c: &str) -> String {
+    let s = String::from_utf8(
+        base64::decode_config(c, base64::URL_SAFE_NO_PAD)
+            .unwrap_or(Vec::new())
+    )
+    .unwrap_or("".into());
+    s
+}
+
+pub fn en_base64(s: &str) -> String {
+    let c = base64::encode_config(s, base64::URL_SAFE_NO_PAD);
+    c
+}
+
 // extract host of url
 lazy_static! {
     static ref RE_S: Regex =

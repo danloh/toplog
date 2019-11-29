@@ -214,6 +214,18 @@ impl NewBlog {
         conn: &PooledConn,
     ) -> ServiceResult<Blog> {
         use crate::schema::blogs::dsl::blogs;
+        let new_blog = NewBlog {
+            aname: self.aname.trim().to_owned(),
+            avatar: self.avatar.trim().to_owned(),
+            intro: self.intro.trim().to_owned(),
+            topic: self.topic.trim().to_owned(),
+            blog_link: self.blog_link.trim().to_owned(),
+            blog_host: self.blog_host.trim().to_owned(),
+            tw_link: self.tw_link.trim().to_owned(),
+            gh_link: self.gh_link.trim().to_owned(),
+            other_link: self.other_link.trim().to_owned(),
+            is_top: self.is_top,
+        };
         let blog_new = diesel::insert_into(blogs)
             .values(self)
             .on_conflict_do_nothing()
@@ -227,7 +239,7 @@ impl NewBlog {
         conn: &PooledConn,
     ) -> ServiceResult<Blog> {
         let new_blog = NewBlog {
-            aname: name.to_owned(),
+            aname: name.trim().to_owned(),
             is_top: false,
             ..NewBlog::default()
         };
@@ -265,15 +277,25 @@ impl UpdateBlog {
             .get_result::<Blog>(conn)?;
         // check if anything chenged
         let new_aname = self.aname.trim();
+        let new_avatar = self.avatar.trim();
+        let new_intro =  self.intro.trim();
+        let new_topic = self.topic.trim();
+        let new_blog_link = self.blog_link.trim();
+        let new_blog_host = self.blog_host.trim();
+        let new_tw_link = self.tw_link.trim();
+        let new_gh_link = self.gh_link.trim();
+        let new_other_link = self.other_link.trim();
+        let new_is_top = self.is_top;
+
         let check_changed: bool = new_aname != old.aname.trim()
-            || self.avatar.trim() != old.avatar.trim()
-            || self.intro.trim() != old.intro.trim()
-            || self.topic.trim() != old.topic.trim()
-            || self.blog_link.trim() != old.blog_link.trim()
-            || self.tw_link.trim() != old.tw_link.trim()
-            || self.gh_link.trim() != old.gh_link.trim()
-            || self.other_link.trim() != old.other_link.trim()
-            || self.is_top != old.is_top;
+            || new_avatar != old.avatar.trim()
+            || new_intro != old.intro.trim()
+            || new_topic != old.topic.trim()
+            || new_blog_link != old.blog_link.trim()
+            || new_tw_link != old.tw_link.trim()
+            || new_gh_link != old.gh_link.trim()
+            || new_other_link != old.other_link.trim()
+            || new_is_top != old.is_top;
         if !check_changed {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
@@ -289,7 +311,21 @@ impl UpdateBlog {
             .execute(conn)?;
         }
 
-        let blog_update = diesel::update(&old).set(&self).get_result::<Blog>(conn)?;
+        let up = UpdateBlog {
+            id: self.id,
+            aname: new_aname.to_owned(),
+            avatar: new_avatar.to_owned(),
+            intro: new_intro.to_owned(),
+            topic: new_topic.to_owned(),
+            blog_link: new_blog_link.to_owned(),
+            blog_host: new_blog_host.to_owned(),
+            tw_link: new_tw_link.to_owned(),
+            gh_link: new_gh_link.to_owned(),
+            other_link: new_other_link.to_owned(),
+            is_top: new_is_top,
+        };
+
+        let blog_update = diesel::update(&old).set(&up).get_result::<Blog>(conn)?;
 
         Ok(blog_update)
     }
@@ -358,6 +394,7 @@ pub enum QueryBlogs {
     Index(String, i32, i32),
     Topic(String, i32, i32),
     Top(String, i32, i32),  // topic, perpage-42, page
+    Name(String, i32, i32),
 }
 
 impl QueryBlogs {
@@ -381,6 +418,16 @@ impl QueryBlogs {
             }
             QueryBlogs::Top(t, o, p) => {
                 let query = blogs.filter(is_top.eq(true)).filter(topic.eq(t));
+                let p_o = std::cmp::max(0, p-1);
+                blog_count = query.clone().count().get_result(conn)?;
+                blog_list = query
+                    .order(karma.desc())
+                    .limit(o.into())
+                    .offset((o * p_o).into())
+                    .load::<Blog>(conn)?;
+            }
+            QueryBlogs::Name(n, o, p) => {
+                let query = blogs.filter(aname.eq(n));
                 let p_o = std::cmp::max(0, p-1);
                 blog_count = query.clone().count().get_result(conn)?;
                 blog_list = query

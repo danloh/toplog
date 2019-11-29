@@ -252,10 +252,20 @@ impl NewItem {
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
         use crate::schema::items::dsl::items;
-        let a_slug = gen_slug(&self.title);
+        let title = self.title.trim();
+        let a_slug = gen_slug(title);
         let new_item = NewItem {
+            title: title.to_owned(),
             slug: a_slug,
-            ..self
+            content: self.content.trim().to_owned(),  // do some trim
+            logo: self.logo.trim().to_owned(),
+            author: self.author.trim().to_owned(),
+            ty: self.ty.trim().to_owned(),
+            lang: self.lang.trim().to_owned(),
+            topic: self.topic.trim().to_owned(),
+            link: self.link.trim().to_owned(),
+            origin_link: self.origin_link.trim().to_owned(),
+            post_by: self.post_by.trim().to_owned(),
         };
 
         // save item's author to blog, for reference
@@ -308,29 +318,49 @@ impl UpdateItem {
         
         // check if anything changed
         let new_title = self.title.trim();
+        let new_content = self.content.trim();
+        let new_logo = self.logo.trim();
+        let new_author = self.author.trim();
+        let new_ty = self.ty.trim();
+        let new_lang = self.lang.trim();
+        let new_topic = self.topic.trim();
+        let new_link = self.link.trim();
+        let new_origin = self.origin_link.trim();
+        let new_pub_at = self.pub_at;
+
         let check_changed: bool = new_title != old.title.trim()
-            || self.content.trim() != old.content.trim()
-            || self.logo.trim() != old.logo.trim()
-            || self.author.trim() != old.author.trim()
-            || self.ty.trim() != old.ty.trim()
-            || self.lang.trim() != old.lang.trim()
-            || self.topic.trim() != old.topic.trim()
-            || self.link.trim() != old.link.trim()
-            || self.origin_link.trim() != old.origin_link.trim()
-            || self.pub_at != old.pub_at;
+            || new_content != old.content.trim()
+            || new_logo != old.logo.trim()
+            || new_author != old.author.trim()
+            || new_ty != old.ty.trim()
+            || new_lang != old.lang.trim()
+            || new_topic != old.topic.trim()
+            || new_link != old.link.trim()
+            || new_origin != old.origin_link.trim()
+            || new_pub_at != old.pub_at;
         if !check_changed {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
         
         // check if title changed
-        let check_title_changed: bool = &self.title.trim() == &old.title.trim();
+        let check_title_changed: bool = &new_title != &old.title.trim();
         let a_slug = if check_title_changed {
-            (&old).slug.to_owned()
+            gen_slug(new_title) 
         } else {
-            gen_slug(&self.title)
+            (&old).slug.to_owned()
         };
         let up = UpdateItem {
+            title: new_title.to_owned(),
             slug: a_slug,
+            content: new_content.to_owned(),  // do some trim
+            logo: new_logo.to_owned(),
+            author: new_author.to_owned(),
+            ty: new_ty.to_owned(),
+            lang: new_lang.to_owned(),
+            topic: new_topic.to_owned(),
+            link: new_link.to_owned(),
+            origin_link: new_origin.to_owned(),
+            pub_at: new_pub_at,
             ..self
         };
 
@@ -553,7 +583,7 @@ impl QueryItems {
             }
             QueryItems::Author(a, o, p) => {
                 let query = items
-                    .filter(is_top.eq(true))
+                    //.filter(is_top.eq(true))
                     .filter(author.eq(a));
                 let p_o = std::cmp::max(0, p-1);
                 item_count = query.clone().count().get_result(conn)?;

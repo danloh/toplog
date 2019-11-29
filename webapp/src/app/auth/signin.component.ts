@@ -40,7 +40,7 @@ export class SigninComponent implements OnInit {
   onLogin() {
     let authdata: Auth = this.authForm.value;
     // just base64 encode, todo: encrypt
-    let pswd = Base64.encode(authdata.password);
+    let pswd = Base64.encode(authdata.password, true);
     authdata.password = pswd;
     this.authService.signIn(authdata)
     .subscribe(

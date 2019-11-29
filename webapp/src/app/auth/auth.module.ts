@@ -7,7 +7,7 @@ import { RegComponent } from './reg.component';
 import { SigninComponent } from './signin.component';
 import { ResetComponent } from './reset.component';
 import { RepswComponent } from './repsw.component';
-import { SpiderComponent } from './spider.component';
+import { SiteComponent } from './site.component';
 import { OauthComponent } from './oauth.component';
 
 @NgModule({
@@ -16,7 +16,7 @@ import { OauthComponent } from './oauth.component';
     SigninComponent,
     ResetComponent,
     RepswComponent,
-    SpiderComponent,
+    SiteComponent,
     OauthComponent
   ],
   imports: [

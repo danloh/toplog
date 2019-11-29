@@ -183,6 +183,10 @@ pub fn init_server() -> std::io::Result<()> {
                     .default_handler(route().to(view::tmpl::spa_index))
             )
             .service(
+                resource("/from")  // per author: /from?by=
+                    .route(get().to_async(view::tmpl::item_from))
+            )
+            .service(
                 resource("/{ty}")  // special case: /index
                     .route(get().to_async(view::tmpl::index_either))
             )

@@ -82,8 +82,8 @@ export class UpdateUserComponent implements OnInit {
       return;
     }
     // just base64 encode, todo: encrypt
-    let oldPswd = Base64.encode(pswObj.old_psw);
-    let newPswd = Base64.encode(pswObj.new_psw);
+    let oldPswd = Base64.encode(pswObj.old_psw, true);
+    let newPswd = Base64.encode(pswObj.new_psw, true);
     pswObj.old_psw = oldPswd;
     pswObj.new_psw = newPswd;
     pswObj.confirm = newPswd;

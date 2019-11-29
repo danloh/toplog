@@ -39,7 +39,7 @@ export class RepswComponent implements OnInit {
       return
     }
     // just base64 encode, todo: encrypt
-    let rePswd = Base64.encode(pswdata.re_psw);
+    let rePswd = Base64.encode(pswdata.re_psw, true);
     this.authService.resetPsw(rePswd, pswdata.token)
     .subscribe(
       res => {

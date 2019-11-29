@@ -8,7 +8,6 @@ use actix_web::{
     Error, HttpResponse, ResponseError,
     FromRequest, HttpRequest,
 };
-use base64::decode as base64_decode;
 use diesel::prelude::*;
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 use bcrypt::{hash, verify, DEFAULT_COST};
@@ -18,7 +17,7 @@ use jsonwebtoken::{decode, encode, Header, Validation};
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{Msg, AuthMsg, UserMsg};
-use crate::util::helper::gen_slug;
+use crate::util::helper::{de_base64, gen_slug};
 use crate::util::email::{try_send_confirm_email, try_send_reset_email};
 use crate::schema::{users};
 use crate::api::{
@@ -42,10 +41,7 @@ pub fn signup(
     let reg_usr = reg_user.into_inner();
 
     // for decode password
-    let pswd = String::from_utf8(
-        base64_decode(&reg_usr.password).unwrap_or(Vec::new())
-    )
-    .unwrap_or("".into());
+    let pswd = de_base64(&reg_usr.password);
 
     let reg = RegUser {
         password: pswd,
@@ -80,10 +76,7 @@ pub fn signin(
     let auth_usr = auth.into_inner();
 
     // for decode password
-    let pswd = String::from_utf8(
-        base64_decode(&auth_usr.password).unwrap_or(Vec::new())
-    )
-    .unwrap_or("".into());
+    let pswd = de_base64(&auth_usr.password);
 
     let auth_user = AuthUser {
         password: pswd,
@@ -218,15 +211,8 @@ pub fn change_psw(
     }
 
     // for decode password
-    let new_psw = String::from_utf8(
-        base64_decode(&usr_psw.new_psw).unwrap_or(Vec::new())
-    )
-    .unwrap_or("".into());
-
-    let old_psw = String::from_utf8(
-        base64_decode(&usr_psw.old_psw).unwrap_or(Vec::new())
-    )
-    .unwrap_or("".into());
+    let new_psw = de_base64(&usr_psw.new_psw);
+    let old_psw = de_base64(&usr_psw.old_psw);
 
     let user_psw = ChangePsw {
         old_psw,

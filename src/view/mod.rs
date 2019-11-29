@@ -14,6 +14,7 @@ lazy_static! {
         //tera.autoescape_on(vec!["html", ".sql"]);
         tera.register_filter("host", &host);
         tera.register_filter("showless", &showless);
+        tera.register_filter("enbase", &enbase);
         tera
     };
 }
@@ -27,6 +28,15 @@ pub fn host(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     let host = get_host(&s);
 
     Ok(to_value(&host).unwrap())
+}
+
+// extract host from  url
+pub fn enbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
+    use crate::util::helper::en_base64;
+    let s = try_get_value!("enbase", "value", String, value);
+    let b64 = en_base64(&s);
+
+    Ok(to_value(&b64).unwrap())
 }
 
 // override tera filter trucate to avoid char boundary and cut html tag
