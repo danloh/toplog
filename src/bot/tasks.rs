@@ -115,7 +115,10 @@ pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
             .select(vote)
             .load::<i32>(conn)?;
         let k: i32 = votes.iter().sum();
-        let if_top = k > 100 || b.is_top;
+        let threshold: i32 = dotenv::var("THRESHOLD")
+            .unwrap_or("42".to_owned())
+            .parse().unwrap_or(42);
+        let if_top = k > threshold || b.is_top;
         diesel::update(&b)
             .set((
                 karma.eq(k), 

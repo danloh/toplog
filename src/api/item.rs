@@ -396,7 +396,10 @@ impl QueryItem {
         let as_vote = new_vote.new(conn).unwrap_or(0) as i32;
 
         let incr = if act == "VOTE" { as_vote } else { 0 - as_vote };
-        let if_top = old_vote > 100 || old_is_top;
+        let threshold: i32 = dotenv::var("THRESHOLD")
+            .unwrap_or("42".to_owned())
+            .parse().unwrap_or(42);
+        let if_top = old_vote > threshold || old_is_top;
 
         let item = diesel::update(&old)
             .set((

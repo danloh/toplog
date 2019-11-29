@@ -21,6 +21,7 @@ export class NewComponent implements OnInit {
   ) {}
 
   newFor: string;  // topic
+  newTo: string; // ty
   itemCates: string[] = itemCates;
   topicCates: string[] = topicCates;
   host_url: string = environment.host_url;
@@ -42,6 +43,8 @@ export class NewComponent implements OnInit {
 
     // extract query to check this new will be added to which topic
     this.newFor = this.route.snapshot.queryParamMap.get('for');
+    this.newTo = this.route.snapshot.queryParamMap.get('to');
+
 
     this.createForm = this.formBuild.group(
       { 'title': ['', [Validators.required]],
@@ -49,7 +52,7 @@ export class NewComponent implements OnInit {
         'link': [''],
         'author': [''],
         'topic': [ this.newFor || '', [Validators.required]],
-        'ty': ['Article', [Validators.required]],
+        'ty': [ this.newTo || 'Article', [Validators.required]],
         'lang': ['English'], // if ty == translate
         'origin_link': [''], // if ty == translate
         'logo': [''],        // required if ty == book

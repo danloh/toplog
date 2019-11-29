@@ -83,7 +83,7 @@ pub fn init_server() -> std::io::Result<()> {
     // init logger
     init_fern_logger().unwrap_or_default();
     // new runtime
-    let sys = actix_rt::System::new("rut-server-rust");
+    let sys = actix_rt::System::new("server");
     // init actor
     let addr: DbAddr = init_dba();
 

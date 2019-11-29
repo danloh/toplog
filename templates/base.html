@@ -53,7 +53,7 @@
           <a class="ty-tab" href="{{ t }}">{{ t }}</a>
           {%- endif -%}
         {%- endfor -%}
-        <a onclick="openLink('{{ `/me/item/new?for=` ~ topic }}')" href="javascript:void(0);" style="float:right">
+        <a onclick="openLink('{{ `/me/item/new?for=` ~ topic ~ `&to=` ~ ty }}')" href="javascript:void(0);" style="float:right">
           <small class="help-tips">Submit...</small>
         </a>
       </div>
