@@ -95,7 +95,7 @@ pub fn toggle_top(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let item = QueryItem{
         slug: qb.into_inner(), 
-        method: String::from("PUT"),
+        method: String::from("PATCH"),
         uname: auth.uname
     };
     db.send(item)
@@ -157,7 +157,7 @@ impl Handler<QueryItem> for Dba {
 
         match method {
             "GET" => { qb.get(conn) }
-            "PUT" => { qb.toggle_top(conn) }
+            "PATCH" => { qb.toggle_top(conn) }
             "VOTE" => { qb.vote_or_veto(conn, "VOTE") }
             "VETO" => { qb.vote_or_veto(conn, "VETO") }
             "DELETE" => { qb.del(conn) }

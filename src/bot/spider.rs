@@ -396,7 +396,7 @@ lazy_static! {
         map.insert("fitzgeraldnick.com", ("Nick Fitzgerald", "Rust"));
         map.insert("blog.digital-scurf.org", ("Daniel Silverstone", "Rust"));
         map.insert("blog.x5ff.xyz", ("Claus Matzinger", "Rust"));
-        map.insert("blog.x5ff.xyz", ("Andre Bogus", "Rust"));
+        map.insert("llogiq.github.io", ("Andre Bogus", "Rust"));
         map.insert("tonyarcieri.com", ("Tony Arcieri", "Rust"));
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
 

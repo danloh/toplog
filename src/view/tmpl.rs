@@ -68,7 +68,7 @@ pub fn index_either(
     })
 }
 
-// GET /{ty} // special: /index, /Misc
+// GET /{ty}/dyn // special: /index, /Misc
 //
 // response dynamically
 pub fn index_dyn(
@@ -103,7 +103,7 @@ pub fn index_dyn(
     })
 }
 
-// GET /t/{topic}/{ty}
+// GET /t/{topic}/{ty}/dyn
 //
 // response dynamically
 pub fn topic_dyn(
@@ -162,6 +162,7 @@ pub fn topic_either(
     .and_then(|res| match res {
         Ok(msg) => {
             if msg.status == 201 {
+                // println!(">> via dyn 201");
                 let mut ctx = tera::Context::new();
                 ctx.insert("items", &msg.items.unwrap_or(Vec::new()));
                 ctx.insert("blogs", &msg.blogs.unwrap_or(Vec::new()));
@@ -224,8 +225,8 @@ pub fn item_from(
             let h = tmpl.render("home.html", &ctx).map_err(|_| {
                 ServiceError::NotFound("failed".into())
             })?;
-            let t_dir = "www/".to_owned() + &msg.message + ".html";
-            std::fs::write(&t_dir, h.as_bytes())?;
+            // let t_dir = "www/".to_owned() + &msg.message + ".html";
+            // std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
@@ -462,13 +463,13 @@ impl Handler<TopicEither> for Dba {
         let typ = t.ty;
         let msg = tpc.clone() + "-" + &typ;
 
-        let dir = "www/".to_owned() + &tpc + &typ + ".html";
+        let dir = "www/".to_owned() + &msg + ".html";
         let i_html = std::fs::read(dir);
 
         match i_html {
             Ok(s) => {
                 let html = String::from_utf8(s).unwrap_or_default();
-                // println!("via static");
+                // println!(">> via static");
                 Ok(EitherMsg {
                     status: 200,
                     message: msg,
