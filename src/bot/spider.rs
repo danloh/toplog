@@ -312,6 +312,51 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Daniel Silverstone
+        "blog.digital-scurf.org" => {
+            for link in raw_links {
+                if link.starts_with("./posts/") && link.len() > 8 && !(link.contains("/#")) {
+                    let f_link = "https://blog.digital-scurf.org".to_string() 
+                        + &link.replacen("./", "/", 1);
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Claus Matzinger
+        "blog.x5ff.xyz" => {
+            for link in raw_links {
+                if link.starts_with("/blog/") && link.len() > 6 
+                    && !(link.contains("/page/")) && !(link.contains(".xml")) {
+                    let f_link = "https://blog.x5ff.xyz".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Andre Bogus
+        "llogiq.github.io" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                    let f_link = "https://llogiq.github.io".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Tony Arcieri
+        "tonyarcieri.com" => {
+            for link in raw_links {
+                if link.starts_with("https://tonyarcieri.com/") {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Yoshua Wuyts
+        "blog.yoshuawuyts.com" => {
+            for link in raw_links {
+                if link.starts_with("https://blog.yoshuawuyts.com/") && !(link.contains(".xml"))  {
+                    links.push(link)
+                }
+            }
+        }
         
         _ => {}  // to deal with
     }
@@ -349,6 +394,11 @@ lazy_static! {
         map.insert("boats.gitlab.io", ("Without Boats", "Rust"));
         map.insert("deterministic.space", ("Pascal Hertleif", "Rust"));
         map.insert("fitzgeraldnick.com", ("Nick Fitzgerald", "Rust"));
+        map.insert("blog.digital-scurf.org", ("Daniel Silverstone", "Rust"));
+        map.insert("blog.x5ff.xyz", ("Claus Matzinger", "Rust"));
+        map.insert("blog.x5ff.xyz", ("Andre Bogus", "Rust"));
+        map.insert("tonyarcieri.com", ("Tony Arcieri", "Rust"));
+        map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
 
         map
     };
