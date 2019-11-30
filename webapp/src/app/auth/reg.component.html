@@ -1,7 +1,6 @@
 <div class="s-auth-page">
   <form nz-form [formGroup]="regForm" (ngSubmit)="onReg()" class="s-auth-form">
     <h2 class="s-form-title">Welcome To Join</h2>
-    <!-- <p style="text-align: center">A Place to Share Read List</p> -->
     <nz-form-item>
       <nz-form-control>
         <input nz-input formControlName="uname" maxlength="16" nzRequired placeholder="Username*" />
@@ -19,11 +18,11 @@
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
-        <input nz-input type="password" formControlName="confirm" nzRequired placeholder="Confirm*" />
+        <input nz-input type="password" formControlName="confirm" nzRequired placeholder="Confirm Password*" />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
-      <span>By clicking "Register" you indicate that you have read and agree to
+      <span>By clicking "Register" you indicate that you have read and agree to the
         <a href="{{host_url + '/about.html#terms'}}" target="_blank" rel="nofollow noopener noreferrer">
           Terms and Policy
         </a>

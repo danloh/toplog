@@ -139,7 +139,8 @@ function toggleTop(slug) {
 }
 
 function upVote(slug) {
-  var check = Boolean(getCookie(TOK));
+  var tok = getCookie(TOK);
+  var check = Boolean(tok);
   if (!check) return;
   axios.defaults.headers.common['Authorization'] = tok;
   axios.put(`/api/items/${slug}?action=vote`)

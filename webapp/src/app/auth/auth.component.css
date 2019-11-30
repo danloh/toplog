@@ -4,7 +4,6 @@
 } 
 .s-auth-form {
   padding: 20px;
-  border: 1px dotted #689f38;
 }
 
 @media (max-width: 680px) {

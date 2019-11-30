@@ -49,19 +49,17 @@ export class ResponIntercept implements HttpInterceptor {
       case 401:
         // del all saved token
         this.authService.delAuth();
-        alert('UnAuthorized or Expired Authorization');
+        alert('UnAuthorized or No Permission');
         this.redirectTo('/signin');
         break;
       case 404:
-        this.redirectTo('/404');
-        break;
       case 403:
       case 500:
         this.redirectTo('/404');
         break;
       default:
         if (rev instanceof HttpErrorResponse) {
-          console.warn('Unkown Error, maybe Server or CORS error', rev);
+          console.warn('error', rev);
           return throwError(rev);
         }
         break;

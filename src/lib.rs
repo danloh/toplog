@@ -73,7 +73,7 @@ pub fn init_fern_logger() -> Result<(), fern::InitError> {
             ))
         })
         .level(log::LevelFilter::Info)
-        .chain(fern::log_file("rut.log")?)
+        .chain(fern::log_file("srv.log")?)
         .apply()?;
 
     Ok(())

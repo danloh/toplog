@@ -5,7 +5,6 @@ import { OauthComponent } from './oauth.component';
 import { SigninComponent } from './signin.component';
 import { ResetComponent } from './reset.component';
 import { RepswComponent } from './repsw.component';
-import { SiteComponent } from './site.component';
 
 const authRoutes: Routes = [
   {
@@ -31,10 +30,6 @@ const authRoutes: Routes = [
   {
     path: 'resetpsw',
     component: RepswComponent
-  },
-  {
-    path: 'site',
-    component: SiteComponent
   }
 ];
 

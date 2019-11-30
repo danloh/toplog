@@ -5,7 +5,7 @@ src/.DS_Store
 
 .env
 migrations/.gitkeep
-rut.log
+srv.log
 
 webapp/node_modules
 webapp/dist
@@ -15,3 +15,4 @@ webapp/src/assets/.gitkeep
 /www
 
 **/.DS_Store
+

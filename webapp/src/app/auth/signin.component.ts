@@ -49,9 +49,9 @@ export class SigninComponent implements OnInit {
     );
   }
 
-  onGoauth() {
-    this.authService.oauth_url(this.preUrl).subscribe(
-      res => window.location.href = res.url
-    )
-  }
+  // onGoauth() {
+  //   this.authService.oauth_url(this.preUrl).subscribe(
+  //     res => window.location.href = res.url
+  //   )
+  // }
 }
