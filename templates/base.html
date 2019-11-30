@@ -24,7 +24,7 @@
       <div class="right-menu">
         <a href="/me/" id="login-link"><b>Log in</b></a>
         <div class="menudown" id="menu-down" style="display: none">
-          <button onclick="showMenu()" class="toolbtn">:-)</button>
+          <button onclick="showMenu()" class="toolbtn">:::</button>
           <div id="drop-menu" class="dropdown-content">
             <li><a href="#" id="profile-link"><b>My Profile</b></a></li>
           </div>
@@ -46,11 +46,12 @@
       {%- endfor -%}
       <small class="help-tips">More coming soon...</small>
       <div class="menu-bar">
+        {%- set baseUrl = topic | setbase -%}
         {%- for t in ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate', 'Misc'] -%}
           {%- if t == ty -%}
-          <a class="ty-tab-active" href="{{ '/a/' ~ t }}">{{ t }}</a>
+          <a class="ty-tab-active" href="{{ baseUrl ~ t }}">{{ t }}</a>
           {%- else -%}
-          <a class="ty-tab" href="{{ '/a/' ~ t }}">{{ t }}</a>
+          <a class="ty-tab" href="{{ baseUrl ~ t }}">{{ t }}</a>
           {%- endif -%}
         {%- endfor -%}
         <a onclick="openLink('{{ `/me/item/new?for=` ~ topic ~ `&to=` ~ ty }}')" href="javascript:void(0);" style="float:right">

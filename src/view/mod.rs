@@ -15,6 +15,7 @@ lazy_static! {
         tera.register_filter("host", &host);
         tera.register_filter("showless", &showless);
         tera.register_filter("enbase", &enbase);
+        tera.register_filter("setbase", &setbase);
         tera
     };
 }
@@ -27,16 +28,34 @@ pub fn host(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     let s = try_get_value!("host", "value", String, value);
     let host = get_host(&s);
 
-    Ok(to_value(&host).unwrap())
+    Ok(to_value(&host).unwrap_or_default())
 }
 
-// extract host from  url
+// base64 encode
 pub fn enbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     use crate::util::helper::en_base64;
     let s = try_get_value!("enbase", "value", String, value);
     let b64 = en_base64(&s);
 
-    Ok(to_value(&b64).unwrap())
+    Ok(to_value(&b64).unwrap_or_default())
+}
+
+// set base url for href
+pub fn setbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
+    use crate::util::helper::en_base64;
+    let s = try_get_value!("setbase", "value", String, value);
+    // let check: String = match args.get("check") {
+    //     Some(c) => try_get_value!("setbase", "check", String, c),
+    //     None => "all".to_owned(),
+    // };
+    let check_s = s.trim();
+    let base = if  check_s == "all" || check_s == "from" { 
+        "/a/".to_owned() 
+    } else { 
+        "/t/".to_owned() + check_s + "/"
+    };
+
+    Ok(to_value(&base).unwrap_or_default())
 }
 
 // override tera filter trucate to avoid char boundary and cut html tag
@@ -50,7 +69,7 @@ pub fn showless(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Valu
     };
 
     if least >= length {
-        return Ok(to_value(&s).unwrap());
+        return Ok(to_value(&s).unwrap_or_default());
     }
 
     let r_s = s[..graphemes[least].0].to_string();
@@ -63,7 +82,7 @@ pub fn showless(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Valu
         r_s
     };
 
-    Ok(to_value(&result).unwrap())
+    Ok(to_value(&result).unwrap_or_default())
 }
 
 #[cfg(test)]
