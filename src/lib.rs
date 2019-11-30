@@ -170,10 +170,6 @@ pub fn init_server() -> std::io::Result<()> {
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
-                resource("/confirm/{token}")
-                    .route(get().to_async(api::auth::confirm_email))
-            )
-            .service(
                 fs::Files::new("/static", "./static/") // static files
                     .default_handler(route().to(|| HttpResponse::NotFound()))
             )
@@ -183,11 +179,15 @@ pub fn init_server() -> std::io::Result<()> {
                     .default_handler(route().to(view::tmpl::spa_index))
             )
             .service(
+                resource("/confirm/{token}")
+                    .route(get().to_async(api::auth::confirm_email))
+            )
+            .service(
                 resource("/from")  // per author: /from?by=
                     .route(get().to_async(view::tmpl::item_from))
             )
             .service(
-                resource("/{ty}")  // special case: /index
+                resource("/a/{ty}")  // special case: /index
                     .route(get().to_async(view::tmpl::index_either))
             )
             .service( 
@@ -195,7 +195,7 @@ pub fn init_server() -> std::io::Result<()> {
                     .route(get().to_async(view::tmpl::topic_either))
             )
             .service(
-                resource("/{ty}/dyn")
+                resource("/a/{ty}/dyn")
                     .route(get().to_async(view::tmpl::index_dyn))
             )
             .service( 
@@ -208,7 +208,11 @@ pub fn init_server() -> std::io::Result<()> {
             )
             .service(
                 resource("/site/{name}")
-                    .route(get().to_async(view::tmpl::site))
+                    .route(get().to(view::tmpl::site))
+            )
+            .service(
+                resource("/generate-sitemap")
+                    .route(get().to(view::tmpl::gen_sitemap))
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap

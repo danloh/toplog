@@ -294,22 +294,31 @@ pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
     let p = p_info.into_inner();
     let tpl_dir = p + ".html";
     let dir = "www/".to_owned() + &tpl_dir;
-    let s_html = std::fs::read(&dir);
+    
+    let t = tmpl.render(&tpl_dir, &tera::Context::new())
+        .map_err(|_| ServiceError::NotFound("404".into()))?;
+    std::fs::write(dir, t.as_bytes())?;
 
-    let html = match s_html {
-        Ok(s) => {
-            String::from_utf8(s).unwrap_or_default()
-        }
-        _ => {
-            let t = tmpl.render(&tpl_dir, &tera::Context::new())
-                .map_err(|_| ServiceError::NotFound("404".into()))?;
-            std::fs::write(dir, t.as_bytes())?;
-            t
-        }
-    };
     Ok(HttpResponse::build(http::StatusCode::OK)
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(t))
+}
+
+pub fn gen_sitemap()-> Result<HttpResponse, Error> {
+    let mut s_ctx = tera::Context::new();
+    s_ctx.insert(
+        "lastmod",
+        &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+    );
+    let s = tmpl.render("sitemap/sitemap.xml", &s_ctx).map_err(|_| {
+        ServiceError::InternalServerError("tmpl failed".into())
+    })?;
+    std::fs::write("www/sitemap.xml", s.as_bytes())?;
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/xml; charset=utf-8")
+        .body(s)
+    )
 }
 
 // =====================================================================
