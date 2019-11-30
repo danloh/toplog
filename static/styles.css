@@ -246,6 +246,13 @@ section.item-sum:hover {
   max-height: 180px;
   z-index: 999;
 }
+.vote-num {
+  font-size: 0.75em;
+  color: #fff;
+  background-color: #aab0c6;
+  padding: 1px 2px;
+  border-radius: 5%;
+}
 
 .badge, 
 .Article, .Book, .Event, .Job, 
