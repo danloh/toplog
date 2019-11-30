@@ -10,7 +10,7 @@
   <changefreq>Daily</changefreq>
   <priority>1.0</priority>
 </url>
-{%- for t in ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate', 'Misc'] -%}
+{%- for t in ['Article', 'Book', 'Event', 'Job', 'Meida', 'Product', 'Translate', 'Misc'] -%}
 <url>
   <loc>{{'https://ruthub.com/a/' ~ t }}</loc>
   <lastmod>{{ lastmod }}</lastmod>

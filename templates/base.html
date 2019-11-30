@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico" >
   <meta name="google-site-verification" content="" />
   {%- block head -%}
-  <title>{{ hostDomain }}&nbsp; | &nbsp;{%- block title -%} {{ title }} {%- endblock title -%}</title>
+  <title>{{ hostDomain }} |&nbsp;{%- block title -%} {{ title }} {%- endblock title -%}</title>
   {%- block metaDescription -%}
   <meta name="description" content="Aggregated Blogs of Top Contributors To Rust, Golang, TypeScript, Angular ...">
   {%- endblock metaDescription -%}
@@ -47,7 +47,7 @@
       <small class="help-tips">More coming soon...</small>
       <div class="menu-bar">
         {%- set baseUrl = topic | setbase -%}
-        {%- for t in ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate', 'Misc'] -%}
+        {%- for t in ['Article', 'Book', 'Event', 'Job', 'Media', 'Product', 'Translate', 'Misc'] -%}
           {%- if t == ty -%}
           <a class="ty-tab-active" href="{{ baseUrl ~ t }}">{{ t }}</a>
           {%- else -%}

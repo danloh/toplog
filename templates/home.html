@@ -11,6 +11,9 @@
     {%- if ty == 'Translate' -%}
     <span class="note-content">Share your translation here</span>
     {%- endif -%}
+    {%- if ty == 'Media' -%}
+    <span class="note-content">Podcast or Video or Cartoon...</span>
+    {%- endif -%}
     {%- if topic == 'from' -%}
     <span class="note-content">By {{ ty }} :</span>
     {%- endif -%}

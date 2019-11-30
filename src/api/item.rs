@@ -217,7 +217,7 @@ pub struct Item {
     pub content: String,
     pub logo: String,
     pub author: String,
-    pub ty: String,      // 1-item,2-translate,3-podcast,4-event,5-book
+    pub ty: String,      // item|translate|media|event|book
     pub lang: String,
     pub topic: String,
     pub link: String,

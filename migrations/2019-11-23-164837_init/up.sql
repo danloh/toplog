@@ -51,7 +51,7 @@ CREATE TABLE items (
   content TEXT NOT NULL DEFAULT '',
   logo VARCHAR NOT NULL DEFAULT '',
   author VARCHAR NOT NULL,
-  ty VARCHAR NOT NULL, -- article|podcast|event|book| etc..
+  ty VARCHAR NOT NULL, -- article|media|event|book| etc..
   lang VARCHAR NOT NULL DEFAULT 'English',
   topic VARCHAR NOT NULL DEFAULT '',
   link VARCHAR NOT NULL DEFAULT '',

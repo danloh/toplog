@@ -256,7 +256,7 @@ section.item-sum:hover {
 
 .badge, 
 .Article, .Book, .Event, .Job, 
-.Podcast, .Product, .Translate {
+.Media, .Product, .Translate {
   flex: 0 0 auto;
   width: 8px;
   height: 10px;
@@ -275,7 +275,7 @@ section.item-sum:hover {
 .Job {
   background-color: #18f3d6;
 }
-.Podcast {
+.Media {
   background-color: #c372f1;
 }
 .Product {

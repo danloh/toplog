@@ -529,7 +529,7 @@ fn checker(ty: &str) -> bool {
         || ty == "Book" 
         || ty == "Event" 
         || ty == "Job" 
-        || ty == "Podcast" 
+        || ty == "Media" 
         || ty == "Product" 
         || ty == "Translate"
         || ty == "Misc";

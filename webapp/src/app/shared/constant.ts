@@ -8,5 +8,5 @@ export const regName = /^[\w-]{3,16}$/;
 export const regHashTag = /[\n|\r|\s]#(\w+)/g; // /(?<=[\n|\r|\s])#(\w+)/g N/A SAFARI, FIREFOX
 export const regSpecial = /[^a-zA-Z0-9]/g;
 
-export const itemCates: string[] = ['Article', 'Book', 'Event', 'Job', 'Podcast', 'Product', 'Translate' ];
+export const itemCates: string[] = ['Article', 'Book', 'Event', 'Job', 'Media', 'Product', 'Translate' ];
 export const topicCates: string[] = ['Rust', 'Go', 'TypeScript', 'Angular', 'Vue', 'React', 'Dart'];
