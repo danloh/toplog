@@ -504,7 +504,8 @@ impl QueryItems {
                         item_list = items
                             .filter(is_top.eq(true))
                             .order(pub_at.desc())
-                            .limit(42)
+                            .limit(o.into())
+                            .offset((o * p_o).into())
                             .load::<Item>(conn)?;
                         item_count = item_list.len() as i64;
                     }
