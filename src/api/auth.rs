@@ -335,24 +335,24 @@ impl Handler<ResetReq> for Dba {
             .filter(&uname.eq(&req.uname))
             .get_result::<User>(conn)?;
 
-        if req.email == check_user.email {
-            let rq_uname = req.uname;
-            let rq_email = req.email;
-            let tok = generate_token(&rq_uname, &rq_email, 60 * 2)
-                .unwrap_or("".to_owned());
-
-            try_send_reset_email(&rq_email, &rq_uname, &tok)?;
-
-            Ok(Msg {
-                status: 200,
-                message: String::from("The token has been sent to you via email"),
-            })
-        } else {
-            Ok(Msg {
-                status: 404,
-                message: String::from("No Existing User or Email"),
+        let rq_email = check_user.email;
+        if !re_test_email(&rq_email) {
+            return Ok(Msg {
+                status: 400,
+                message: String::from("No Valid Email or User"),
             })
         }
+
+        let rq_uname = req.uname; 
+        let tok = generate_token(&rq_uname, &rq_email, 60 * 2)
+            .unwrap_or("".to_owned());
+
+        try_send_reset_email(&rq_email, &rq_uname, &tok)?;
+
+        Ok(Msg {
+            status: 200,
+            message: String::from("The token has been sent to you via email"),
+        })
     }
 }
 
@@ -401,10 +401,8 @@ pub fn confirm_email(
     p_info: Path<String>,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
-    use base64::decode;
     let tok = p_info.into_inner();
-    let de_tok =
-        String::from_utf8(decode(&tok).unwrap_or(Vec::new())).unwrap_or("".into());
+    let de_tok = de_base64(&tok);
     let tc = verify_token(&de_tok);
 
     db.send(tc).from_err().and_then(|res| match res {
@@ -913,6 +911,17 @@ impl UpdateUser {
 
         let old_user = users.filter(&uname.eq(unm)).get_result::<User>(conn)?;
         let old_user_email: &str = old_user.email.trim();
+        
+        // check if anything changed
+        let check_changed: bool = 
+            self.avatar.trim() != old_user.avatar.trim()
+            || self.intro.trim() != old_user.intro.trim()
+            || self.location.trim() != old_user.location.trim()
+            || self.nickname.trim() != old_user.nickname.trim();
+        // if nothing changed + email, return err
+        if !check_changed && new_user_email == old_user_email {
+            return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
+        }
 
         // default using old email
         let mut up_user = UpdateUser {
@@ -931,7 +940,11 @@ impl UpdateUser {
                 Some(_) => true,
                 None => false,
             };
-            // sen confirm email if new unique email added
+            // if dup email and nothing changed
+            if check_dup_email && !check_changed {
+                return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
+            }
+            // send confirm email if new unique email added
             if !check_dup_email {
                 // if not dup and valid new email, using new email
                 up_user = user_;
@@ -980,12 +993,11 @@ impl Message for ChangePsw {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ResetReq {
     pub uname: String,
-    pub email: String,
 }
 
 impl ResetReq {
     fn validate(&self) -> ServiceResult<()> {
-        let check = re_test_name(&self.uname) && re_test_email(&self.email);
+        let check = re_test_name(&self.uname);
         if check {
             Ok(())
         } else {

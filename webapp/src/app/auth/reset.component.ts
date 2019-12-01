@@ -22,9 +22,7 @@ export class ResetComponent implements OnInit {
   ngOnInit() {
     // use FormBuilder to create a form group
     this.resetForm = this.formBuild.group(
-      { 'uname': [null, [Validators.required, Validators.pattern(regName)]],
-        'email': [null, [Validators.required, Validators.pattern(regEmail)]],
-      }
+      { 'uname': [null, [Validators.required, Validators.pattern(regName)]],}
     );
   }
 

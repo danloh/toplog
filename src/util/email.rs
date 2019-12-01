@@ -1,6 +1,5 @@
 // send confirm email
 use crate::errors::ServiceError;
-use base64;
 use lettre::file::FileTransport;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::smtp::SmtpClient;
@@ -96,10 +95,11 @@ pub fn try_send_confirm_email(
     user_name: &str,
     token: &str,
 ) -> Result<(), ServiceError> {
-    let subject = "Please confirm your email address";
+    let subject = "Please verify your email address";
+    use crate::util::helper::en_base64;
     let body = format!(
         "Hello {}: \n\n Welcome to Newdin. Please click the link below to verify your email address. Thank you! \n\n https://newdin.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Newdin Team",
-        user_name, base64::encode(token)
+        user_name, en_base64(token)
     );
 
     send_email(email, subject, &body)

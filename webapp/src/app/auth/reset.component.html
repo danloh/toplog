@@ -7,12 +7,7 @@
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
-      <nz-form-control>
-        <input nz-input formControlName="email" nzRequired placeholder="Email*" />
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <button nz-button class="s-full-width" nzType="primary" [disabled]="!resetForm.valid">Request Reset Password</button>
+      <button nz-button class="s-full-width" nzType="primary" [disabled]="!resetForm.valid">Send Reset Email</button>
     </nz-form-item>
     <a routerLink="/">Back To Log In</a>
   </form>

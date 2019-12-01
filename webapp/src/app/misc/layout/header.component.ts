@@ -24,5 +24,6 @@ export class HeaderComponent implements OnInit {
   onLogOut() {
     this.authService.delAuth();
     this.authService.isAuthed$.subscribe(auth => this.ifAuthed = auth);
+    window.location.href = this.host_url;
   }
 }
