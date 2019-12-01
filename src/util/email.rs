@@ -98,7 +98,7 @@ pub fn try_send_confirm_email(
     let subject = "Please verify your email address";
     use crate::util::helper::en_base64;
     let body = format!(
-        "Hello {}: \n\n Welcome to Newdin. Please click the link below to verify your email address. Thank you! \n\n https://newdin.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Newdin Team",
+        "Hello {}: \n\n Welcome to newdin.com. Please click or copy to browser the link below to verify your email address. Thank you! \n\n https://newdin.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Newdin Team",
         user_name, en_base64(token)
     );
 
@@ -112,7 +112,7 @@ pub fn try_send_reset_email(
 ) -> Result<(), ServiceError> {
     let subject = "Please Reset Your password";
     let body = format!(
-        "Hello {}: \n\n The Token to reset your password as below:\n\n {} \n\n This Token will expire in 2 hours. \n\n\n The Newdin Team",
+        "Hello {}: \n\n Someone (hopefully you) requested we reset your password at Newdin. \n\n The Token to reset password as below:\n\n {} \n\n This Token will expire in 2 hours. If not you, just ignore this message. \n\n\n The Newdin Team",
         user_name, base64::encode(token)
     );
     //println!("reset: {:?}", token);
