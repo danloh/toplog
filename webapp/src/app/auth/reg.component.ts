@@ -29,7 +29,7 @@ export class RegComponent implements OnInit {
         'email': [''],
         'password': [null, [Validators.required]],
         'confirm': [null, [Validators.required]],
-        'agree': [true]  // deserve
+        'agree': [true]  // reserve
       }
     );
   }

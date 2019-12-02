@@ -163,6 +163,10 @@ function openLink(link, admin=false) {
   let check = admin 
     ? getCookie("oMg") === "true" 
     : Boolean(getCookie(TOK));
+  if (!check && !admin) {
+    window.location.href = "/me";
+    return;
+  }
   if (!check) return;
   window.location.href = link;
 }
