@@ -67,8 +67,16 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
             links_set.insert(l);
         }
     }
+    // TODO: limit the db query
+    /*
+    use chrono::{NaiveDate, Utc, Duration};
+    let now = Utc::now().naive_utc();
+    let limit_day = now - Duration::days(1);
+    */
+    
     let db_links: Vec<String> = items
         .filter(link.ne(""))
+        //.filter(post_at.lt(limit_day))  // did nothing
         .select(link)
         .load::<String>(conn)?;
     let mut db_links_set = HashSet::new();

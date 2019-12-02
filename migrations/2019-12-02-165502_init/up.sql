@@ -61,7 +61,8 @@ CREATE TABLE items (
   post_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   pub_at DATE NOT NULL DEFAULT CURRENT_DATE,
   is_top BOOLEAN NOT NULL DEFAULT FALSE,
-  vote INTEGER NOT NULL DEFAULT 1
+  vote INTEGER NOT NULL DEFAULT 1,
+  UNIQUE (title, author, link)  -- ?
 );
 
 CREATE INDEX items_author_idx ON items (author);
