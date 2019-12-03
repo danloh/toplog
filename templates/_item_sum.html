@@ -26,7 +26,7 @@
     </a> 
     <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ a.vote }}</span>&nbsp;&nbsp;
     <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" href="javascript:void(0);">..</a>&nbsp;
-    <a onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
+    <a id="{{'t-' ~ a_slug}}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
       {%- if a.is_top -%} ... {%- else -%} ::: {%- endif -%}
     </a>
   </div>

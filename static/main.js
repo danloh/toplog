@@ -93,7 +93,11 @@ function toggleTop(slug) {
   axios.defaults.headers.common['Authorization'] = tok;
   axios.patch(`/api/items/${slug}`)
   .then(
-    res => console.log(res.data)
+    _res => {
+      let toggleEle = document.getElementById("t-" + slug);
+      if (toggleEle) { toggleEle.hidden = true }
+      //console.log(res.data)
+    }
   );
 }
 
