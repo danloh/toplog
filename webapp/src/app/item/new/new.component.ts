@@ -45,7 +45,6 @@ export class NewComponent implements OnInit {
     this.newFor = this.route.snapshot.queryParamMap.get('for');
     this.newTo = this.route.snapshot.queryParamMap.get('to');
 
-
     this.createForm = this.formBuild.group(
       { 'title': ['', [Validators.required]],
         'content': [''],

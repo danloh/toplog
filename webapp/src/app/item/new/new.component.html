@@ -5,7 +5,7 @@
   <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
     <nz-form-label>Title*</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="title" nzRequired nzAutosize maxlength="64"></textarea>
+      <textarea nz-input formControlName="title" nzRequired nzAutosize maxlength="255"></textarea>
     </nz-form-control>
     <nz-form-label>Source Link*</nz-form-label>
     <nz-form-control>
@@ -32,7 +32,7 @@
         <span>Origin Link: </span> <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255" placeholder="Origin Link"></textarea>
       </nz-form-control>
       <nz-form-control>
-        <span>Translate To: </span> <input nz-input formControlName="lang" maxlength="32" placeholder="Translate Language"/>
+        <span>Translate To: </span> <input nz-input formControlName="lang" maxlength="16" placeholder="Translate Language"/>
       </nz-form-control>
     </div>
     <br>

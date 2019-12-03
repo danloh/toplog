@@ -280,7 +280,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Pietro Albini
         "pietroalbini.org" => {
             for link in raw_links {
-                if link.starts_with("/blog/") {
+                if link.starts_with("/blog/") && !(link.contains(".xml")) {
                     let f_link = "https://www.pietroalbini.org".to_string() + &link;
                     links.push(f_link)
                 }

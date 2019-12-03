@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ItemService, AuthService, Item, UpdateItem } from '../../core';
-import { regUrl, itemCates, topicCates } from '../../shared';
+import { regUrl, regDate, itemCates, topicCates } from '../../shared';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -56,7 +56,7 @@ export class UpdateComponent implements OnInit {
         'topic': [ this.item.topic || 'Rust', [Validators.required]],
         'link': [ this.item.link || ''],
         'origin_link': [ this.item.origin_link || ''],
-        'pub_at': [ this.item.pub_at || ''],
+        'pub_at': [ this.item.pub_at, [Validators.pattern(regDate)]],
       }
     );
   }
