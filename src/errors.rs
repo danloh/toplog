@@ -56,6 +56,12 @@ impl ResponseError for ServiceError {
     }
 }
 
+impl From<std::io::Error> for ServiceError {
+    fn from(_error: std::io::Error) -> Self {
+        ServiceError::NotFound("io".into())
+    }
+}
+
 impl From<MailboxError> for ServiceError {
     fn from(_error: MailboxError) -> Self {
         ServiceError::InternalServerError("Mailbox".into())

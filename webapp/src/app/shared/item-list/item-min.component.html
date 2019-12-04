@@ -10,6 +10,6 @@
     <span class="s-meta-tag">{{ item.author }}</span>
     <span class="s-meta-tag">{{ item.topic }}</span> 
     <span class="s-meta-tag">{{ item.vote }}</span>&nbsp;&nbsp;
-    <a href= "{{'/item/update/' + item.slug }}">..</a>&nbsp;
+    <a [routerLink]= "'/item/update/' + item.slug">..</a>&nbsp;
   </div>
 </section>

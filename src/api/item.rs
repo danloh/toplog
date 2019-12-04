@@ -39,7 +39,19 @@ impl Handler<NewItem> for Dba {
 
     fn handle(&mut self, na: NewItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
-        na.new(conn)
+
+        let topic = na.topic.trim().to_owned();
+        let ty = na.ty.trim().to_owned();
+
+        let res = na.new(conn);
+
+        // ========================
+        // gen html
+        use crate::view::tmpl::gen_html;
+        gen_html(topic, ty, conn);   // TODO: ignor error but log
+        // =========================
+
+        res
     }
 }
 
@@ -63,7 +75,19 @@ impl Handler<UpdateItem> for Dba {
 
     fn handle(&mut self, b: UpdateItem, _: &mut Self::Context) -> Self::Result {
         let conn: &PooledConn = &self.0.get().unwrap();
-        b.update(conn)
+
+        let topic = b.topic.trim().to_owned();
+        let ty = b.ty.trim().to_owned();
+
+        let res = b.update(conn);
+
+        // ========================
+        // gen html
+        use crate::view::tmpl::gen_html;
+        gen_html(topic, ty, conn);   // TODO: ignor error but log
+        // =========================
+
+        res
     }
 }
 
@@ -385,6 +409,15 @@ impl UpdateItem {
         let item_update = diesel::update(&old)
             .set(up)
             .get_result::<Item>(conn)?;
+
+        // ========================
+        // gen html
+        let itm = item_update.clone();
+        let topic_ = itm.topic;
+        let ty_ = itm.ty;
+        use crate::view::tmpl::gen_html;
+        gen_html(topic_, ty_, conn);   // TODO: ignor error but log
+        // ==========================
         
         Ok(item_update)
     }
@@ -464,6 +497,16 @@ impl QueryItem {
         let item = diesel::update(&old)
             .set(is_top.eq(!check_top))
             .get_result::<Item>(conn)?;
+
+        // ========================
+        // gen html
+        let itm = item.clone();
+        let topic = itm.topic;
+        let ty = itm.ty;
+        use crate::view::tmpl::gen_html;
+        gen_html(topic.clone(), ty, conn);   // TODO: ignor error but log
+        gen_html(topic, "Misc".into(), conn);
+        // =========================
 
         Ok(item)
     }

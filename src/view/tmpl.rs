@@ -304,6 +304,55 @@ pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
         .body(t))
 }
 
+pub fn gen_html(
+    topic: String,
+    ty: String,
+    conn: &PooledConn,
+) -> ServiceResult<()> {
+
+    let dir = topic.clone() + "-" + &ty;
+    let mut ctx = tera::Context::new();
+    ctx.insert("ty", &ty);
+    ctx.insert("topic", &topic);
+
+    let tp = topic.trim().to_lowercase();
+
+    let (query_item, query_blog) = match tp.trim() {
+        "all" => {
+            (
+                QueryItems::Index(ty, 42, 1),
+                QueryBlogs::Index("index".into(), 42, 1)
+            )
+        }
+        "from" => {
+            (
+                QueryItems::Author(ty.clone(), 42, 1),
+                QueryBlogs::Name(ty, 42, 1)
+            )
+        } 
+        _ => {
+            (
+                QueryItems::Tt(topic.clone(), ty, 42, 1),
+                QueryBlogs::Top(topic, 42, 1)
+            )
+        }
+    };
+
+    let (i_list, _) = query_item.get(conn)?;
+    let (b_list, _) = query_blog.get(conn)?;
+
+    ctx.insert("items", &i_list);
+    ctx.insert("blogs", &b_list);
+
+    let h = tmpl.render("home.html", &ctx).map_err(|_| {
+        ServiceError::NotFound("failed".into())
+    })?;
+    let t_dir = "www/".to_owned() + &dir + ".html";
+    std::fs::write(&t_dir, h.as_bytes())?;
+            
+    Ok(())
+}
+
 pub fn gen_sitemap()-> Result<HttpResponse, Error> {
     let mut s_ctx = tera::Context::new();
     s_ctx.insert(
