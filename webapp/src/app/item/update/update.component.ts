@@ -72,7 +72,6 @@ export class UpdateComponent implements OnInit {
       );
       return;
     }
-    let topic = item.topic;
     const itemData: UpdateItem = Object.assign(
       item, 
       { id: this.itemID,

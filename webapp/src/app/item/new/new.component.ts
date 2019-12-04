@@ -70,12 +70,10 @@ export class NewComponent implements OnInit {
       );
       return;
     }
-    let topic = this.newFor || 'Rust';
     const itemData: NewItem = Object.assign(
       newItem,
       {
         slug: '',
-        topic,
         post_by: this.uname,
       }
     );

@@ -24,7 +24,7 @@
     "@types/js-base64": "^2.3.1",
     "@types/js-cookie": "^2.2.4",
     "@types/marked": "^0.7.2",
-    "core-js": "^3.4.5",
+    "core-js": "^3.4.7",
     "js-base64": "^2.5.1",
     "js-cookie": "^2.2.1",
     "marked": "^0.7.0",

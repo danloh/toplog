@@ -46,7 +46,7 @@ export class NewBlogComponent implements OnInit {
         'avatar': [''],
         'intro': [''],
         'topic': [this.newFor || ''],
-        'blog_link': ['', [Validators.required, Validators.pattern(regUrl)]],
+        'blog_link': [null, [Validators.required, Validators.pattern(regUrl)]],
         'blog_host': [''],
         'tw_link': [''],
         'gh_link': [''],
@@ -62,7 +62,6 @@ export class NewBlogComponent implements OnInit {
       alert("Invalid Input");
       return;
     }
-    let topic = newBlog.topic;
     this.blogService.create(newBlog).subscribe(
       res => window.location.href = this.host_url + '/t/' + res.topic + '/Article',
       //err => console.log(err)

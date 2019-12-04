@@ -46,7 +46,7 @@ export class UpdateBlogComponent implements OnInit {
         'avatar': [ this.blog.avatar || ''],
         'intro': [ this.blog.intro || ''],
         'topic': [ this.blog.topic || ''],
-        'blog_link': [ this.blog.blog_link ||'', [Validators.required, Validators.pattern(regUrl)]],
+        'blog_link': [ this.blog.blog_link || null, [Validators.required, Validators.pattern(regUrl)]],
         'blog_host': [ this.blog.blog_host || ''],
         'tw_link': [ this.blog.tw_link || ''],
         'gh_link': [ this.blog.gh_link || ''],
@@ -62,7 +62,6 @@ export class UpdateBlogComponent implements OnInit {
       alert("Invalid Input");
       return;
     }
-    let topic = blog.topic;
     const blogData: UpdateBlog = Object.assign(blog, { id: this.blogID });
     this.blogService.update(blogData)
     .subscribe(
