@@ -1,0 +1,10 @@
+<div class="s-item-list-view">
+  <div class="s-item-list">
+    <app-item-min *ngFor="let item of items" [item]="item"></app-item-min>
+  </div>
+  <div *ngIf="hasMore">
+    <button nz-button nzSize="small" nzType="primary" (click)="loadMore()">
+      Show More
+    </button>
+  </div>
+</div>

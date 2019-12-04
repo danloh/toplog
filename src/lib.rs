@@ -139,6 +139,9 @@ pub fn init_server() -> std::io::Result<()> {
                     resource("/items")
                         .route(post().to_async(api::item::new))
                         .route(put().to_async(api::item::update))
+                )
+                .service(
+                    resource("/getitems/{per}")
                         // get_list: ?per=topic&kw=&perpage=20&page=p
                         .route(get().to_async(api::item::get_list)) 
                 )

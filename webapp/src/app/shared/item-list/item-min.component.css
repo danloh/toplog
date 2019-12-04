@@ -1,0 +1,16 @@
+.s-item-info {
+  padding: 10px;
+  border-bottom: 0.5px dashed #ddd;
+}
+.s-item-info .s-item-sum {
+  color: #828282;
+  font-size: 16px;
+}
+.s-item-meta {
+  font-size: 14px;
+}
+.s-meta-tag {
+  margin-right: 8px;
+  border-left: 3px solid #03a87c;
+  padding-left: 3px;
+}

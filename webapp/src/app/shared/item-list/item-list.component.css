@@ -1,0 +1,13 @@
+.s-count-title {
+  padding: 5px;
+}
+.s-item-list {
+  background-color: #f5f7f8;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .s-item-list {
+    background-color: #353746;
+    color: #e4e4e4;
+  }
+} */

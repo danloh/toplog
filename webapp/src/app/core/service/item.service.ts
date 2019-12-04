@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ApiService } from './api.service';
-import { Item, NewItem, UpdateItem } from '../model';
+import { Item, NewItem, UpdateItem, ItemListRes } from '../model';
 
 @Injectable()
 export class ItemService {
@@ -30,4 +30,18 @@ export class ItemService {
     return this.apiService.delete('/items/' + slug)
       .pipe(map(data => data));
   }
+
+  get_list(
+    p: string,
+    per: string, 
+    kw: string, 
+    page: number = 1, 
+    perp: number = 42
+  ): Observable<ItemListRes> {
+    return this.apiService.get(
+      `/getitems/${p}?per=${per}&kw=${kw}&page=${page}&perpage=${perp}`
+    )
+    .pipe(map(data => data));
+  }
+
 }

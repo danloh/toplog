@@ -21,6 +21,12 @@
       <a routerLink="/item/new">
         <small style="color:orange">  +New</small>
       </a><br>
+      <a [routerLink]="'/p/' + uname + '/submit'" routerLinkActive="active">
+        Sumissions
+      </a><br>
+      <a [routerLink]="'/p/' + uname + '/vote'" routerLinkActive="active">
+        Voted
+      </a>
     </div>
   </div>
 </div>

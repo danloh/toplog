@@ -19,6 +19,7 @@ pub struct ActionQuery {
 }
 
 use crate::api::auth::CheckUser;
+use crate::api::item::Item;
 
 // general response msg struct
 #[derive(Deserialize, Serialize, Debug)]
@@ -36,6 +37,12 @@ pub struct AuthMsg {
     pub exp: i32,
     pub user: CheckUser,
     pub omg: bool, // if it is the admin
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ItemsMsg {
+    pub items: Vec<Item>,
+    pub count: i64,
 }
 
 // msg for get user info

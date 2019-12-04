@@ -7,7 +7,7 @@ use actix_web::{
 };
 use base64::decode;
 use diesel::prelude::*;
-use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{self, dsl::any, ExpressionMethods, QueryDsl, RunQueryDsl};
 use chrono::{NaiveDateTime, NaiveDate, Utc};
 
 use crate::errors::{ServiceError, ServiceResult};
@@ -166,29 +166,40 @@ impl Handler<QueryItem> for Dba {
     }
 }
 
-// GET: api/items?per=topic|author&kw=&page=p&perpage=42
+// GET: api/items/{per}?per=topic|author&kw=&page=p&perpage=42
 // 
 pub fn get_list(
+    pt: Path<String>,
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
+    let p = pt.into_inner();
+    // extract query param
     let perpage = pq.perpage;
     let page = pq.page;
     let kw = pq.clone().kw;
-    let per = pq.per.trim();
-    let item = match per {
+    let per = pq.clone().per;
+    let item = match p.trim() {
         "topic" => QueryItems::Topic(kw, perpage, page),
         "author" => QueryItems::Author(kw, perpage, page),
         "ty" => QueryItems::Ty(kw, perpage, page),
         "index" => QueryItems::Index(kw, perpage, page),
+        "user" => QueryItems::User(per, kw, perpage, page),
         // other: 
         // kw-topic: rust|go.., per-ty: art|book|..
-        _ => QueryItems::Tt(kw, per.to_owned(), perpage, page),
+        _ => QueryItems::Tt(kw, per, perpage, page),
     };
     db.send(item)
         .from_err()
         .and_then(move |res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Ok(b) => {
+                use crate::api::ItemsMsg;
+                let res = ItemsMsg {
+                    items: b.0,
+                    count: b.1,
+                };
+                Ok(HttpResponse::Ok().json(res))
+            },
             Err(err) => Ok(err.error_response()),
         })
 }
@@ -483,6 +494,7 @@ impl Message for QueryItem {
 pub enum QueryItems {
     Index(String, i32, i32),
     Topic(String, i32, i32), // topic, perpage, page
+    User(String, String, i32, i32), // uname, action:submit|vote, 
     Ty(String, i32, i32), // ty, perpage, page
     Tt(String, String, i32, i32), // topic, ty, perpage, page
     Author(String, i32, i32),  // aname, ..
@@ -581,6 +593,38 @@ impl QueryItems {
                     .limit(o.into())
                     .offset((o * p_o).into())
                     .load::<Item>(conn)?;
+            }
+            QueryItems::User(u, a, o, p) => {
+                let action = a.trim();
+                let p_o = std::cmp::max(0, p-1);
+
+                match action {
+                    "submit" => {
+                        let query = items.filter(post_by.eq(u));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(pub_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
+                    "vote" => {
+                        use crate::schema::voteitems::dsl::*;
+                        let itemid_list = voteitems
+                            .filter(uname.eq(u))
+                            .filter(vote_as.eq(1))
+                            .select(item_id)
+                            .load::<i32>(conn)?;
+                        item_count = itemid_list.len() as i64;
+                        item_list = items
+                            .filter(id.eq(any(&itemid_list)))
+                            .order(pub_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
+                    _ => {}
+                }
             }
             QueryItems::Author(a, o, p) => {
                 let query = items

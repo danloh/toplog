@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ProfileComponent } from './profile/profile.component';
 import { UpdateUserComponent } from './update-user/update-user.component';
+import { WrapItemListComponent } from '../shared/item-list/wrap-item-list.component';
 import { UserResolver } from './user-resolver.service';
 import { AuthGuard } from '../core';
 
@@ -16,8 +17,18 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'create',
+        redirectTo: 'submit',
         pathMatch: 'full',
+      },
+      {
+        path: 'submit',
+        component: WrapItemListComponent,
+        data: {kw: 'submit'}
+      },
+      {
+        path: 'vote',
+        component: WrapItemListComponent,
+        data: {kw: 'vote'}
       },
     ]
   },
