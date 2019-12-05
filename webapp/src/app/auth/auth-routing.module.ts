@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { AuthGuard } from '../core';
 import { RegComponent } from './reg.component';
 import { OauthComponent } from './oauth.component';
 import { SigninComponent } from './signin.component';
@@ -34,7 +35,8 @@ const authRoutes: Routes = [
   },
   {
     path: 'gensite',
-    component: SiteComponent
+    component: SiteComponent,
+    canActivate: [AuthGuard]
   }
 ];
 
