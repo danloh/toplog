@@ -2,7 +2,7 @@
 use futures::{Future, future::result};
 use actix::{Handler, Message};
 use crate::errors::{ServiceError, ServiceResult};
-use crate::api::auth::{verify_token, CheckUser};
+use crate::api::auth::{verify_token, CheckUser, CheckCan};
 use crate::api::item::{Item, QueryItems};
 use crate::api::blog::{Blog, QueryBlogs};
 use crate::view::TEMPLATE as tmpl;
@@ -353,7 +353,59 @@ pub fn gen_html(
     Ok(())
 }
 
-pub fn gen_sitemap()-> Result<HttpResponse, Error> {
+// GET /generate-staticsite
+//
+// statify site
+pub fn statify_site(
+    db: Data<DbAddr>,
+    _auth: CheckCan,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let ss = StaticSite();
+    db.send(ss).from_err().and_then(|res| match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
+pub struct StaticSite();
+
+impl Message for StaticSite {
+    type Result = ServiceResult<String>;
+}
+
+impl Handler<StaticSite> for Dba {
+    type Result = ServiceResult<String>;
+
+    fn handle(&mut self, ss: StaticSite, _: &mut Self::Context) -> Self::Result {
+        let conn = &self.0.get()?;
+        gen_static(conn);
+
+        Ok(String::from("Done"))
+    }
+}
+
+pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
+    let tpcs = vec!(
+        "all", "Rust", "Go", 
+        "TypeScript", "Angular", "Vue", "React", "Dart"
+    );
+    let typs = vec!(
+        "Article", "Book", "Event", "Job", "Media", 
+        "Product", "Translate", "Misc"
+    );
+
+    for tpc in tpcs {
+        for typ in typs.clone() {
+            gen_html(tpc.into(), typ.into(), conn);
+        }
+    }
+          
+    Ok(())
+}
+
+// GET /generate-sitemap
+//
+pub fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
     let mut s_ctx = tera::Context::new();
     s_ctx.insert(
         "lastmod",
@@ -364,10 +416,7 @@ pub fn gen_sitemap()-> Result<HttpResponse, Error> {
     })?;
     std::fs::write("www/sitemap.xml", s.as_bytes())?;
 
-    Ok(HttpResponse::Ok()
-        .content_type("text/xml; charset=utf-8")
-        .body(s)
-    )
+    Ok(HttpResponse::Ok().json("Done".to_owned()))
 }
 
 // =====================================================================

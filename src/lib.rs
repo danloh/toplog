@@ -170,6 +170,14 @@ pub fn init_server() -> std::io::Result<()> {
                         .route(post().to_async(api::rfc::label_isuue))
                         .route(delete().to_async(api::rfc::del_label_isuue))
                 )
+                .service(
+                    resource("/generate-sitemap")
+                        .route(get().to(view::tmpl::gen_sitemap))
+                )
+                .service(
+                    resource("/generate-staticsite")
+                        .route(get().to_async(view::tmpl::statify_site))
+                )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
@@ -212,10 +220,6 @@ pub fn init_server() -> std::io::Result<()> {
             .service(
                 resource("/site/{name}")
                     .route(get().to(view::tmpl::site))
-            )
-            .service(
-                resource("/generate-sitemap")
-                    .route(get().to(view::tmpl::gen_sitemap))
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap

@@ -8,6 +8,7 @@ import { SigninComponent } from './signin.component';
 import { ResetComponent } from './reset.component';
 import { RepswComponent } from './repsw.component';
 import { OauthComponent } from './oauth.component';
+import { SiteComponent } from './site.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { OauthComponent } from './oauth.component';
     SigninComponent,
     ResetComponent,
     RepswComponent,
-    OauthComponent
+    OauthComponent,
+    SiteComponent
   ],
   imports: [
     CommonModule,
