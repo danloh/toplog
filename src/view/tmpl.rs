@@ -390,7 +390,7 @@ pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
         "TypeScript", "Angular", "Vue", "React", "Dart"
     );
     let typs = vec!(
-        "Article", "Book", "Event", "Job", "Media", 
+        "index", "Article", "Book", "Event", "Job", "Media", 
         "Product", "Translate", "Misc"
     );
 

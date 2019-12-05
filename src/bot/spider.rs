@@ -181,6 +181,15 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
     let raw_links = page.extract_links();
     let mut links: Vec<String> = Vec::new();
     match domain.trim() {
+        // Rust: team Blog
+        "blog.rust-lang.org" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") {
+                    let f_link = "https://blog.rust-lang.org".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
         // Rust: Nicholas Matsakis 
         "smallcultfollowing.com" => {
             for link in raw_links {
@@ -357,6 +366,31 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Go: Team Blog
+        "blog.golang.org" => {
+            for link in raw_links {
+                if link.starts_with("/") && link.len() > 2 && !(link.contains("/index")) && !(link.contains("//")) {
+                    let f_link = "https://blog.golang.org".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Misc, Microsoft
+        "devblogs.microsoft.com" => {
+            for link in raw_links {
+                if link.starts_with("https://devblogs.microsoft.com/") 
+                && !(link.contains("/#"))
+                && !(link.contains("/tag/"))
+                && !(link.contains("/category/"))
+                && !(link.contains("/blog/"))
+                && !(link.contains("/author/"))
+                && !(link.contains("/wp-login"))
+                && !(link.contains("/feed/"))
+                {
+                    links.push(link)
+                }
+            }
+        }
         
         _ => {}  // to deal with
     }
@@ -379,6 +413,8 @@ use std::collections::HashMap;
 lazy_static! {
     pub static ref MAP_HOST: HashMap<&'static str, (&'static str, &'static str)> = {
         let mut map = HashMap::new();
+        // Rust
+        map.insert("blog.rust-lang.org", ("Rust Team", "Rust"));
         map.insert("smallcultfollowing.com", ("Nicholas Matsakis", "Rust"));
         map.insert("tokio.rs", ("Tokio Team", "Rust"));
         map.insert("async.rs", ("async-std", "Rust"));
@@ -399,6 +435,12 @@ lazy_static! {
         map.insert("llogiq.github.io", ("Andre Bogus", "Rust"));
         map.insert("tonyarcieri.com", ("Tony Arcieri", "Rust"));
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
+        // Golang
+        map.insert("blog.golang.org", ("Go Team", "Go"));
+        // Angular
+        map.insert("blog.angular.io", ("Angular Team", "Angular"));
+        // Misc
+        map.insert("devblogs.microsoft.com", ("MicroSoft", "C"));
 
         map
     };

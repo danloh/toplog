@@ -37,7 +37,7 @@
   <div class="banner">
     {%- block banner -%}
     <div class="banner-view">
-      {%- for t in ["Rust", "Go", "TypeScript", "Angular", "Vue", "React"] -%}
+      {%- for t in ["Rust", "Go", "TypeScript"] -%}
         {%- if t == topic -%}
         <a class="{{ 'topic-tab-active tab-' ~ topic }}" href="{{ '/t/' ~ t ~ '/Article' }}">{{ t }}</a>
         {%- else -%}

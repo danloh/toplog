@@ -29,6 +29,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     let mut links: Vec<String> = Vec::new();
     let url_list = vec!(
         // ## Rust
+        "https://blog.rust-lang.org/",
         "http://smallcultfollowing.com/babysteps/", // babystep
         "https://tokio.rs/blog/2019-11-tokio-0-2/", // tokio
         "https://async.rs/blog/", // async-std
@@ -49,6 +50,12 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://llogiq.github.io/", // Andre Bogus
         "https://tonyarcieri.com/",  // Tony Arcieri
         "https://blog.yoshuawuyts.com/", // Yoshua Wuyts
+        // ## Golang
+        "https://blog.golang.org/index",
+        // ## Angular
+        
+        // ## Mic
+        "https://devblogs.microsoft.com",
     );
 
     for url in url_list {

@@ -39,7 +39,7 @@ blockquote {
 .header {
   z-index: 999;
   height: 45px;
-  min-width: 400px;
+  min-width: 240px;
 }
 .header .nav-menu {
   box-sizing: border-box;
@@ -109,7 +109,7 @@ blockquote {
 .footer {
   margin-top: 3em;
   background-color: #f5f5f5;
-  min-width: 400px;
+  min-width: 240px;
 }
 .footer .bottom {
   margin: 5px auto;
@@ -122,7 +122,7 @@ blockquote {
 .banner-view {
   box-sizing: border-box;
   margin: 0px auto;
-  padding: 5px 145px 5px 5px;
+  padding: 5px 100px 5px 5px;
   position: relative;
 }
 .banner-thumb {
@@ -171,7 +171,7 @@ blockquote {
 .banner .banner-view,
 .main-view {
   max-width: 960px;
-  min-width: 400px;
+  min-width: 240px;
 }
 
 .main-page {
