@@ -13,6 +13,8 @@ fn main() -> SrvResult<()> {
     tasks::cal_blogs_karma()
         .enqueue(&conn)
         .map_err(|e| SrvError::from_std_error(e))?;
+    
+    println!("enqueue 2 tasks");
 
     Ok(())
 }

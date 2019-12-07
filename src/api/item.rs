@@ -489,7 +489,7 @@ impl QueryItem {
         let tpc = itm.topic;
         let typ = itm.ty;
         use crate::view::tmpl::gen_html;
-        println!("here {}, {}", tpc, typ);
+        // println!("here {}, {}", tpc, typ);
         gen_html(tpc.clone(), typ, conn);   // TODO: ignor error but log
         gen_html(tpc, "Misc".into(), conn);
         // =========================
