@@ -1,6 +1,13 @@
 {%- extends "base.html" -%}
 
-{%- block title -%} Home {%- endblock title -%}
+{%- block title -%} 
+  {%- if topic == 'all' or topic == 'from' -%}
+    {{ ty }}
+  {%- else -%}
+    {{ ty ~ 's on ' ~ topic }} 
+  {%- endif -%}
+{%- endblock title -%}
+
 
 {%- block mainview -%}
 <div class="main-page">
