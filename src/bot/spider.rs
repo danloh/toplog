@@ -383,6 +383,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 && !(link.contains("/tag/"))
                 && !(link.contains("/category/"))
                 && !(link.contains("/blog/"))
+                && !(link.contains("/page/"))
                 && !(link.contains("/author/"))
                 && !(link.contains("/wp-login"))
                 && !(link.contains("/feed/"))
