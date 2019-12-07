@@ -45,7 +45,7 @@ export class NewBlogComponent implements OnInit {
       { 'aname': [null, [Validators.required]],
         'avatar': [''],
         'intro': [''],
-        'topic': [this.newFor || ''],
+        'topic': [this.newFor || null, [Validators.required]],
         'blog_link': [null, [Validators.required, Validators.pattern(regUrl)]],
         'blog_host': [''],
         'tw_link': [''],

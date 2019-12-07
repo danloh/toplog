@@ -45,7 +45,7 @@ export class UpdateBlogComponent implements OnInit {
       { 'aname': [ this.blog.aname || null, [Validators.required]],
         'avatar': [ this.blog.avatar || ''],
         'intro': [ this.blog.intro || ''],
-        'topic': [ this.blog.topic || ''],
+        'topic': [ this.blog.topic || null, [Validators.required]],
         'blog_link': [ this.blog.blog_link || null, [Validators.required, Validators.pattern(regUrl)]],
         'blog_host': [ this.blog.blog_host || ''],
         'tw_link': [ this.blog.tw_link || ''],
