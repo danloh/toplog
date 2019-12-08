@@ -369,6 +369,10 @@ impl UpdateItem {
         } else {
             (&old).slug.to_owned()
         };
+        // post_by
+        let postBy = 
+            if &old.post_by == "bot" { &self.post_by } else { &old.post_by};
+
         let up = UpdateItem {
             title: new_title.to_owned(),
             slug: a_slug,
@@ -380,6 +384,7 @@ impl UpdateItem {
             topic: new_topic.to_owned(),
             link: new_link.to_owned(),
             origin_link: new_origin.to_owned(),
+            post_by: postBy.to_owned(),
             pub_at: new_pub_at,
             ..self
         };
