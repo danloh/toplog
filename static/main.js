@@ -1,4 +1,45 @@
-
+// config marked
+const renderer = new marked.Renderer();
+function paragraphParse(text) {
+  return `<p>\n${text}</p>`;
+}
+function linkParse(href, title, text) {
+  const isSelf = href.includes('newdin.com');
+  const textIsImage = text.includes('<img');
+  return `
+  <a href="${href}" target="_blank"
+    title="${title || (textIsImage ? href : text)}" 
+    ${isSelf ? '' : 'rel="external nofollow noopener noreferrer"'}
+  >${text}
+  </a>`.replace(/\s+/g, ' ').replace('\n', '');
+}
+function imageParse(src, title, alt) {
+  return `
+  <br><a href="${src}" 
+    target="_blank" rel="nofollow noopener noreferrer">
+    <img src="${src}" title="${title || alt || ''}" 
+      style="max-width:95%; max-height:45%"
+      alt="${alt || title || src}"
+    />
+  </a><br>`.replace(/\s+/g, ' ').replace('\n', '');
+}
+function headingParse(text, level) {
+  let realLevel = level + 2;
+  return '<h' + realLevel + '>' + text + '</h' + realLevel + '>\n';
+}
+renderer.link = linkParse;
+renderer.image = imageParse;
+renderer.paragraph = paragraphParse;
+renderer.heading = headingParse;
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  pedantic: false,
+  smartLists: true,
+  smartypants: true,
+  renderer: renderer
+})
+// =================================================================
 //## show dropdown
 function showMenu() { 
   showDrop("drop-menu"); 
@@ -120,6 +161,30 @@ function upVote(slug) {
       if (upEle) { upEle.hidden = true }
     }
   });
+}
+
+function showFull(slug) {
+  let rawSelector = 'raw-' + slug;
+  let partSelector = 'part-' + slug;
+  let mdSelector = 'md-' + slug;
+  let btnSelector = 'btn-' + slug;
+  let btn = document.getElementById(btnSelector);
+  let ifShowMore = btn.innerText === 'more...' ? true : false;
+  let mdEle = document.getElementById(mdSelector);
+  let partEle = document.getElementById(partSelector);
+  let rawEle = document.getElementById(rawSelector);
+  let raw = rawEle ? rawEle.innerText : '';
+  if (ifShowMore) {    
+    mdEle.innerHTML = marked(raw);
+    mdEle.hidden = false;
+    partEle.hidden = true;
+    btn.innerText = 'less...';
+  } else {
+    partEle.hidden = false;
+    mdEle.hidden = true;
+    btn.innerText = 'more...';
+  }
+  
 }
 
 function openLink(link, admin=false) {

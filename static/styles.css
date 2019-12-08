@@ -117,7 +117,8 @@ blockquote {
 }
 .banner {
   background-color: #f6f9f8;
-  padding: 5px;
+  padding: 5px 5px 8px 5px;
+  border-bottom: 0.2px dashed #63a191;
 }
 .banner-view {
   box-sizing: border-box;
@@ -156,7 +157,7 @@ blockquote {
 }
 .ty-tab-active {
   border-bottom: 3px solid #03a87c;
-  padding: 2px;
+  padding: 2px 2px 5px 2px;
 }
 
 .main-view {
@@ -253,6 +254,10 @@ section.item-sum:hover {
   padding: 1px 2px;
   border-radius: 5%;
 }
+/* .hide-part {
+  max-height: 150px;
+  overflow: hidden;
+} */
 
 .badge, 
 .Article, .Book, .Event, .Job, 

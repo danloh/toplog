@@ -459,4 +459,5 @@ pub struct Topic {
     pub tname: String,
     pub logo: String,
     pub intro: String,
+    pub vote: i32,
 }

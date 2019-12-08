@@ -1,10 +1,23 @@
 <section class="item-sum">
   {%- set a_url = a.link -%}
+  {%- set a_content = a.content -%}
+  {%- set a_author = a.author | enbase -%}
+  {%- set a_slug = a.slug -%}
   <a href ="{{ a_url }}" target="_blank" rel="noopener">
     <b class="title">{{ a.title }}</b>
     <span class="host"> | </span>
     <span style="color: #37a">{{ a_url | safe | host }}</span>
-    <div class="meta-sum">{{ a.content | showless(least=256) }}</div>
+    <div id="{{'raw-' ~ a_slug}}" style="display: none">{{ a_content }}</div>
+    <div id="{{'part-' ~ a_slug}}" class="meta-sum">{{ a_content | showless(least=256) }}</div>
+    <div id="{{'md-' ~ a_slug}}" class="meta-sum"></div>
+    {%- if a_content | length > 256 -%}
+    <a href="javascript:void(0);" 
+      onclick="showFull('{{ a_slug }}')" 
+      id="{{'btn-' ~ a_slug}}" class="help-tips"
+    >
+      more...
+    </a>
+    {%- endif -%}
   </a>
   {%- set logo = a.logo -%}
   {%- if logo -%}
@@ -16,13 +29,11 @@
     <span class="{{ a.ty }}"></span>
     <span class="meta-tag">{{ a.ty }}</span> 
     <span class="badge" style="background-color: #03a87c;"></span>
-    {%- set a_author = a.author | enbase -%}
     <span class="meta-tag"><a href="{{ '/from?by=' ~ a_author }}">{{ a.author }}</a></span>
     <span class="{{ 'badge tab-' ~ a.topic }}"></span>
     <span class="meta-tag">{{ a.topic }}</span> 
     <span class="badge" style="background-color: #03a83a;"></span>
     <span class="meta-tag">{{ a.pub_at | date(format="%b %d %Y") }}</span> 
-    {%- set a_slug = a.slug -%}
     <a id="{{'up-' ~ a_slug}}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
       <span class="triangle-up"></span>
     </a> 
