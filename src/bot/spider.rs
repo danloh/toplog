@@ -190,6 +190,42 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Users forum
+        "users.rust-lang.org" => {
+            for link in raw_links {
+                if link.starts_with("https://users.rust-lang.org/t/") {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Internal forum
+        "internals.rust-lang.org" => {
+            for link in raw_links {
+                if link.starts_with("https://internals.rust-lang.org/t/") {
+                    links.push(link)
+                }
+            }
+        }
+        // reddit: Rust / Go ....
+        "reddit.com" => {
+            for link in raw_links {
+                if link.starts_with("/r/rust/comments/") {
+                    let f_link = "https://www.reddit.com".to_string() + &link;
+                    links.push(f_link)
+                }
+                // if link.starts_with("https://www.reddit.com/r/rust/comments/") {
+                //     links.push(link)
+                // }
+                if link.starts_with("/r/golang/comments/") {
+                    let f_link = "https://www.reddit.com".to_string() + &link;
+                    links.push(f_link)
+                }
+                if link.starts_with("/r/typescript/comments/") {
+                    let f_link = "https://www.reddit.com".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
         // Rust: Nicholas Matsakis 
         "smallcultfollowing.com" => {
             for link in raw_links {
@@ -375,6 +411,14 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Web: Mozilla
+        "hacks.mozilla.org" => {
+            for link in raw_links {
+                if link.starts_with("https://hacks.mozilla.org/2020/") || link.starts_with("https://hacks.mozilla.org/2019/") {
+                    links.push(link)
+                }
+            }
+        }
         // Misc, Microsoft
         "devblogs.microsoft.com" => {
             for link in raw_links {
@@ -416,6 +460,9 @@ lazy_static! {
         let mut map = HashMap::new();
         // Rust
         map.insert("blog.rust-lang.org", ("Rust Team", "Rust"));
+        map.insert("users.rust-lang.org", ("Rust Forum", "Rust"));
+        map.insert("internals.rust-lang.org", ("Rust Forum", "Rust"));
+        map.insert("reddit.com", ("Reddit", "Rust"));  // more
         map.insert("smallcultfollowing.com", ("Nicholas Matsakis", "Rust"));
         map.insert("tokio.rs", ("Tokio Team", "Rust"));
         map.insert("async.rs", ("async-std", "Rust"));
@@ -440,8 +487,10 @@ lazy_static! {
         map.insert("blog.golang.org", ("Go Team", "Go"));
         // Angular
         map.insert("blog.angular.io", ("Angular Team", "Angular"));
+        // Web
+        map.insert("hacks.mozilla.org", ("Mozilla", "Web"));
         // Misc
-        map.insert("devblogs.microsoft.com", ("MicroSoft", "C"));
+        map.insert("devblogs.microsoft.com", ("MicroSoft", "dotnet"));
 
         map
     };
