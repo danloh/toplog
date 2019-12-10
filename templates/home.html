@@ -11,14 +11,29 @@
 {%- block mainview -%}
 <div class="main-page">
   <div class="note">
+    {%- if ty == 'Article' -%}
+    <span class="note-content">Highlights</span>
+    {%- endif -%}
     {%- if ty == 'Book' -%}
     <span class="note-content">Guided learning journey & Featured books</span>
     {%- endif -%}
-    {%- if ty == 'Translate' -%}
-    <span class="note-content">Share your translation here</span>
+    {%- if ty == 'Event' -%}
+    <span class="note-content">Events, Talks and Playlist</span>
+    {%- endif -%}
+    {%- if ty == 'Job' -%}
+    <span class="note-content">Who is Hiring?</span>
     {%- endif -%}
     {%- if ty == 'Media' -%}
     <span class="note-content">Podcast or Video or Cartoon...</span>
+    {%- endif -%}
+    {%- if ty == 'Product' -%}
+    <span class="note-content">Show your creations</span>
+    {%- endif -%}
+    {%- if ty == 'Translate' -%}
+    <span class="note-content">Share your translation</span>
+    {%- endif -%}
+    {%- if ty == 'Misc' -%}
+    <span class="note-content">Raw links...</span>
     {%- endif -%}
     {%- if topic == 'from' -%}
     <span class="note-content">By {{ ty }} :</span>

@@ -32,9 +32,9 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://blog.rust-lang.org/",
         "https://users.rust-lang.org/top",
         "https://internals.rust-lang.org/top",
-        "https://www.reddit.com/r/rust/hot/",  // Rust
-        "https://www.reddit.com/r/golang/hot/", // Golang
-        "https://www.reddit.com/r/typescript/hot/", // TypeScript
+        //"https://www.reddit.com/r/rust/hot/",  // Rust
+        //"https://www.reddit.com/r/golang/hot/", // Golang
+        //"https://www.reddit.com/r/typescript/hot/", // TypeScript
         "http://smallcultfollowing.com/babysteps/", // babystep
         "https://tokio.rs/blog/2019-11-tokio-0-2/", // tokio
         "https://async.rs/blog/", // async-std

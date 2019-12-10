@@ -259,15 +259,34 @@ section.item-sum:hover {
   overflow: hidden;
 } */
 
-.badge, 
-.Article, .Book, .Event, .Job, 
-.Media, .Product, .Translate {
+.badge, .badge-circle, 
+.badge-bead, .badge-oval {
   flex: 0 0 auto;
-  width: 8px;
-  height: 10px;
   margin-right: 1px;
   display: inline-block;
+  background-color: #03a87c;  /*default*/
 }
+.badge {
+  width: 8px;
+  height: 10px;
+}
+.badge-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.badge-bead {
+  width: 8px;
+  height: 10px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+.badge-oval {
+  width: 6px;
+  height: 10px;
+  border-radius: 50% / 50%;
+  background-color: #03a83a;
+}
+
 .Article {
   background-color: #3ab54a;
 }
@@ -296,6 +315,9 @@ section.item-sum:hover {
 .tab-Go {
   background-color: #00add8;
 }
+.tab-CPP {
+  background-color: #f34b7d;
+}
 .tab-TypeScript {
   background-color: #2b7489;
 }
@@ -313,6 +335,9 @@ section.item-sum:hover {
 }
 .tab-React {
   background-color: #61dafb;
+}
+.tab-Web {
+  background-color: #60c1e4;
 }
 
 .triangle-up {
