@@ -273,6 +273,37 @@ pub fn more_item(
     })
 }
 
+// GET /item/{slug}
+//
+pub fn item_view(
+    db: Data<DbAddr>,
+    p: Path<String>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let slug = p.into_inner();
+    use crate::api::item::QueryItem;
+
+    let item_msg = QueryItem { 
+        slug, 
+        method: String::from("GET"), 
+        uname: String::new(),
+    };
+
+    db.send(item_msg).from_err().and_then(|res| match res {
+        Ok(msg) => {
+            let mut ctx = tera::Context::new();
+            ctx.insert("item", &msg);
+            ctx.insert("ty", "all");
+            ctx.insert("topic", "all");
+
+            let h = tmpl.render("item.html", &ctx).map_err(|_| {
+                ServiceError::NotFound("failed".into())
+            })?;
+            Ok(HttpResponse::Ok().content_type("text/html").body(h))
+        }
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
 // GET /me/index.html // spa
 // try_uri for spa
 // 

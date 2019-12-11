@@ -34,8 +34,8 @@
     </nav>
   {%- endblock header -%}
   </header>
+  {%- block banner -%}
   <div class="banner">
-    {%- block banner -%}
     <div class="banner-view">
       {%- for t in ["Rust", "Go", "TypeScript"] -%}
         {%- if t == topic -%}
@@ -62,8 +62,8 @@
         <img class="banner-thumb" src="{{ '/static/logo/' ~ topic ~ '.svg' }}">
       </span>
     </div>
-    {%- endblock banner -%}
   </div>
+  {%- endblock banner -%}
   <div class="main-view">
     {%- block mainview -%}{%- endblock mainview -%}
   </div>
@@ -83,6 +83,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="/static/main.js"></script>
+{%- block script -%}{%- endblock script -%}
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154003490-1"></script>
 <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-154003490-1');</script>

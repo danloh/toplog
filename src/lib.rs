@@ -217,6 +217,10 @@ pub fn init_server() -> std::io::Result<()> {
                 resource("/more/{topic}/{ty}") // ?page=&perpage=42
                     .route(get().to_async(view::tmpl::more_item))
             )
+            .service( 
+                resource("/item/{slug}")
+                    .route(get().to_async(view::tmpl::item_view))
+            )
             .service(
                 resource("/site/{name}")
                     .route(get().to(view::tmpl::site))

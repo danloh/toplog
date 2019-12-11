@@ -1,7 +1,10 @@
 <section class="blog-info">
   {%- set cname = c.aname -%}
   <b>{{ cname }}</b> 
-  <a onclick= "openLink('{{`/me/blog/update/` ~ c.id }}', true)" href="javascript:void(0);">..</a><br>
+  <a onclick= "openLink('{{`/me/blog/update/` ~ c.id }}', true)" 
+    href="javascript:void(0);"
+    class="edit-link"
+  >..</a><br>
   {%- set c_intro = c.intro -%}
   {%- if c_intro -%}
   <div class="blog-intro">{{ c_intro | showless(least=256) }}</div>
@@ -26,7 +29,7 @@
   </a>
   {%- endif -%}
   {%- set c_name = cname | enbase -%}
-  <a href="{{ '/from?by=' ~ c_name }}">...</a>
+  <a href="{{ '/from?by=' ~ c_name }}">~</a>
   {%- if blog_avatar -%}
   <span>
     <img class="blog-thumb" src="{{ blog_avatar }}" referrerPolicy="no-referrer">

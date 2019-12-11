@@ -81,7 +81,7 @@ export class UpdateComponent implements OnInit {
     );
     this.itemService.update(itemData)
     .subscribe(
-      res => window.location.href = this.host_url + '/t/' + res.topic + '/Misc',
+      res => { window.location.href = this.host_url + '/item/' + res.slug },
       //err => console.log(err)
     );
   }

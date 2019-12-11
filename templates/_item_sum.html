@@ -1,10 +1,10 @@
 <section class="item-sum">
-  {%- set a_url = a.link -%}
-  {%- set a_content = a.content -%}
-  {%- set a_author = a.author | enbase -%}
-  {%- set a_slug = a.slug -%}
+  {%- set a_url = item.link -%}
+  {%- set a_content = item.content -%}
+  {%- set a_author = item.author | enbase -%}
+  {%- set a_slug = item.slug -%}
   <a href ="{{ a_url }}" target="_blank" rel="noopener">
-    <b class="title">{{ a.title }}</b>
+    <b class="title">{{ item.title }}</b>
     <span class="host"> | </span>
     <span style="color: #37a">{{ a_url | safe | host }}</span>
     <div id="{{'raw-' ~ a_slug}}" style="display: none">{{ a_content }}</div>
@@ -19,28 +19,31 @@
     </a>
     {%- endif -%}
   </a>
-  {%- set logo = a.logo -%}
+  {%- set logo = item.logo -%}
   {%- if logo -%}
   <span>
     <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
   </span>
   {%- endif -%}
-  <div class="a-meta">
-    <span class="{{ 'badge ' ~ a.ty }}"></span> <!-- type badge-->
-    <span class="meta-tag">{{ a.ty }}</span> 
+  <div class="item-meta">
+    <span class="{{ 'badge ' ~ item.ty }}"></span> <!-- type badge-->
+    <span class="meta-tag">{{ item.ty }}</span> 
     <span class="badge-bead"></span> <!-- author badge-->
-    <span class="meta-tag"><a href="{{ '/from?by=' ~ a_author }}">{{ a.author }}</a></span>
-    <span class="{{ 'badge-circle tab-' ~ a.topic }}"></span> <!-- topic badge -->
-    <span class="meta-tag">{{ a.topic }}</span>  
+    <span class="meta-tag"><a href="{{ '/from?by=' ~ a_author }}">{{ item.author }}</a></span>
+    <span class="{{ 'badge-circle tab-' ~ item.topic }}"></span> <!-- topic badge -->
+    <span class="meta-tag">{{ item.topic }}</span>  
     <span class="badge-oval"></span> <!-- date badge -->
-    <span class="meta-tag">{{ a.pub_at | date(format="%b %d %Y") }}</span> 
+    <span class="meta-tag">{{ item.pub_at | date(format="%b %d %Y") }}</span> 
     <a id="{{'up-' ~ a_slug}}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
       <span class="triangle-up"></span>
     </a> 
-    <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ a.vote }}</span>&nbsp;&nbsp;
-    <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" href="javascript:void(0);">..</a>&nbsp;
+    <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
+    <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" 
+      href="javascript:void(0);"
+      class="edit-link"
+    >..</a>&nbsp;
     <a id="{{'t-' ~ a_slug}}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
-      {%- if a.is_top -%} ... {%- else -%} ::: {%- endif -%}
+      {%- if item.is_top -%} ... {%- else -%} ::: {%- endif -%}
     </a>
   </div>
 </section>

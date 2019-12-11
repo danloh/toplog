@@ -2,6 +2,7 @@ body {
   font-family: Lato,Roboto,Open Sans,sans-serif;
   font-size: 18px;
   line-height: 1.8em;
+  /* background-color: #e1e1db; */
   overflow-wrap: break-word;
 }
 a {
@@ -211,13 +212,22 @@ blockquote {
 .link-icon:hover {
   border-top: 2px solid #03a87c;
 }
+.edit-link {
+  color: transparent;
+}
+.edit-link:hover {
+  color: #03a87c;
+  font-size: 18px;
+}
 
-.item-sum {
+.item-sum, .item-view {
   background-color:#f5f7f8;
   padding: 10px 75px 10px 10px;
   min-height: 75px;
-  border-bottom: 1px dashed #ddd;
   position: relative;
+}
+.item-sum {
+  border-bottom: 1px dashed #ddd;
 }
 section.item-sum:hover {
   background-color:  #fcfdfc;
@@ -225,7 +235,7 @@ section.item-sum:hover {
 .item-sum .title {
   font-size: 22px;
 }
-.item-sum .a-meta {
+.item-meta {
   font-size: 14px;
 }
 .meta-tag {
@@ -234,6 +244,13 @@ section.item-sum:hover {
 .meta-sum {
   color: #828282;
   font-size: 16px;
+}
+.item-view .title {
+  font-size: 24px;
+}
+.item-md {
+  color: #98a3ad;
+  font-size: 18px;
 }
 .item-thumb {
   position: absolute;
@@ -399,7 +416,7 @@ section.item-sum:hover {
     background-color: #282a36;
     color: #e4e4e4;
   }
-  .page-side, .right-title, .dropdown-content, .item-sum
+  .page-side, .right-title, .dropdown-content, .item-sum, .item-view
   {
     background-color: #353746;
     color: #e4e4e4;

@@ -78,7 +78,7 @@ export class NewComponent implements OnInit {
       }
     );
     this.itemService.create(itemData).subscribe(
-      res => { window.location.href = this.host_url + '/t/' + res.topic + '/Misc' },
+      res => { window.location.href = this.host_url + '/item/' + res.slug },
       //err => console.log(err)
     );
   }
