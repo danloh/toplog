@@ -402,6 +402,14 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Sean McArthur
+        "seanmonstar.com" => {
+            for link in raw_links {
+                if link.starts_with("https://seanmonstar.com/post/")  {
+                    links.push(link)
+                }
+            }
+        }
         // Go: Team Blog
         "blog.golang.org" => {
             for link in raw_links {
@@ -483,6 +491,7 @@ lazy_static! {
         map.insert("llogiq.github.io", ("Andre Bogus", "Rust"));
         map.insert("tonyarcieri.com", ("Tony Arcieri", "Rust"));
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
+        map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
         // Angular

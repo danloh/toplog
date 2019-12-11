@@ -268,15 +268,15 @@ section.item-sum:hover {
   font-size: 0.75em;
   color: #fff;
   background-color: #aab0c6;
-  padding: 1px 2px;
-  border-radius: 5%;
+  padding: 0px 2px;
+  border-radius: 25%;
 }
 /* .hide-part {
   max-height: 150px;
   overflow: hidden;
 } */
 
-.badge, .badge-circle, 
+.badge, .badge-circle, .badge-heart,
 .badge-bead, .badge-oval {
   flex: 0 0 auto;
   margin-right: 1px;
@@ -302,6 +302,41 @@ section.item-sum:hover {
   height: 10px;
   border-radius: 50% / 50%;
   background-color: #03a83a;
+}
+.badge-heart {
+  position: relative;
+  width: 10px;
+  height: 9px;
+  background-color: transparent;
+}
+.badge-heart:before,
+.badge-heart:after {
+  position: absolute;
+  content: "";
+  left: 5px;
+  top: 0;
+  width: 5px;
+  height: 8px;
+  background: rgb(231, 140, 140);
+  border-radius: 5px 5px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
+.badge-heart:after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+}
+.triangle-up {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #999999;
+  margin-right: 1px;
+  display: inline-block;
+  text-align: justify;
 }
 
 .Article {
@@ -376,18 +411,6 @@ section.item-sum:hover {
 }
 .tab-Web {
   background-color: #60c1e4;
-}
-
-.triangle-up {
-  flex: 0 0 auto;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 10px solid #999999;
-  margin-right: 1px;
-  display: inline-block;
-  text-align: justify;
 }
 
 .blog-info {

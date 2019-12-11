@@ -55,6 +55,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://llogiq.github.io/", // Andre Bogus
         "https://tonyarcieri.com/",  // Tony Arcieri
         "https://blog.yoshuawuyts.com/", // Yoshua Wuyts
+        "https://seanmonstar.com/",
         // ## Golang
         "https://blog.golang.org/index",
         // ## Angular
