@@ -332,8 +332,20 @@ section.item-sum:hover {
 .tab-Go {
   background-color: #00add8;
 }
+.tab-Swift {
+  background-color: #ffac45;
+}
 .tab-CPP {
   background-color: #f34b7d;
+}
+.tab-C {
+  background-color: #555555;
+}
+.tab-C-sharp  {
+  background-color: #178600;
+}
+.tab-Python {
+  background-color: #3572a5;
 }
 .tab-TypeScript {
   background-color: #2b7489;
@@ -343,6 +355,15 @@ section.item-sum:hover {
 }
 .tab-Dart {
   background-color: #00b4ab;
+}
+.tab-Java {
+  background-color: #b07219;
+}
+.tab-Kotlin {
+  background-color: #f18133;
+}
+.tab-PHP {
+  background-color: #4f5d95;
 }
 .tab-Vue {
   background-color: #34495e;

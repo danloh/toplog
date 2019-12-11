@@ -22,7 +22,7 @@
     {%- block nav -%}
       <a href="/"><b class="logo">{{ hostDomain }}</b></a><sup class="logo-sup">beta</sup>
       <div class="right-menu">
-        <a href="/me/" id="login-link"><b>Log in</b></a>
+        <a href="/me/" id="login-link" rel="nofollow noopener"><b>Log in</b></a>
         <div class="menudown" id="menu-down" style="display: none">
           <button onclick="showMenu()" class="toolbtn">:::</button>
           <div id="drop-menu" class="dropdown-content">
@@ -72,8 +72,8 @@
     <div class="bottom">
       ©{{ hostDomain }} | <a href="/about.html">About</a>
       <!--google site search -->
-      <form id="Search" onsubmit="onSearch('q', 'g')" class="search-box">
-        <input type="text" id="q" placeholder=" Search " class="search-text"/>
+      <form id="Search" onsubmit="onSearch('q')" class="search-box">
+        <input type="text" id="q" placeholder=" Search ..." class="search-text"/>
       </form>
       <!--end google site search -->	
     </div><br>

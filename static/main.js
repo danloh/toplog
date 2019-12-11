@@ -85,12 +85,10 @@ window.addEventListener('load', function() {
   }
 });
 
-function onSearch(selector, ty) {
+function onSearch(selector) {
   let q = document.getElementById(selector);
   if (q && q.value != "") {
-    let openUrl = ty === "g" 
-      ? 'https://www.google.com/search?q=site:newdin.com/%20'
-      : '/me/item/search?q=';
+    let openUrl = 'https://www.google.com/search?q=site:newdin.com/%20';
     window.open(openUrl + q.value, "_blank");
   }
 }
