@@ -27,7 +27,7 @@ pub fn index() -> Result<HttpResponse, Error> {
         .body(res))
 }
 
-// GET /{ty} // special: /index, /Misc
+// GET /a/{ty} // special: /index, /Misc
 //
 // static file default, otherwise generate
 pub fn index_either(
@@ -68,16 +68,17 @@ pub fn index_either(
     })
 }
 
-// GET /{ty}/dyn // special: /index, /Misc
+// GET /a/{ty}/dyn // special: /index, /Misc, /newest
 //
 // response dynamically
 pub fn index_dyn(
     db: Data<DbAddr>,
     p: Path<String>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
+    let ty = p.into_inner();
     let home_msg = Topic { 
         topic: String::from("all"), 
-        ty: p.into_inner(),
+        ty,
         page: 1, 
     };
     
@@ -101,6 +102,16 @@ pub fn index_dyn(
         }
         Err(e) => Ok(e.error_response()),
     })
+}
+
+// GET /all/newest
+//
+// redirect to index_dyn
+pub fn index_newest(
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let p: Path<String> = String::from("newest").into();
+    index_dyn(db, p)
 }
 
 // GET /t/{topic}/{ty}/dyn
@@ -198,7 +209,7 @@ pub fn item_from(
     bq: Query<ByQuery>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     // extract Query
-    let bq_by = bq.into_inner().by;
+    let bq_by = bq.into_inner().by.unwrap_or_default();
     use crate::util::helper::de_base64;
     let by = de_base64(&bq_by);
 
@@ -464,7 +475,9 @@ pub struct PageQuery {
 // for extrct query param
 #[derive(Deserialize, Clone)]
 pub struct ByQuery {
-    by: String,
+    by: Option<String>,
+    site: Option<String>,  // TODO
+    ord: Option<String>,   // TODO
 }
 
 // result struct in response
@@ -479,7 +492,7 @@ pub struct ItemBlogMsg {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Topic{
     pub topic: String,  // special case: all, from
-    pub ty: String,     // special case: index, Misc, Author
+    pub ty: String,     // special case: index, Misc, Author, newest
     pub page: i32,
 }
 
@@ -661,7 +674,8 @@ fn checker(ty: &str) -> bool {
         || ty == "Media" 
         || ty == "Product" 
         || ty == "Translate"
-        || ty == "Misc";
+        || ty == "Misc"
+        || ty == "newest";
 
     check
 }

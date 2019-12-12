@@ -201,6 +201,10 @@ pub fn init_server() -> std::io::Result<()> {
                 resource("/a/{ty}")  // special case: /index
                     .route(get().to_async(view::tmpl::index_either))
             )
+            .service(
+                resource("/all/newest")  // special
+                    .route(get().to_async(view::tmpl::index_newest))
+            )
             .service( 
                 resource("/t/{topic}/{ty}")
                     .route(get().to_async(view::tmpl::topic_either))

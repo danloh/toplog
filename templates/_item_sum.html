@@ -10,7 +10,7 @@
     <div id="{{'raw-' ~ a_slug}}" style="display: none">{{ a_content }}</div>
     <div id="{{'part-' ~ a_slug}}" class="meta-sum">{{ a_content | showless(least=256) }}</div>
     <div id="{{'md-' ~ a_slug}}" class="meta-sum"></div>
-    {%- if a_content | length > 256 -%}
+    {%- if a_content | length > 128 -%}
     <a href="javascript:void(0);" 
       onclick="showFull('{{ a_slug }}')" 
       id="{{'btn-' ~ a_slug}}" class="help-tips"
@@ -39,10 +39,14 @@
     </a> 
     <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
     <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" 
-      href="javascript:void(0);"
-      class="edit-link"
+      href="javascript:void(0);" title="Edit"
+      class="edit-link hide-link"
     >..</a>&nbsp;
-    <a id="{{'t-' ~ a_slug}}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
+    <a id="{{'t-' ~ a_slug}}" 
+      onclick="toggleTop('{{a_slug}}')" 
+      href="javascript:void(0);" 
+      class="help-tips hide-link"
+    >
       {%- if item.is_top -%} ... {%- else -%} ::: {%- endif -%}
     </a>
   </div>

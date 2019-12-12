@@ -68,7 +68,6 @@ function getCookie(c_name) {
   }
   return ""
 }
-
 //## action once window loaded
 window.addEventListener('load', function() {
   //# check if authed
@@ -76,23 +75,7 @@ window.addEventListener('load', function() {
   document.getElementById('login-link').style.display = iden ? 'none' : '';
   document.getElementById('menu-down').style.display = iden ? '' : 'none';
   document.getElementById('profile-link').href = iden ? '/me/p/' + iden : '#';
-  //# if show edit link
-  let editlink = document.getElementById('edit-link');
-  if (editlink) { 
-    let omg = getCookie("oMg");
-    let check =  omg === 'true';                                                 // for tag|item
-    editlink.style.display = check ? '' : 'none';
-  }
 });
-
-function onSearch(selector) {
-  let q = document.getElementById(selector);
-  if (q && q.value != "") {
-    let openUrl = 'https://www.google.com/search?q=site:newdin.com/%20';
-    window.open(openUrl + q.value, "_blank");
-  }
-}
-
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
   if (!event.target.matches('.toolbtn')) {
@@ -104,6 +87,14 @@ window.onclick = function(event) {
         openDropdown.classList.remove('show');
       }
     }
+  }
+}
+
+function onSearch(selector) {
+  let q = document.getElementById(selector);
+  if (q && q.value != "") {
+    let openUrl = 'https://www.google.com/search?q=site:newdin.com/%20';
+    window.open(openUrl + q.value, "_blank");
   }
 }
 

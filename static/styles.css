@@ -35,7 +35,7 @@ blockquote {
 }
 .help-tips {
   color: green;
-  font-size: 0.6em;
+  font-size: 12px;
 }
 .header {
   z-index: 999;
@@ -75,7 +75,7 @@ blockquote {
   border: none;
   cursor: pointer;
 }
-.toolbtn:hover, .toolbtn:focus, #edit-link:hover, #create-link:hover {
+.toolbtn:hover, .toolbtn:focus {
   background-color: #2980b9;
   color: white;
 }
@@ -212,10 +212,10 @@ blockquote {
 .link-icon:hover {
   border-top: 2px solid #03a87c;
 }
-.edit-link {
+.hide-link {
   color: transparent;
 }
-.edit-link:hover {
+.hide-link:hover {
   color: #03a87c;
   font-size: 18px;
 }

@@ -2,12 +2,12 @@
   {%- set cname = c.aname -%}
   <b>{{ cname }}</b> 
   <a onclick= "openLink('{{`/me/blog/update/` ~ c.id }}', true)" 
-    href="javascript:void(0);"
-    class="edit-link"
+    href="javascript:void(0);" title="Edit"
+    class="edit-link hide-link"
   >..</a><br>
   {%- set c_intro = c.intro -%}
   {%- if c_intro -%}
-  <div class="blog-intro">{{ c_intro | showless(least=256) }}</div>
+  <div class="blog-intro">{{ c_intro | showless(least=128) }}</div>
   {%- endif -%}
   {%- set blog_link = c.blog_link -%}
   {%- set gh_link = c.gh_link -%}

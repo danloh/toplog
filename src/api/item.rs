@@ -543,9 +543,9 @@ impl QueryItems {
         let mut item_list: Vec<Item> = Vec::new();
         let mut item_count = 0;
         match self {
-            QueryItems::Index(t, o, p) => {  // topic = all
+            QueryItems::Index(typ, o, p) => {  // topic = all -/a/
                 let p_o = std::cmp::max(0, p-1);
-                match t.to_lowercase().trim() {
+                match typ.to_lowercase().trim() {
                     "index" => {
                         item_list = items
                             .filter(is_top.eq(true))
@@ -565,10 +565,20 @@ impl QueryItems {
                             .offset((o * p_o).into())
                             .load::<Item>(conn)?;
                     }
+                    "newest" => {
+                        let query = items
+                            .filter(is_top.eq(false));  // need to filter? 
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(post_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
                     _ => {
                         let query = items
                             .filter(is_top.eq(true))
-                            .filter(ty.eq(t));
+                            .filter(ty.eq(typ));
                         item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
@@ -581,27 +591,41 @@ impl QueryItems {
             }
             QueryItems::Tt(t, typ, o, p) => {
                 let p_o = std::cmp::max(0, p-1);
-                if typ.trim().to_lowercase() == "misc" {
-                    let query = items
-                        .filter(is_top.eq(false))
-                        .filter(topic.eq(t));
-                    item_count = query.clone().count().get_result(conn)?;
-                    item_list = query
-                        .order(pub_at.desc())
-                        .limit(o.into())
-                        .offset((o * p_o).into())
-                        .load::<Item>(conn)?;
-                } else {
-                    let query = items
-                        .filter(is_top.eq(true))
-                        .filter(topic.eq(t))
-                        .filter(ty.eq(typ));
-                    item_count = query.clone().count().get_result(conn)?;
-                    item_list = query
-                        .order(pub_at.desc())
-                        .limit(o.into())
-                        .offset((o * p_o).into())
-                        .load::<Item>(conn)?;
+                match typ.to_lowercase().trim() {
+                    "misc" => {
+                        let query = items
+                            .filter(is_top.eq(false))
+                            .filter(topic.eq(t));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(pub_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
+                    "newest" => {
+                        let query = items
+                            .filter(is_top.eq(false))  // need to filter? 
+                            .filter(topic.eq(t));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(post_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
+                    _ =>  {
+                        let query = items
+                            .filter(is_top.eq(true))
+                            .filter(topic.eq(t))
+                            .filter(ty.eq(typ));
+                        item_count = query.clone().count().get_result(conn)?;
+                        item_list = query
+                            .order(pub_at.desc())
+                            .limit(o.into())
+                            .offset((o * p_o).into())
+                            .load::<Item>(conn)?;
+                    }
                 }
             }
             QueryItems::Topic(t, o, p) => {
