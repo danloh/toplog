@@ -6,6 +6,7 @@ use swirl::Job;
 
 fn main() -> SrvResult<()> {
     let conn = db::connect_now()?;
+
     tasks::spider_items()
         .enqueue(&conn)
         .map_err(|e| SrvError::from_std_error(e))?;
@@ -13,8 +14,12 @@ fn main() -> SrvResult<()> {
     tasks::cal_blogs_karma()
         .enqueue(&conn)
         .map_err(|e| SrvError::from_std_error(e))?;
+
+    tasks::gen_static_site()
+        .enqueue(&conn)
+        .map_err(|e| SrvError::from_std_error(e))?;
     
-    println!("enqueue 2 tasks");
+    println!("enqueue tasks");
 
     Ok(())
 }

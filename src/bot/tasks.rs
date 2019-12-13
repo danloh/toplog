@@ -17,7 +17,7 @@ use swirl::PerformError;
 pub fn spider_items(env: &Environment) -> Result<(), PerformError> {
     let conn = env.connection()?;
     spider_and_save_item(&conn)?;
-
+    
     Ok(())
 }
 
@@ -148,5 +148,16 @@ pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
             .execute(conn)?;
     }
 
+    Ok(())
+}
+
+
+// statify the site
+//
+#[swirl::background_job]
+pub fn gen_static_site(_env: &Environment) -> Result<(), PerformError> {
+    //reqwest::get("http://127.0.0.1:8085/api/generate-staticsite-noexpose")?;
+    reqwest::get("https://newdin.com/api/generate-staticsite-noexpose")?;
+    
     Ok(())
 }

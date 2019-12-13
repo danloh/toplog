@@ -1,7 +1,6 @@
 // a simple page crawle
 
 use regex::Regex;
-use reqwest;
 use scraper::{Html, Selector};
 
 use crate::api::item::NewItem;

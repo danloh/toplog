@@ -178,6 +178,10 @@ pub fn init_server() -> std::io::Result<()> {
                     resource("/generate-staticsite")
                         .route(get().to_async(view::tmpl::statify_site))
                 )
+                .service(
+                    resource("/generate-staticsite-noexpose")  // do not expose!!
+                        .route(get().to_async(view::tmpl::statify_site_))
+                )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(

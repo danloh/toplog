@@ -419,6 +419,19 @@ pub fn statify_site(
     })
 }
 
+// alt statify site
+//
+// non auth, only for background job,  do not expose!
+pub fn statify_site_(
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let ss = StaticSite();
+    db.send(ss).from_err().and_then(|res| match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
+        Err(e) => Ok(e.error_response()),
+    })
+}
+
 pub struct StaticSite();
 
 impl Message for StaticSite {
