@@ -9,8 +9,13 @@
   <meta name="google-site-verification" content="P10UfOiuebgp0WYj145tOWff3niVoKVb8dh_vRcOJrU" />
   {%- block head -%}
   <title>{{ hostDomain }} |&nbsp;{%- block title -%} {{ title }} {%- endblock title -%}</title>
+  {%- if topic == 'all' or topic == 'from' -%}
+    {%- set t_lang = 'each programming language' -%}
+  {%- else -%}
+    {%- set t_lang = topic -%}
+  {%- endif -%}
   {%- block metaDescription -%}
-  <meta name="description" content="Aggregated Blogs of Top Contributors To Rust, Golang, TypeScript, Angular ...">
+  <meta name="description" content="{{ 'Aggregate great Books, Blog Posts, Articles, Discussions, Podcasts, Talks Video, Events, Tutorials, Courses, Jobs, etc. for ' ~ t_lang }}">
   {%- endblock metaDescription -%}
   {%- endblock head -%}
 </head>

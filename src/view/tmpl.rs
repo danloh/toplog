@@ -515,7 +515,7 @@ pub struct ItemBlogMsg {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Topic{
     pub topic: String,  // special case: all, from
-    pub ty: String,     // special case: index, Misc, Author, newest
+    pub ty: String,     // special case: index, Misc, newest
     pub page: i32,
 }
 

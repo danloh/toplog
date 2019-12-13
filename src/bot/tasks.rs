@@ -156,8 +156,9 @@ pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
 //
 #[swirl::background_job]
 pub fn gen_static_site(_env: &Environment) -> Result<(), PerformError> {
-    //reqwest::get("http://127.0.0.1:8085/api/generate-staticsite-noexpose")?;
-    reqwest::get("https://newdin.com/api/generate-staticsite-noexpose")?;
+    let host = dotenv::var("DOMAIN_HOST").unwrap_or("https://newdin.com".to_string());
+    let url = host + "/api/generate-staticsite-noexpose";
+    reqwest::get(&url)?;
     
     Ok(())
 }

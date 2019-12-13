@@ -423,11 +423,14 @@ section.item-sum:hover {
   font-size: 14px;
   line-height: 1.5em;
 }
+.blog-meta {
+  font-size: 12px;
+}
 .blog-thumb {
   position: absolute;
-  max-width: 40px;
-  max-height: 50px;
-  top: 2px;
+  max-width: 42px;
+  max-height: 52px;
+  top: 8px;
   right: 0px;
   border-radius: 50%;
 }
