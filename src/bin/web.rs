@@ -7,7 +7,7 @@ fn main() -> std::io::Result<()> {
     /*
     // to test sth
     use srv::bot::spider::{WebPage};
-    let r = WebPage::new("https://seanmonstar.com/");
+    let r = WebPage::new("https://research.swtch.com/");
     let links = r.clean_links();
     println!("{:#?}", links);
     let item = WebPage::new(&links[0]).into_item();

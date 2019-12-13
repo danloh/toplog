@@ -29,9 +29,13 @@
           <span class="triangle-up"></span>
         </a> 
         <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
-        <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" href="javascript:void(0);">..</a>&nbsp;
-        <a id="{{'t-' ~ a_slug}}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
-          {%- if item.is_top -%} ... {%- else -%} ::: {%- endif -%}
+        <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" 
+          href="javascript:void(0);" title="Edit"
+        >...</a>&nbsp;&nbsp;
+        <a id="{{'t-' ~ a_slug}}" 
+          onclick="toggleTop('{{a_slug}}')" 
+          href="javascript:void(0);" class="help-tips hide-link">
+          {%- if item.is_top -%} .. {%- else -%} ::: {%- endif -%}
         </a>
       </div>
       <div id="raw-item-content" class="item-md">{{ a_content }}</div>

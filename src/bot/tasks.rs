@@ -32,9 +32,6 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://blog.rust-lang.org/",
         "https://users.rust-lang.org/top",
         "https://internals.rust-lang.org/top",
-        //"https://www.reddit.com/r/rust/hot/",  // Rust
-        //"https://www.reddit.com/r/golang/hot/", // Golang
-        //"https://www.reddit.com/r/typescript/hot/", // TypeScript
         "http://smallcultfollowing.com/babysteps/", // babystep
         "https://tokio.rs/blog/2019-11-tokio-0-2/", // tokio
         "https://async.rs/blog/", // async-std
@@ -58,6 +55,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://seanmonstar.com/",
         // ## Golang
         "https://blog.golang.org/index",
+        "https://research.swtch.com/",  // Russ Cox
         // ## Angular
         // ## Web
         "https://hacks.mozilla.org/",
@@ -100,7 +98,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     }
     let diff_links = links_set.difference(&db_links_set);
     //println!("{:#?}", diff_links);
-    // spider the diff_links and build Rut
+    // spider the diff_links and build item
     let mut new_items: Vec<NewItem> = Vec::new();
     for l in diff_links {
         let sp_item = WebPage::new(l).into_item();

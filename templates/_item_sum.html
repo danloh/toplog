@@ -41,13 +41,13 @@
     <a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" 
       href="javascript:void(0);" title="Edit"
       class="edit-link hide-link"
-    >..</a>&nbsp;
+    >...</a>&nbsp;&nbsp;
     <a id="{{'t-' ~ a_slug}}" 
       onclick="toggleTop('{{a_slug}}')" 
       href="javascript:void(0);" 
       class="help-tips hide-link"
     >
-      {%- if item.is_top -%} ... {%- else -%} ::: {%- endif -%}
+      {%- if item.is_top -%} .. {%- else -%} ::: {%- endif -%}
     </a>
   </div>
 </section>

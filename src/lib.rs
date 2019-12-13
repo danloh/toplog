@@ -194,6 +194,10 @@ pub fn init_server() -> std::io::Result<()> {
                     .route(get().to_async(api::auth::confirm_email))
             )
             .service(
+                resource("/index")
+                    .route(get().to_async(view::tmpl::dyn_index))
+            )
+            .service(
                 resource("/from")  // per author: /from?by=
                     .route(get().to_async(view::tmpl::item_from))
             )

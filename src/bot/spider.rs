@@ -206,26 +206,6 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
-        // // reddit: Rust / Go ....
-        // "reddit.com" => {
-        //     for link in raw_links {
-        //         if link.starts_with("/r/rust/comments/") {
-        //             let f_link = "https://www.reddit.com".to_string() + &link;
-        //             links.push(f_link)
-        //         }
-        //         // if link.starts_with("https://www.reddit.com/r/rust/comments/") {
-        //         //     links.push(link)
-        //         // }
-        //         if link.starts_with("/r/golang/comments/") {
-        //             let f_link = "https://www.reddit.com".to_string() + &link;
-        //             links.push(f_link)
-        //         }
-        //         if link.starts_with("/r/typescript/comments/") {
-        //             let f_link = "https://www.reddit.com".to_string() + &link;
-        //             links.push(f_link)
-        //         }
-        //     }
-        // }
         // Rust: Nicholas Matsakis 
         "smallcultfollowing.com" => {
             for link in raw_links {
@@ -419,6 +399,15 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Go: Russ Cox
+        "research.swtch.com" => {
+            for link in raw_links {
+                if !link.starts_with("https://") && !(link.contains(".atom")) {
+                    let f_link = "https://research.swtch.com/".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
         // Web: Mozilla
         "hacks.mozilla.org" => {
             for link in raw_links {
@@ -470,7 +459,6 @@ lazy_static! {
         map.insert("blog.rust-lang.org", ("Rust Team", "Rust"));
         map.insert("users.rust-lang.org", ("Rust Forum", "Rust"));
         map.insert("internals.rust-lang.org", ("Rust Forum", "Rust"));
-        //map.insert("reddit.com", ("Reddit", "Rust"));  // more
         map.insert("smallcultfollowing.com", ("Nicholas Matsakis", "Rust"));
         map.insert("tokio.rs", ("Tokio Team", "Rust"));
         map.insert("async.rs", ("async-std", "Rust"));
@@ -494,6 +482,7 @@ lazy_static! {
         map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
+        map.insert("research.swtch.com", ("Russ Cox", "Go"));
         // Angular
         map.insert("blog.angular.io", ("Angular Team", "Angular"));
         // Web

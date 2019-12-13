@@ -104,6 +104,16 @@ pub fn index_dyn(
     })
 }
 
+// GET /index
+//
+// redirect to index_dyn
+pub fn dyn_index(
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let p: Path<String> = String::from("index").into();
+    index_dyn(db, p)
+}
+
 // GET /all/newest
 //
 // redirect to index_dyn
