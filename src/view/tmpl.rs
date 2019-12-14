@@ -458,12 +458,14 @@ impl Handler<StaticSite> for Dba {
 
 pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
     let tpcs = vec!(
-        "all", "Rust", "Go", 
-        "TypeScript", "Angular", "Vue", "React", "Dart"
+        "all", 
+        "Rust", "Go", "Swift", "TypeScript", "Angular", "Vue", "React", "Dart", "Flutter",
+        "Python", "C-sharp", "C", "CPP", "JavaScript", "Java", "PHP", "Kotlin", "DataBase"
     );
     let typs = vec!(
-        "index", "Article", "Book", "Event", "Job", "Media", 
-        "Product", "Translate", "Misc"
+        "index", "Misc", 
+        "Article", "Book", "Event", "Job", "Media", 
+        "Product", "Translate"
     );
 
     for tpc in tpcs {

@@ -404,12 +404,12 @@ impl QueryBlogs {
     ) -> ServiceResult<(Vec<Blog>, i64)> {
         use crate::schema::blogs::dsl::*;
         let mut blog_list: Vec<Blog> = Vec::new();
-        let mut blog_count = 0;
+        let mut blog_count = 0;  // currently no need
         match self {
             QueryBlogs::Topic(t, o, p) => {
                 let query = blogs.filter(topic.eq(t));
                 let p_o = std::cmp::max(0, p-1);
-                blog_count = query.clone().count().get_result(conn)?;
+                //blog_count = query.clone().count().get_result(conn)?;
                 blog_list = query
                     .order(karma.desc())
                     .limit(o.into())
@@ -419,7 +419,7 @@ impl QueryBlogs {
             QueryBlogs::Top(t, o, p) => {
                 let query = blogs.filter(is_top.eq(true)).filter(topic.eq(t));
                 let p_o = std::cmp::max(0, p-1);
-                blog_count = query.clone().count().get_result(conn)?;
+                //blog_count = query.clone().count().get_result(conn)?;
                 blog_list = query
                     .order(karma.desc())
                     .limit(o.into())
@@ -429,7 +429,7 @@ impl QueryBlogs {
             QueryBlogs::Name(n, o, p) => {
                 let query = blogs.filter(aname.eq(n));
                 let p_o = std::cmp::max(0, p-1);
-                blog_count = query.clone().count().get_result(conn)?;
+                //blog_count = query.clone().count().get_result(conn)?;
                 blog_list = query
                     .order(karma.desc())
                     .limit(o.into())
@@ -440,7 +440,7 @@ impl QueryBlogs {
                 blog_list = blogs
                     .filter(is_top.eq(true))
                     .order(karma.desc()).limit(42).load::<Blog>(conn)?;
-                blog_count = blog_list.len() as i64;
+                //blog_count = blog_list.len() as i64;
             }
         }
         Ok((blog_list, blog_count))

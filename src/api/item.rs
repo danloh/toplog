@@ -541,7 +541,7 @@ impl QueryItems {
     ) -> ServiceResult<(Vec<Item>, i64)> {
         use crate::schema::items::dsl::*;
         let mut item_list: Vec<Item> = Vec::new();
-        let mut item_count = 0;
+        let mut item_count = 0; // currently no need
         match self {
             QueryItems::Index(typ, o, p) => {  // topic = all -/a/
                 let p_o = std::cmp::max(0, p-1);
@@ -549,16 +549,16 @@ impl QueryItems {
                     "index" => {
                         item_list = items
                             .filter(is_top.eq(true))
-                            .order(pub_at.desc())
+                            .order(post_at.desc())
                             .limit(o.into())
                             .offset((o * p_o).into())
                             .load::<Item>(conn)?;
-                        item_count = item_list.len() as i64;
+                        //item_count = item_list.len() as i64;
                     }
                     "misc" => {
                         let query = items
                             .filter(is_top.eq(false));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -568,7 +568,7 @@ impl QueryItems {
                     "newest" => {
                         let query = items
                             .filter(is_top.eq(false));  // need to filter? 
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(post_at.desc())
                             .limit(o.into())
@@ -579,7 +579,7 @@ impl QueryItems {
                         let query = items
                             .filter(is_top.eq(true))
                             .filter(ty.eq(typ));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -596,7 +596,7 @@ impl QueryItems {
                         let query = items
                             .filter(is_top.eq(false))
                             .filter(topic.eq(t));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -607,7 +607,7 @@ impl QueryItems {
                         let query = items
                             .filter(is_top.eq(false))  // need to filter? 
                             .filter(topic.eq(t));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(post_at.desc())
                             .limit(o.into())
@@ -619,7 +619,7 @@ impl QueryItems {
                             .filter(is_top.eq(true))
                             .filter(topic.eq(t))
                             .filter(ty.eq(typ));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -633,7 +633,7 @@ impl QueryItems {
                     .filter(is_top.eq(true))
                     .filter(topic.eq(t));
                 let p_o = std::cmp::max(0, p-1);
-                item_count = query.clone().count().get_result(conn)?;
+                //item_count = query.clone().count().get_result(conn)?;
                 item_list = query
                     .order(pub_at.desc())
                     .limit(o.into())
@@ -645,7 +645,7 @@ impl QueryItems {
                     .filter(is_top.eq(true))
                     .filter(ty.eq(t));
                 let p_o = std::cmp::max(0, p-1);
-                item_count = query.clone().count().get_result(conn)?;
+                //item_count = query.clone().count().get_result(conn)?;
                 item_list = query
                     .order(pub_at.desc())
                     .limit(o.into())
@@ -659,7 +659,7 @@ impl QueryItems {
                 match action {
                     "submit" => {
                         let query = items.filter(post_by.eq(u));
-                        item_count = query.clone().count().get_result(conn)?;
+                        //item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -673,7 +673,7 @@ impl QueryItems {
                             .filter(vote_as.eq(1))
                             .select(item_id)
                             .load::<i32>(conn)?;
-                        item_count = itemid_list.len() as i64;
+                        //item_count = itemid_list.len() as i64;
                         item_list = items
                             .filter(id.eq(any(&itemid_list)))
                             .order(pub_at.desc())
@@ -689,7 +689,7 @@ impl QueryItems {
                     //.filter(is_top.eq(true))
                     .filter(author.eq(a));
                 let p_o = std::cmp::max(0, p-1);
-                item_count = query.clone().count().get_result(conn)?;
+                //item_count = query.clone().count().get_result(conn)?;
                 item_list = query
                     .order(pub_at.desc())
                     .limit(o.into())
@@ -702,7 +702,7 @@ impl QueryItems {
                     .order(pub_at.desc())
                     .limit(42)
                     .load::<Item>(conn)?;
-                item_count = item_list.len() as i64;
+                //item_count = item_list.len() as i64;
             }
         }
         Ok((item_list, item_count))
