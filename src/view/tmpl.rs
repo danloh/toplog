@@ -283,6 +283,11 @@ pub fn more_item(
     .and_then(|res| match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
+            let mesg: Vec<&str> = (&msg.message).split("-").collect();
+            let tpc = mesg[0];
+            let typ = mesg[1];
+            ctx.insert("ty", typ);
+            ctx.insert("topic", tpc);
             ctx.insert("items", &msg.items);
 
             let h = tmpl.render("more_item.html", &ctx).map_err(|_| {
@@ -509,7 +514,7 @@ pub struct ByQuery {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ItemBlogMsg {
     pub status: i32,
-    pub message: String,
+    pub message: String,  // send back topic-ty
     pub items: Vec<Item>,
     pub blogs: Vec<Blog>,
 }
@@ -585,7 +590,7 @@ impl Handler<Topic> for Dba {
 
         Ok(ItemBlogMsg {
             status: 201,
-            message: msg, // send back the ty and topic info
+            message: msg, // send back the topic-ty info
             items: i_list,
             blogs: b_list,
         })
