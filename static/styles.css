@@ -121,7 +121,13 @@ blockquote {
   padding: 5px 5px 0px 5px;
   border-bottom: 0.2px dashed #63a191;
 }
-.banner-view {
+.banner-bar {
+  box-sizing: border-box;
+  margin: 0px auto;
+  padding: 0px;
+  position: relative;
+}
+/* .banner-view {
   box-sizing: border-box;
   min-height: 85px;
   margin: 0px auto;
@@ -134,7 +140,7 @@ blockquote {
   max-height: 80px;
   top: 1px;
   right: 1px;
-}
+} */
 .menu-bar {
   margin: 10px auto -15px auto;
   border-top: 2px solid #eaf7f3;
@@ -151,8 +157,8 @@ blockquote {
 }
 .topic-tab-active {
   background-color: #2980b9;
-  padding: 5px 8px;
-  font-size: 22px;
+  padding: 5px 10px;
+  font-size: 16px;
   color: #fff;
   font-weight: 600;
   border-radius: 3px;
@@ -171,7 +177,8 @@ blockquote {
 
 .header .nav-menu, 
 .footer .bottom, 
-.banner .banner-view,
+/* .banner .banner-view, */
+.banner .banner-bar,
 .main-view {
   max-width: 960px;
   min-width: 240px;
