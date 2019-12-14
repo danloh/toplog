@@ -12,6 +12,6 @@ export const regFullDate = /^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9]
 
 export const itemCates: string[] = ['Article', 'Book', 'Event', 'Job', 'Media', 'Product', 'Translate' ];
 export const topicCates: string[] = [
-    'Rust', 'Go', 'Swift', 'TypeScript', 'Angular', 'Vue', 'React', 'Dart',
-    'Python', 'C-sharp', 'C', 'CPP', 'JavaScript', 'Java', 'PHP', 'Kotlin', 'database'
+    'Rust', 'Go', 'Swift', 'TypeScript', 'Angular', 'Vue', 'React', 'Dart', 'Flutter',
+    'Python', 'C-sharp', 'C', 'CPP', 'JavaScript', 'Java', 'PHP', 'Kotlin', 'DataBase'
 ];
