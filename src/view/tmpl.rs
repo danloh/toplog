@@ -346,8 +346,10 @@ pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
     let p = p_info.into_inner();
     let tpl_dir = p + ".html";
     let dir = "www/".to_owned() + &tpl_dir;
-    
-    let t = tmpl.render(&tpl_dir, &tera::Context::new())
+    let mut ctx = tera::Context::new();
+    ctx.insert("ty", "all");
+    ctx.insert("topic", "all");
+    let t = tmpl.render(&tpl_dir, &ctx)
         .map_err(|_| ServiceError::NotFound("404".into()))?;
     std::fs::write(dir, t.as_bytes())?;
 
