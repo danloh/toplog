@@ -38,4 +38,12 @@ export class ApiService {
       `${environment.api_url}${path}`
     ).pipe(catchError(this.formatErrors));
   }
+
+  req(method: string, url: string, option?: any): Observable<any> {
+    return this.http.request(
+      method,
+      url,
+      option
+    ).pipe(catchError(this.formatErrors));
+  }
 }

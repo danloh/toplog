@@ -14,6 +14,7 @@ use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{
     ReqQuery, ActionQuery, 
     auth::{CheckUser, CheckCan},
+    re_test_url,
 };
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
@@ -28,7 +29,7 @@ pub fn new(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(item.into_inner())
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -43,6 +44,32 @@ impl Handler<NewItem> for Dba {
     }
 }
 
+// PUT: /api/spider, Body: SpiderItem
+// 
+// spider a url
+pub fn spider(
+    sp: Json<SpiderItem>,
+    db: Data<DbAddr>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let item = sp.into_inner();
+    result(item.validate())
+        .from_err()
+        .and_then(move |_| db.send(item).from_err())
+        .and_then(|res| match res {
+            Ok(b) => Ok(HttpResponse::Ok().json(b)),
+            Err(err) => Ok(err.error_response()),
+        })
+}
+
+impl Handler<SpiderItem> for Dba {
+    type Result = ServiceResult<Item>;
+
+    fn handle(&mut self, sp: SpiderItem, _: &mut Self::Context) -> Self::Result {
+        let conn: &PooledConn = &self.0.get().unwrap();
+        sp.spider(conn)
+    }
+}
+
 // PUT: /api/items
 // 
 pub fn update(
@@ -52,7 +79,7 @@ pub fn update(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(item.into_inner())
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -80,7 +107,7 @@ pub fn get(
     };
     db.send(item)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -100,7 +127,7 @@ pub fn toggle_top(
     };
     db.send(item)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
             Err(err) => Ok(err.error_response()),
         })
@@ -121,7 +148,7 @@ pub fn vote_or_veto(
     };
     db.send(item)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b.vote)),
             Err(err) => Ok(err.error_response()),
         })
@@ -142,7 +169,7 @@ pub fn del(
     };
     db.send(item)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b.slug)),
             Err(err) => Ok(err.error_response()),
         })
@@ -191,7 +218,7 @@ pub fn get_list(
     };
     db.send(item)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => {
                 use crate::api::ItemsMsg;
                 let res = ItemsMsg {
@@ -292,12 +319,20 @@ impl NewItem {
             .get_result::<Item>(conn)?;
 
         // ========================
-        // gen html
+        // way-1: gen html, renew cache, heavy!
         let itm = item_new.clone();
         let tpc = itm.topic;
-        let typ = if itm.is_top { itm.ty } else { "Misc".into() };
-        use crate::view::tmpl::gen_html;
-        gen_html(tpc, typ, conn);   // TODO: ignor error but log
+        // let typ = if itm.is_top { itm.ty } else { "Misc".into() };
+        // use crate::view::tmpl::gen_html;
+        // gen_html(tpc, typ, conn);   // TODO: ignor error but log
+
+        // ==========================
+        // way-2: del related html, re-generate when visit, clean cache
+        use crate::view::tmpl::del_html;
+        let name1 = "all-Misc";
+        let name2 = tpc + "-Misc";
+        del_html(name1);
+        del_html(&name2);
         // ==========================
         
         Ok(item_new)
@@ -401,12 +436,27 @@ impl UpdateItem {
             .get_result::<Item>(conn)?;
 
         // ========================
-        // gen html
+        // // way-1: gen html, renew cache, heavy!
         let itm = item_update.clone();
         let tpc = itm.topic;
-        let typ = if itm.is_top { itm.ty } else { "Misc".into() };
-        use crate::view::tmpl::gen_html;
-        gen_html(tpc, typ, conn);   // TODO: ignor error but log
+        let itmty = itm.ty;
+        // let typ = if itm.is_top { itmty } else { "Misc".into() };
+        // use crate::view::tmpl::gen_html;
+        // gen_html(tpc, typ, conn);   // TODO: ignor error but log
+
+        // ==========================
+        // way-2: del related html, re-generate when visit, clean cache
+        use crate::view::tmpl::del_html;
+        let name0 = "all-index";
+        let name1 = "all-Misc";
+        let name2 = tpc.clone() + "-Misc";
+        let name3 = tpc + "-" + &itmty;
+        let name4 = String::from("all-") + &itmty;
+        del_html(name0);
+        del_html(name1);
+        del_html(&name2);
+        del_html(&name3);
+        del_html(&name4);
         // ==========================
         
         Ok(item_update)
@@ -414,6 +464,65 @@ impl UpdateItem {
 }
 
 impl Message for UpdateItem {
+    type Result = ServiceResult<Item>;
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct SpiderItem {
+    pub url: String,
+    pub topic: String,
+    pub ty: String,
+}
+
+impl SpiderItem {
+    fn spider(
+        &self, 
+        conn: &PooledConn,
+    ) -> ServiceResult<Item> {
+        use crate::bot::spider::{WebPage};
+        use crate::schema::items::dsl::items;
+        let sp = self.clone();
+        let sp_item = WebPage::new(&self.url).into_item();
+
+        let sp_topic = sp.topic;
+        use crate::view::{TY_VEC};
+        let topic = if sp_topic.trim() == "all" || sp_topic.trim() == "from" {
+            String::from("Rust")
+        } else {
+            sp_topic 
+        };
+        let sp_ty = sp.ty;
+        let ty = if TY_VEC.contains(&sp_ty.trim()) {
+            sp_ty
+        } else {
+            String::from("Article")
+        }; 
+        let item_new = NewItem {
+            topic,
+            ty,
+            ..sp_item
+        };
+        // save to db
+        let new_item = diesel::insert_into(items)
+            .values(&item_new)
+            .on_conflict_do_nothing()
+            .get_result::<Item>(conn)?;
+        Ok(new_item)
+    }
+
+    fn validate(&self) -> ServiceResult<()> {
+        let url = &self.url.trim();
+        let check = re_test_url(url);
+
+        if check {
+            Ok(())
+        } else {
+            Err(ServiceError::BadRequest("Invalid Url".into()))
+        }
+    }
+}
+
+impl Message for SpiderItem {
     type Result = ServiceResult<Item>;
 }
 

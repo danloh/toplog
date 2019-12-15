@@ -25,7 +25,7 @@ pub fn new(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(issue.into_inner())
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -53,7 +53,7 @@ pub fn update(
     };
     db.send(up)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -81,7 +81,7 @@ pub fn get(
     };
     db.send(issue)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -101,7 +101,7 @@ pub fn del(
     };
     db.send(issue)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -137,7 +137,7 @@ pub fn get_list(
     };
     db.send(issue)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -166,7 +166,7 @@ pub fn label_isuue(
     };
     db.send(new_label)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -186,7 +186,7 @@ pub fn del_label_isuue(
     };
     db.send(new_label)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })

@@ -3,9 +3,9 @@
     <span><b>Suggest a New Contributor/Blogger: </b></span>
   </div>
   <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
-    <nz-form-label>Name*</nz-form-label>
+    <nz-form-label nzRequired>Name*</nz-form-label>
     <nz-form-control>
-      <input nz-input formControlName="aname" nzAutosize maxlength="64" nzRequired />
+      <input nz-input formControlName="aname" nzAutosize maxlength="64" />
     </nz-form-control>
     <nz-form-label>Avatar</nz-form-label>
     <nz-form-control>
@@ -15,13 +15,13 @@
     <nz-form-control>
       <textarea nz-input formControlName="intro" nzAutosize maxlength="128"></textarea>
     </nz-form-control>
-    <nz-form-label>Topic*</nz-form-label>
+    <nz-form-label nzRequired>Topic*</nz-form-label>
     <nz-form-control>
-      <input nz-input formControlName="topic" maxlength="16" nzRequired/>
+      <input nz-input formControlName="topic" maxlength="16"/>
     </nz-form-control>
-    <nz-form-label>Blog Link*</nz-form-label>
+    <nz-form-label nzRequired>Blog Link*</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="blog_link" nzRequired nzAutosize maxlength="255"></textarea>
+      <textarea nz-input formControlName="blog_link" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
     <nz-form-label>Blog Host</nz-form-label>
     <nz-form-control>

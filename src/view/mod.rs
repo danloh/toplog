@@ -18,6 +18,20 @@ lazy_static! {
         tera.register_filter("setbase", &setbase);
         tera
     };
+
+    pub static ref TOPIC_VEC: Vec<&'static str> = {
+        vec!(
+            "all", 
+            "Rust", "Go", "Swift", "TypeScript", "Angular", "Vue", "React", "Dart", "Flutter",
+            "Python", "C-sharp", "C", "CPP", "JavaScript", "Java", "PHP", "Kotlin", "DataBase"
+        )
+    };
+
+    pub static ref TY_VEC: Vec<&'static str> = {
+        vec!(
+            "Misc", "Article", "Book", "Event", "Job", "Media", "Product", "Translate"
+        )
+    };
 }
 
 // custom filters

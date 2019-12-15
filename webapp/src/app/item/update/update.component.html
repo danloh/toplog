@@ -3,9 +3,9 @@
     <b>Update Item</b>
   </div>
   <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onUpdate()" class="s-create-form">
-    <nz-form-label>Title*</nz-form-label>
+    <nz-form-label nzRequired>Title*</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="title" nzAutosize maxlength="255" nzRequired></textarea>
+      <textarea nz-input formControlName="title" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
     <nz-form-label>Source Link*</nz-form-label>
     <nz-form-control>
@@ -15,20 +15,20 @@
     <nz-form-control>
       <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
     </nz-form-control>
-    <nz-form-label>Origin Author</nz-form-label>
+    <nz-form-label nzRequired>Origin Author*</nz-form-label>
     <nz-form-control>
       <input nz-input formControlName="author" maxlength="32"/>
     </nz-form-control>
-    <nz-form-label>Topic*</nz-form-label>
+    <nz-form-label nzRequired>Topic*</nz-form-label>
     <nz-form-control>
-      <input nz-input formControlName="topic" nzRequired maxlength="16"/>
+      <input nz-input formControlName="topic" maxlength="16"/>
     </nz-form-control>
-    <nz-form-label>Publish Date (YYYY-MM-DD)</nz-form-label>
+    <nz-form-label nzRequired>Publish Date (YYYY-MM-DD)</nz-form-label>
     <nz-form-control>
       <input nz-input formControlName="pub_at" maxlength="16"/>
     </nz-form-control>
-    <nz-form-label>Category*</nz-form-label>
-    <nz-select formControlName="ty" nzRequired>
+    <nz-form-label nzRequired>Category*</nz-form-label>
+    <nz-select formControlName="ty">
       <nz-option *ngFor="let cate of itemCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
     </nz-select>
     <nz-form-label>Language</nz-form-label>

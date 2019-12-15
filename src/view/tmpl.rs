@@ -363,6 +363,7 @@ pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
         .body(t))
 }
 
+// generate static html
 pub fn gen_html(
     topic: String,
     ty: String,
@@ -412,7 +413,14 @@ pub fn gen_html(
     Ok(())
 }
 
-// GET /generate-staticsite
+// del static html
+pub fn del_html(name: &str) -> ServiceResult<()> {
+    let to_del_html = "www/".to_owned() + name + ".html";
+    std::fs::remove_file(to_del_html)?;
+    Ok(())
+}
+
+// GET /api/generate-staticsite
 //
 // statify site
 pub fn statify_site(
@@ -426,6 +434,18 @@ pub fn statify_site(
     })
 }
 
+// DELETE /api/stfile/{t-t}  // any potential issue??
+//
+// delete static file.
+pub fn del_static_file(
+    p: Path<String>
+) -> Result<HttpResponse, Error> {
+    del_html(&p.into_inner())?;
+
+    Ok(HttpResponse::Ok().json(String::from("delete")))
+}
+
+// GET /api/generate-staticsite-noexpose
 // alt statify site
 //
 // non auth, only for background job,  do not expose!

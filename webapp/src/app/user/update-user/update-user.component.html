@@ -35,17 +35,17 @@
   <div class="s-update-p-page" *ngIf="!showUserForm">
     <h3 class="s-form-title">Change My Password</h3>
     <form nz-form nzLayout="vertical" [formGroup]="pswForm" (ngSubmit)="onChangePsw()" class="s-user-form">
-        <nz-form-label>Old Password*</nz-form-label>
+        <nz-form-label nzRequired>Old Password*</nz-form-label>
       <nz-form-control>
-        <input nz-input formControlName="old_psw" minlength="8" nzRequired type="password" autocomplete="off" placeholder="Old Password" />
+        <input nz-input formControlName="old_psw" minlength="8" type="password" autocomplete="off" placeholder="Old Password" />
       </nz-form-control>
-      <nz-form-label>New Password*</nz-form-label>
+      <nz-form-label nzRequired>New Password*</nz-form-label>
       <nz-form-control>
-        <input nz-input formControlName="new_psw" minlength="8" nzRequired type="password" autocomplete="off" placeholder="New Password" />
+        <input nz-input formControlName="new_psw" minlength="8" type="password" autocomplete="off" placeholder="New Password" />
       </nz-form-control>
-      <nz-form-label>Confirm New Password*</nz-form-label>
+      <nz-form-label nzRequired>Confirm New Password*</nz-form-label>
       <nz-form-control>
-        <input nz-input formControlName="confirm" minlength="8" nzRequired type="password" autocomplete="off" placeholder="Confirm Password" />
+        <input nz-input formControlName="confirm" minlength="8" type="password" autocomplete="off" placeholder="Confirm Password" />
       </nz-form-control>
       <br>
       <button nz-button class="s-full-width" nzType="primary" [disabled]="!pswForm.valid">Change Password</button>

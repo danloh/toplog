@@ -3,44 +3,47 @@
     <b>Suggest a New Item: </b><small class="s-help-tips">Article / Book / Event / etc.</small>
   </div>
   <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
-    <nz-form-label>Title*</nz-form-label>
-    <nz-form-control>
-      <textarea nz-input formControlName="title" nzRequired nzAutosize maxlength="255"></textarea>
-    </nz-form-control>
-    <nz-form-label>Source Link*</nz-form-label>
+    <nz-form-label>Please Submit Source Link</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="link" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
-    <nz-form-label>Content Summary</nz-form-label>
+    <p>or Input Text Content: </p>
+    <nz-form-label>Pleae input Title*</nz-form-label>
     <nz-form-control>
-      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
+      <textarea nz-input formControlName="title" nzAutosize maxlength="255"></textarea>
     </nz-form-control>
-    <nz-form-label>Origin Author</nz-form-label>
-    <nz-form-control>
-      <input nz-input formControlName="author" maxlength="32"/>
-    </nz-form-control>
-    <nz-form-label>Topic*</nz-form-label>
-    <nz-select formControlName="topic" nzRequired>
-      <nz-option *ngFor="let cate of topicCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
-    </nz-select>
-    <nz-form-label>Category*</nz-form-label>
-    <nz-select formControlName="ty" nzRequired>
-      <nz-option *ngFor="let cate of itemCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
-    </nz-select>
-    <div *ngIf="createForm.value.ty === 'Translate'">
+    <div *ngIf="createForm.value.title.trim() !== ''">
+      <nz-form-label  nzRequired>Content Summary</nz-form-label>
       <nz-form-control>
-        <span>Origin Link: </span> <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255" placeholder="Origin Link"></textarea>
+        <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
       </nz-form-control>
+      <nz-form-label  nzRequired>Origin Author</nz-form-label>
       <nz-form-control>
-        <span>Translate To: </span> <input nz-input formControlName="lang" maxlength="16" placeholder="Translate Language"/>
+        <input nz-input formControlName="author" maxlength="32"/>
+      </nz-form-control>
+      <nz-form-label  nzRequired>Topic*</nz-form-label>
+      <nz-select formControlName="topic">
+        <nz-option *ngFor="let cate of topicCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
+      </nz-select>
+      <nz-form-label nzRequired>Category*</nz-form-label>
+      <nz-select formControlName="ty">
+        <nz-option *ngFor="let cate of itemCates" [nzLabel]="cate" [nzValue]="cate"></nz-option>
+      </nz-select>
+      <div *ngIf="createForm.value.ty === 'Translate'">
+        <nz-form-control>
+          <span>Origin Link*: </span> <textarea nz-input formControlName="origin_link" nzAutosize maxlength="255" placeholder="Origin Link"></textarea>
+        </nz-form-control>
+        <nz-form-control>
+          <span>Translate To*: </span> <input nz-input formControlName="lang" maxlength="16" placeholder="Translate Language"/>
+        </nz-form-control>
+      </div>
+      <br>
+      <nz-form-label>Cover Picture</nz-form-label>
+      <nz-form-control>
+        <textarea nz-input formControlName="logo" nzAutosize></textarea>
       </nz-form-control>
     </div>
-    <br>
-    <nz-form-label>Cover Picture</nz-form-label>
-    <nz-form-control>
-      <textarea nz-input formControlName="logo" nzAutosize></textarea>
-    </nz-form-control>
     <br><br>
-    <button nz-button class="s-full-width" nzType="primary" [disabled]="!createForm.valid">Submit</button>
+    <button nz-button class="s-full-width" nzType="primary">Submit</button>
   </form>
 </div>

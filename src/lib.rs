@@ -141,6 +141,10 @@ pub fn init_server() -> std::io::Result<()> {
                         .route(put().to_async(api::item::update))
                 )
                 .service(
+                    resource("/spider")
+                        .route(put().to_async(api::item::spider))
+                )
+                .service(
                     resource("/getitems/{per}")
                         // get_list: ?per=topic&kw=&perpage=20&page=p
                         .route(get().to_async(api::item::get_list)) 
@@ -178,6 +182,10 @@ pub fn init_server() -> std::io::Result<()> {
                     resource("/generate-staticsite")
                         .route(get().to_async(view::tmpl::statify_site))
                 )
+                // .service(
+                //     resource("/stfile/{p}")
+                //         .route(delete().to_async(view::tmpl::del_static_file))
+                // )
                 .service(
                     resource("/generate-staticsite-noexpose")  // do not expose!!
                         .route(get().to_async(view::tmpl::statify_site_))
@@ -240,7 +248,7 @@ pub fn init_server() -> std::io::Result<()> {
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("all-index.html")
-                    .default_handler(route().to(|| HttpResponse::NotFound()))
+                    .default_handler(route().to_async(view::tmpl::dyn_index))
             )
             .default_service(route().to(|| HttpResponse::NotFound()))
     })

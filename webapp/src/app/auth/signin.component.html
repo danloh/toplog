@@ -3,12 +3,12 @@
   <form nz-form [formGroup]="authForm" (ngSubmit)="onLogin()" class="s-auth-form">
     <nz-form-item>
       <nz-form-control>
-        <input nz-input formControlName="uname" nzRequired placeholder="Username*" />
+        <input nz-input formControlName="uname" placeholder="Username*" />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
-        <input nz-input type="password" formControlName="password" nzRequired autocomplete="off" placeholder="Password*" />
+        <input nz-input type="password" formControlName="password" autocomplete="off" placeholder="Password*" />
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>

@@ -24,7 +24,7 @@ pub fn new(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(blog.into_inner())
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -48,7 +48,7 @@ pub fn update(
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     db.send(blog.into_inner())
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -76,7 +76,7 @@ pub fn get(
     };
     db.send(blog)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })
@@ -96,7 +96,7 @@ pub fn toggle_top(
     };
     db.send(blog)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
             Err(err) => Ok(err.error_response()),
         })
@@ -116,7 +116,7 @@ pub fn del(
     };
     db.send(blog)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b.aname)),
             Err(err) => Ok(err.error_response()),
         })
@@ -155,7 +155,7 @@ pub fn get_list(
     };
     db.send(blog)
         .from_err()
-        .and_then(move |res| match res {
+        .and_then(|res| match res {
             Ok(b) => Ok(HttpResponse::Ok().json(b)),
             Err(err) => Ok(err.error_response()),
         })

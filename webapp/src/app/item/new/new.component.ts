@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ItemService, AuthService, Item, NewItem } from '../../core';
+import { ItemService, AuthService, Item, NewItem, SpiderItem } from '../../core';
 import { regUrl, itemCates, topicCates } from '../../shared';
 import { environment } from '../../../environments/environment';
 
@@ -46,12 +46,12 @@ export class NewComponent implements OnInit {
     this.newTo = this.route.snapshot.queryParamMap.get('to');
 
     this.createForm = this.formBuild.group(
-      { 'title': ['', [Validators.required]],
-        'content': [''],
+      { 'title': [''],
+        'content': ['', [Validators.required]],
         'link': [''],
-        'author': [''],
+        'author': [null, [Validators.required]],
         'topic': [ this.newFor || '', [Validators.required]],
-        'ty': [ this.newTo || 'Article', [Validators.required]],
+        'ty': [ this.newTo || 'Article'],
         'lang': ['English'], // if ty == translate
         'origin_link': [''], // if ty == translate
         'logo': [''],        // required if ty == book
@@ -59,15 +59,35 @@ export class NewComponent implements OnInit {
     );
   }
 
+  spiderUrl(srcUrl: string) {
+    if ( !regUrl.test(srcUrl) ) {
+      alert("Invalid Input");
+      return;
+    }
+    let topic = this.newFor === 'all' || this.newFor === 'from'
+      ? "Rust"
+      : this.newFor;
+    let ty = ~(this.itemCates.indexOf(this.newTo))
+      ? this.newTo
+      : "Article";
+    let sp: SpiderItem = { url: srcUrl, topic, ty };
+    this.itemService.spider(sp).subscribe(
+      res => { window.location.href = this.host_url + '/item/' + res.slug },
+      //err => console.log(err),
+    )
+  }
+
   onSubmit() {
+    if ( !this.canCreate ) return;
     const newItem = this.createForm.value;
-    const url_or_ctn = Boolean(newItem.content.trim()) || Boolean(newItem.link.trim());
+    const toSpider = Boolean(newItem.link.trim()) && !Boolean(newItem.title.trim());
+    if (toSpider) {
+      return this.spiderUrl(newItem.link.trim());
+    }
+
     const notValid = this.createForm.invalid || !Boolean(newItem.title.trim());
-    if ( notValid || !url_or_ctn || !this.canCreate ) {
-      alert(notValid
-        ? "Invalid Input" 
-        : (!url_or_ctn ? "Should input either Source Link or Text Content" : "No Permission!")
-      );
+    if (notValid) {
+      alert("Invalid Input");
       return;
     }
     const itemData: NewItem = Object.assign(

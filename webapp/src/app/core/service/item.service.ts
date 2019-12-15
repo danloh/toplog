@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ApiService } from './api.service';
-import { Item, NewItem, UpdateItem, ItemListRes } from '../model';
+import { Item, NewItem, UpdateItem, ItemListRes, SpiderItem } from '../model';
 
 @Injectable()
 export class ItemService {
@@ -18,6 +18,11 @@ export class ItemService {
 
   create(newItem: NewItem): Observable<Item> {
     return this.apiService.post('/items', newItem)
+      .pipe(map(data => data));
+  }
+
+  spider(sp: SpiderItem): Observable<Item> {
+    return this.apiService.put('/spider', sp)
       .pipe(map(data => data));
   }
 

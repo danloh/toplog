@@ -47,10 +47,10 @@ export class UpdateComponent implements OnInit {
     });
 
     this.updateForm = this.formBuild.group(
-      { 'title': [ this.item.title || '', [Validators.required]],
+      { 'title': [ this.item.title || null, [Validators.required]],
         'content': [ this.item.content || ''],
         'logo': [ this.item.logo || ''],
-        'author': [ this.item.author || ''],
+        'author': [ this.item.author || null, [Validators.required]],
         'ty': [ this.item.ty, [Validators.required]],
         'lang': [ this.item.lang || 'English'],
         'topic': [ this.item.topic || 'Rust', [Validators.required]],
@@ -62,13 +62,14 @@ export class UpdateComponent implements OnInit {
   }
 
   onUpdate() {
+    if ( !this.canUpdate ) return;
     const item = this.updateForm.value;
     const url_or_ctn = Boolean(item.content.trim()) || Boolean(item.link.trim());
     const notValid = this.updateForm.invalid || !Boolean(item.title.trim());
-    if ( notValid || !url_or_ctn || !this.canUpdate ) {
+    if ( notValid || !url_or_ctn ) {
       alert(notValid
         ? "Invalid Input" 
-        : (!url_or_ctn ? "Should input either Source Link or Text Content" : "No Permission!")
+        : "Should input either Source Link or Text Content"
       );
       return;
     }

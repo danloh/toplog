@@ -156,9 +156,23 @@ pub fn update_blogs_karma(conn: &PgConnection) -> QueryResult<()> {
 //
 #[swirl::background_job]
 pub fn gen_static_site(_env: &Environment) -> Result<(), PerformError> {
-    let host = dotenv::var("DOMAIN_HOST").unwrap_or("https://newdin.com".to_string());
-    let url = host + "/api/generate-staticsite-noexpose";
-    reqwest::get(&url)?;
+    // way-1: regenerate site
+    // let host = dotenv::var("DOMAIN_HOST")
+    //     .unwrap_or("https://newdin.com".to_string());
+    // let url = host + "/api/generate-staticsite-noexpose";
+    // reqwest::get(&url)?;
+
+    // way-2: del htmls
+    use crate::view::{ TOPIC_VEC, tmpl::del_html };
+    let mut names: Vec<String> = Vec::new();
+    for n in TOPIC_VEC.iter() {
+        let name = n.to_string() + "-Misc";
+        names.push(name);
+    }
+
+    for nm in names {
+        del_html(&nm);
+    }
     
     Ok(())
 }

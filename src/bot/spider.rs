@@ -495,7 +495,7 @@ lazy_static! {
 
 fn get_author_topic(host: &str) -> (String, String) {
     let map = &MAP_HOST;
-    let default = &(host,"Rust");
+    let default = &(host, "Rust");
     let tup = map.get(host).unwrap_or(default);
 
     (tup.0.to_owned(), tup.1.to_owned())

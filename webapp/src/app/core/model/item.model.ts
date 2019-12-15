@@ -34,6 +34,12 @@ export interface NewItem {
   post_by: string;
 }
 
+export interface SpiderItem {
+  url: string;
+  topic: string;
+  ty: string;
+}
+
 export interface UpdateItem {
   id: number;
   title: string;
