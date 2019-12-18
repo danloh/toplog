@@ -1,44 +1,3 @@
-// config marked
-const renderer = new marked.Renderer();
-function paragraphParse(text) {
-  return `<p>\n${text}</p>`;
-}
-function linkParse(href, title, text) {
-  const isSelf = href.includes('newdin.com');
-  const textIsImage = text.includes('<img');
-  return `
-  <a href="${href}" target="_blank"
-    title="${title || (textIsImage ? href : text)}" 
-    ${isSelf ? '' : 'rel="external nofollow noopener noreferrer"'}
-  >${text}
-  </a>`.replace(/\s+/g, ' ').replace('\n', '');
-}
-function imageParse(src, title, alt) {
-  return `
-  <br><a href="${src}" 
-    target="_blank" rel="nofollow noopener noreferrer">
-    <img src="${src}" title="${title || alt || ''}" 
-      style="max-width:95%; max-height:45%"
-      alt="${alt || title || src}"
-    />
-  </a><br>`.replace(/\s+/g, ' ').replace('\n', '');
-}
-function headingParse(text, level) {
-  let realLevel = level + 2;
-  return '<h' + realLevel + '>' + text + '</h' + realLevel + '>\n';
-}
-renderer.link = linkParse;
-renderer.image = imageParse;
-renderer.paragraph = paragraphParse;
-renderer.heading = headingParse;
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-  pedantic: false,
-  smartLists: true,
-  smartypants: true,
-  renderer: renderer
-})
 // =================================================================
 //## show dropdown
 function showMenu() { 
@@ -104,14 +63,18 @@ let hasMoreIdx = true;
 function loadMoreItems(topic='all', ty='Article') {
   if (!hasMoreIdx) { return; }
   idxPage += 1;
-  axios.get(`/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`)
-  .then(function(resp) {
-    let data = resp.data || "";
-    if ( !Boolean(data) ) {
-      console.log("No More");
-      hasMoreIdx = false;
-    }
-    document.getElementById('item-list').innerHTML += data;
+  fetch(
+    `/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`
+  ).then(resp => {
+    //console.log(resp);
+    resp.text().then( r => {
+      //console.log(r);
+      if ( !Boolean(r) ) {
+        console.log("No More");
+        hasMoreIdx = false;
+      }
+      document.getElementById('item-list').innerHTML += r;
+    })
   });
   window.scrollTo(0, document.body.scrollHeight);
 }
@@ -120,15 +83,14 @@ function toggleTop(slug) {
   let omg = getCookie("oMg");
   if (omg !== 'true') return;
   let tok = getCookie(TOK);
-  axios.defaults.headers.common['Authorization'] = tok;
-  axios.patch(`/api/items/${slug}`)
-  .then(
-    _res => {
-      let toggleEle = document.getElementById("t-" + slug);
-      if (toggleEle) { toggleEle.hidden = true }
-      //console.log(res.data)
-    }
-  );
+  fetch(`/api/items/${slug}`, {
+    method: 'PATCH', 
+    headers: { 'Authorization': tok },
+  }).then(_res => {
+    let toggleEle = document.getElementById("t-" + slug);
+    if (toggleEle) { toggleEle.hidden = true }
+    //console.log(res.data)
+  });
 }
 
 function upVote(slug) {
@@ -138,42 +100,32 @@ function upVote(slug) {
     window.location.href = "/me";
     return;
   }
-  axios.defaults.headers.common['Authorization'] = tok;
-  axios.put(`/api/items/${slug}?action=vote`)
-  .then(res => {
-    let voteNum = res.data;
-    //console.log(voteNum)
-    let voteEle = document.getElementById("vote-" + slug);
-    if (voteEle) { 
-      voteEle.innerText = voteNum; 
-      let upEle = document.getElementById("up-" + slug);
-      if (upEle) { upEle.hidden = true }
-    }
+  fetch(`/api/items/${slug}?action=vote`, {
+    method: 'PUT', 
+    headers: { 'Authorization': tok },
+  }).then(res => {
+    res.json().then(r => {
+      //console.log(r);
+      let voteEle = document.getElementById("vote-" + slug);
+      if (voteEle) { 
+        //let voteNum = Number(voteEle.innerText);
+        voteEle.innerText = r; 
+        let upEle = document.getElementById("up-" + slug);
+        if (upEle) { upEle.hidden = true }
+      }
+    }) 
   });
 }
 
+// md parse in backend
 function showFull(slug) {
-  let rawSelector = 'raw-' + slug;
-  let partSelector = 'part-' + slug;
   let mdSelector = 'md-' + slug;
   let btnSelector = 'btn-' + slug;
   let btn = document.getElementById(btnSelector);
-  let ifShowMore = btn.innerText === 'more...' ? true : false;
-  let mdEle = document.getElementById(mdSelector);
-  let partEle = document.getElementById(partSelector);
-  let rawEle = document.getElementById(rawSelector);
-  let raw = rawEle ? rawEle.innerText : '';
-  if (ifShowMore) {    
-    mdEle.innerHTML = marked(raw);
-    mdEle.hidden = false;
-    partEle.hidden = true;
-    btn.innerText = 'less...';
-  } else {
-    partEle.hidden = false;
-    mdEle.hidden = true;
-    btn.innerText = 'more...';
-  }
-  
+  let full = document.getElementById(mdSelector);
+  let ifShowMore = btn.innerText == 'more...' ? true : false
+  full.className = ifShowMore ? 'meta-sum' : 'hide-part meta-sum';
+  btn.innerText = ifShowMore ? 'less...' : 'more...';
 }
 
 function openLink(link, admin=false) {

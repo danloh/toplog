@@ -13,6 +13,7 @@ lazy_static! {
         let mut tera = Tera::new("templates/**/*").unwrap_or_default();
         //tera.autoescape_on(vec!["html", ".sql"]);
         tera.register_filter("host", &host);
+        tera.register_filter("md", &md);
         tera.register_filter("showless", &showless);
         tera.register_filter("enbase", &enbase);
         tera.register_filter("setbase", &setbase);
@@ -45,6 +46,23 @@ pub fn host(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     Ok(to_value(&host).unwrap_or_default())
 }
 
+// markdown
+pub fn md(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
+    use pulldown_cmark::{Parser, Options, html};
+    let mut options = Options::all();
+    // options.insert(Options::ENABLE_TABLES);
+    // options.insert(Options::ENABLE_FOOTNOTES);
+    // options.insert(Options::ENABLE_TASKLISTS);
+
+    let s = try_get_value!("md", "value", String, value);
+    let parser = Parser::new_ext(&s, options);
+
+    let mut html_res = String::new();
+    html::push_html(&mut html_res, parser);
+
+    Ok(to_value(&html_res).unwrap_or_default())
+}
+
 // base64 encode
 pub fn enbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     use crate::util::helper::en_base64;
@@ -54,7 +72,7 @@ pub fn enbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     Ok(to_value(&b64).unwrap_or_default())
 }
 
-// set base url for href
+// set base url for href, NOTE: not decouple!
 pub fn setbase(value: &Value, _: &HashMap<String, Value>) -> TeraResult<Value> {
     use crate::util::helper::en_base64;
     let s = try_get_value!("setbase", "value", String, value);

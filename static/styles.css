@@ -253,6 +253,10 @@ section.item-sum:hover {
   color: #828282;
   font-size: 16px;
 }
+.hide-part {
+  max-height: 80px;
+  overflow: hidden;
+}
 .item-view .title {
   font-size: 24px;
 }
@@ -279,10 +283,6 @@ section.item-sum:hover {
   padding: 0px 2px;
   border-radius: 25%;
 }
-/* .hide-part {
-  max-height: 150px;
-  overflow: hidden;
-} */
 
 .badge, .badge-circle, .badge-heart,
 .badge-bead, .badge-oval {

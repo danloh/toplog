@@ -9,23 +9,21 @@
     <b class="title">{{ item.title }}</b>
     <span class="host"> | </span>
     <span style="color: #37a">{{ a_url | safe | host }}</span>
-    <div id="{{'raw-' ~ a_slug}}" style="display: none">{{ a_content }}</div>
-    <div id="{{'part-' ~ a_slug}}" class="meta-sum">{{ a_content | showless(least=256) }}</div>
-    <div id="{{'md-' ~ a_slug}}" class="meta-sum"></div>
-    {%- if a_content | length > 128 -%}
-    <a href="javascript:void(0);" 
-      onclick="showFull('{{ a_slug }}')" 
-      id="{{'btn-' ~ a_slug}}" class="help-tips"
-    >
-      more...
-    </a>
-    {%- endif -%}
+  </a>
+  <div id="{{'md-' ~ a_slug}}" class="meta-sum hide-part">
+    {{ a_content | md | safe }}
+  </div>
+  <a href="javascript:void(0);" 
+    onclick="showFull('{{ a_slug }}')" 
+    id="{{'btn-' ~ a_slug}}" class="help-tips"
+  >
+    more...
   </a>
   {%- set logo = item.logo -%}
   {%- if logo -%}
-  <span>
+  <a href ="{{ a_url }}" target="_blank" rel="noopener">
     <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
-  </span>
+  </a>
   {%- endif -%}
   <div class="item-meta">
     <span class="{{ 'badge ' ~ a_ty }}"></span> <!-- type badge-->

@@ -38,8 +38,7 @@
           {%- if item.is_top -%} .. {%- else -%} ::: {%- endif -%}
         </a>
       </div>
-      <div id="raw-item-content" class="item-md">{{ a_content }}</div>
-      <div id="md-item-content" class="item-md"></div>
+      <div id="md-item-content" class="item-md">{{ a_content | md | safe }}</div>
       {%- set logo = item.logo -%}
       {%- if logo -%}
       <span>
@@ -51,5 +50,3 @@
   <div class="page-side"></div>
 </div>
 {%- endblock mainview -%}
-
-{%- block script -%}<script src="/static/loaded.js"></script>{%- endblock script -%}
