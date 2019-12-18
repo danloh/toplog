@@ -11,6 +11,7 @@
 }
 .s-meta-tag {
   margin-right: 8px;
-  border-left: 3px solid #03a87c;
+  border-left: 1px solid #03a87c;
+  border-bottom: 0.5px solid #03a87c;
   padding-left: 3px;
 }
