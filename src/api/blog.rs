@@ -452,17 +452,26 @@ impl Message for QueryBlogs {
 }
 
 // TODO
+//
 //#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
 //#[table_name = "topics"]
 pub struct Topic {
     pub id: i32,
     pub tname: String,
-    pub category: String,  // Programming|Company|Tech|Culture ...
-    pub kind: String,  // web|framework|renderer|parser|Platform|language ...
+    pub slug: String,    // uri friendly
+    pub domain: String,  // Programming|Company|Tech|Culture ...
+    pub kind: String,    // web|framework|renderer|parser|Platform|language|Application ...
     pub intro: String,
+    pub license: String,
     pub logo: String,
     pub vote: i32,
 }
 
 // TODO
 // How x do y
+/*
+x_id: topic, eg. Rust
+y_id: topic, eg. Web
+stack:  as what in Tech Stack, eg. webframework
+app: what, eg. Actix-web
+*/

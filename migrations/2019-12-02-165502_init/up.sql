@@ -107,6 +107,16 @@ CREATE TABLE itemcomments (
   PRIMARY KEY (item_id, comment_id)
 );
 
+-- TODO
+CREATE TABLE itemlinks (
+  item_id VARCHAR NOT NULL REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  link VARCHAR NOT NULL,
+  link_ty VARCHAR NOT NULL, -- trans | comment ...
+  link_host VARCHAR NOT NULL,
+  link_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (item_id, link)
+);
+
 CREATE TABLE itemtrans (
   origin_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
   trans_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
