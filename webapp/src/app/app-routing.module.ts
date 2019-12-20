@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
-import { AuthGuard } from './core';
 import { NotFoundComponent } from './misc';
 
 const routes: Routes = [
@@ -19,6 +18,10 @@ const routes: Routes = [
   {
     path: 'item',
     loadChildren: () => import('./item/item.module').then(m => m.ItemModule),
+  },
+  {
+    path: 'issue',
+    loadChildren: () => import('./rfc/rfc.module').then(m => m.RfcModule),
   },
   {
     path: '404',

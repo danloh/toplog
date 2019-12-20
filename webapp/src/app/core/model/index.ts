@@ -4,6 +4,7 @@
 export * from './user.model';
 export * from './blog.model';
 export * from './item.model';
+export * from './rfc.model';
 export * from './error.model';
 
 export interface MsgRes {

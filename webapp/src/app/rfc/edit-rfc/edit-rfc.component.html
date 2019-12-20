@@ -1,0 +1,22 @@
+<div class="s-create-page">
+  <div class="s-create-title"><b>Update</b></div>
+  <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="s-create-form">
+    <nz-form-label>Title*</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="title" nzAutosize maxlength="255"></textarea>
+    </nz-form-control>
+    <nz-form-label  nzRequired>Content</nz-form-label>
+    <nz-form-control>
+      <textarea nz-input formControlName="content" [nzAutosize]="{ minRows: 3 }"></textarea>
+    </nz-form-control>
+    <nz-form-label  nzRequired>Topic*</nz-form-label>
+    <nz-form-control>
+      <input nz-input formControlName="topic" maxlength="16"/>
+    </nz-form-control>
+    <br><br>
+    <button nz-button class="s-full-width" nzType="primary">Submit</button>
+  </form>
+  <button nz-button nzType="link" nzSize="small" (click)="onDel()">
+    <b style="color:orangered">Delete...</b>
+  </button>
+</div>
