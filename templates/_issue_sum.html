@@ -1,0 +1,23 @@
+<!-- ctx: issue, author -->
+<section class="issue-sum">
+  {%- set a_content = issue.content -%}
+  {%- set a_author = issue.author -%}
+  {%- set a_slug = issue.slug -%}
+  {%- set a_topic = issue.topic -%}
+  
+  <b class="title">{{ issue.title }}</b>
+  <div class="issue-meta">
+    <span class="{{ 'badge ' ~ a_ty }}"></span> <!-- type badge-->
+    <span class="meta-tag">{{ a_ty }}</span> 
+    <span class="badge-bead"></span> <!-- author badge-->
+    <span class="meta-tag"><a href="{{ '/from?by=' ~ a_author }}">{{ issue.author }}</a></span>
+    <span class="{{ 'badge-circle tab-' ~ a_topic }}"></span> <!-- topic badge -->
+    {%- if a_topic != topic -%}
+      <span class="meta-tag"><a href="{{ '/t/' ~ a_topic ~ '/' ~ a_ty }}">{{ a_topic }}</a></span>
+    {%- else -%}
+      <span class="meta-tag">{{ a_topic }}</span>
+    {%- endif -%}
+    <span class="badge-oval"></span> <!-- date badge -->
+    <span class="meta-tag">{{ issue.pub_at | date(format="%b %d %Y") }}</span> 
+  </div>
+</section>
