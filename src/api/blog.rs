@@ -34,7 +34,7 @@ impl Handler<NewBlog> for Dba {
     type Result = ServiceResult<Blog>;
 
     fn handle(&mut self, nb: NewBlog, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         nb.new(conn)
     }
 }
@@ -57,7 +57,7 @@ impl Handler<UpdateBlog> for Dba {
     type Result = ServiceResult<Blog>;
 
     fn handle(&mut self, b: UpdateBlog, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         b.update(conn)
     }
 }
@@ -122,7 +122,7 @@ impl Handler<QueryBlog> for Dba {
     type Result = ServiceResult<Blog>;
 
     fn handle(&mut self, qb: QueryBlog, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = &qb.method.trim();
 
         match method {
@@ -160,7 +160,7 @@ impl Handler<QueryBlogs> for Dba {
     type Result = ServiceResult<(Vec<Blog>, i64)>;
 
     fn handle(&mut self, qbs: QueryBlogs, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         qbs.get(conn)
     }
 }

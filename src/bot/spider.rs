@@ -3,10 +3,10 @@
 use regex::Regex;
 use scraper::{Html, Selector};
 
+use crate::errors::{ServiceError, ServiceResult};
 use crate::api::item::NewItem;
 use crate::api::{re_test_img_url, replace_sep, trim_url_qry};
 use crate::util::helper::gen_slug;
-
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct PageInfo {
@@ -16,7 +16,7 @@ pub struct PageInfo {
     pub content: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct WebPage {
     url: String,
     html: String,
@@ -24,8 +24,8 @@ pub struct WebPage {
 }
 
 impl WebPage {
-    pub fn new(url: &str) -> Self {
-        let res = reqwest::get(url).unwrap().text().unwrap();
+    pub fn new(url: &str) -> ServiceResult<Self> {
+        let res = reqwest::get(url)?.text()?;
 
         lazy_static! {
             static ref Scheme_re: Regex = Regex::new(r"https?://").unwrap();
@@ -36,11 +36,12 @@ impl WebPage {
         let host = Path_re.replace_all(&uri, "");
         let domain = host.replace("www.", "");
 
-        Self {
+        let page = Self {
             url: url.to_string(),
             html: res,
             domain,
-        }
+        };
+        Ok(page)
     }
 
     // URL getter

@@ -79,16 +79,17 @@ pub fn init_fern_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 
-pub fn init_server() -> std::io::Result<()> {
+#[actix_rt::main]
+pub async fn init_server() -> std::io::Result<()> {
     // init logger
     init_fern_logger().unwrap_or_default();
     // new runtime
-    let sys = actix_rt::System::new("server");
+    //let sys = actix_rt::System::new("server");
     // init actor
     let addr: DbAddr = init_dba();
 
     let bind_host =
-        dotenv::var("BIND_ADDRESS").unwrap_or("127.0.0.1:8083".to_string());
+        dotenv::var("BIND_ADDRESS").unwrap_or("127.0.0.1:8085".to_string());
     // config Server, App, AppState, middleware, service
     HttpServer::new(move || {
         App::new()
@@ -254,10 +255,11 @@ pub fn init_server() -> std::io::Result<()> {
     })
     .bind(&bind_host)
     .expect("Can not bind to host")
-    .start();
+    .start()
+    .await
 
-    println!("Starting http server: {}", bind_host);
+    //println!("Starting http server: {}", bind_host);
 
     // start runtime
-    sys.run()
+    //sys.run()
 }

@@ -35,7 +35,7 @@ impl Handler<NewIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, ni: NewIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         ni.new(conn)
     }
 }
@@ -62,7 +62,7 @@ impl Handler<UpdateIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, u: UpdateIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         u.update(conn)
     }
 }
@@ -108,7 +108,7 @@ impl Handler<QueryIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, qb: QueryIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = &qb.method.trim();
         if method == "GET" {
             qb.get(conn)
@@ -143,7 +143,7 @@ impl Handler<QueryIssues> for Dba {
     type Result = ServiceResult<(Vec<Issue>, i64)>;
 
     fn handle(&mut self, qis: QueryIssues, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         qis.get(conn)
     }
 }
@@ -190,7 +190,7 @@ impl Handler<NewIssueLabel> for Dba {
     type Result = ServiceResult<IssueLabel>;
 
     fn handle(&mut self, ni: NewIssueLabel, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = ni.method.trim();
         if method == "POST" {
             ni.new(conn)

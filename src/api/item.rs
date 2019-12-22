@@ -39,7 +39,7 @@ impl Handler<NewItem> for Dba {
     type Result = ServiceResult<Item>;
 
     fn handle(&mut self, na: NewItem, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         na.new(conn)
     }
 }
@@ -65,7 +65,7 @@ impl Handler<SpiderItem> for Dba {
     type Result = ServiceResult<Item>;
 
     fn handle(&mut self, sp: SpiderItem, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         sp.spider(conn)
     }
 }
@@ -88,7 +88,7 @@ impl Handler<UpdateItem> for Dba {
     type Result = ServiceResult<Item>;
 
     fn handle(&mut self, b: UpdateItem, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         b.update(conn)
     }
 }
@@ -174,7 +174,7 @@ impl Handler<QueryItem> for Dba {
     type Result = ServiceResult<Item>;
 
     fn handle(&mut self, qb: QueryItem, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = &qb.method.trim();
 
         match method {
@@ -229,7 +229,7 @@ impl Handler<QueryItems> for Dba {
     type Result = ServiceResult<(Vec<Item>, i64)>;
 
     fn handle(&mut self, qbs: QueryItems, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         qbs.get(conn)
     }
 }
@@ -476,7 +476,7 @@ impl SpiderItem {
         use crate::bot::spider::{WebPage};
         use crate::schema::items::dsl::items;
         let sp = self.clone();
-        let sp_item = WebPage::new(&self.url).into_item();
+        let sp_item = WebPage::new(&self.url)?.into_item();
 
         let sp_topic = sp.topic;
         use crate::view::{TY_VEC};
