@@ -50,8 +50,10 @@ pub async fn signup(
         ..reg_usr
     };
 
-    // result(reg.validate())  // ??
-
+    if let Err(e) = reg.validate() {
+        return Ok(e.error_response());
+    }
+    
     let res = db.send(reg).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
@@ -85,7 +87,10 @@ pub async fn signin(
         ..auth_usr
     };
 
-    // result(auth_user.validate())
+    if let Err(e) = auth_user.validate() {
+        return Ok(e.error_response());
+    }
+
     let res = db.send(auth_user).await?;
     match res {
         Ok(user) => {
@@ -165,7 +170,10 @@ pub async fn update(
         panic!("No Permission"); // to have a better way!!
     }
 
-    // result(up_user.validate())
+    if let Err(e) = up_user.validate() {
+        return Ok(e.error_response());
+    }
+
     let res = db.send(up_user).await?;
     match res {
         Ok(user) => {
@@ -219,7 +227,10 @@ pub async fn change_psw(
         ..usr_psw
     };
 
-    // result(user_psw.validate())
+    if let Err(e) = user_psw.validate() {
+        return Ok(e.error_response());
+    }
+
     let res = db.send(user_psw).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
@@ -274,10 +285,13 @@ pub async fn reset_psw_req(
     db: Data<DbAddr>,
     re_req: Json<ResetReq>,
 ) -> Result<HttpResponse, Error>  {
-    let req = re_req.into_inner(); // need uname and email
-    //result(req.validate())
+    let psw_req = re_req.into_inner(); // need uname and email
 
-    let res = db.send(req).await?;
+    if let Err(e) = psw_req.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(psw_req).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 401 or 404
         Err(e) => Ok(e.error_response()),
@@ -313,7 +327,10 @@ pub async fn reset_psw(
         email,
         exp,
     };
-    //result(reset.validate())
+    
+    if let Err(e) = reset.validate() {
+        return Ok(e.error_response());
+    }
 
     let res = db.send(reset).await?;
     match res {

@@ -52,7 +52,10 @@ pub async fn spider(
     db: Data<DbAddr>,
 ) -> Result<HttpResponse, Error>  {
     let item = sp.into_inner();
-    // result(item.validate())
+    
+    if let Err(e) = item.validate() {
+        return Ok(e.error_response());
+    }
     
     let res = db.send(item).await?;
     match res {

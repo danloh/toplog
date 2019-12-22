@@ -140,7 +140,10 @@ pub async fn topic_dyn(
     let ty = pa.1;
 
     let topic_msg = Topic{ topic, ty, page: 1 };
-    //result(topic_msg.validate())
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
     
     let res = db.send(topic_msg).await?;
     match res {
@@ -177,7 +180,10 @@ pub async fn topic_either(
     let ty = pa.1;
 
     let topic_msg = TopicEither{ topic, ty };
-    //result(topic_msg.validate())
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
 
     let res = db.send(topic_msg).await?;
     match res {
@@ -228,7 +234,10 @@ pub async fn item_from(
         ty: by,
         page: 1, 
     };
-    //result(topic_msg.validate())
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
 
     let res = db.send(topic_msg).await?;
     match res {
@@ -274,7 +283,9 @@ pub async fn more_item(
 
     let topic_msg = Topic{ topic, ty, page };
 
-    //result(topic_msg.validate())
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
 
     let res =  db.send(topic_msg).await?;
     match res {
