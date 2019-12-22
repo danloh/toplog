@@ -1,9 +1,10 @@
 
-use futures::{future::result, Future};
+//use futures::{Future};
 use actix::{Handler, Message};
 use actix_web::{
     web::{Data, Json, Path, Query},
     Error, HttpResponse, ResponseError,
+    Result,
 };
 use base64::decode;
 use diesel::prelude::*;
@@ -22,17 +23,16 @@ use crate::schema::{items, voteitems};
 
 // POST: /api/items
 // 
-pub fn new(
+pub async fn new(
     item: Json<NewItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(item.into_inner())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+) -> Result<HttpResponse, Error>  {
+    let res = db.send(item.into_inner()).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<NewItem> for Dba {
@@ -47,18 +47,18 @@ impl Handler<NewItem> for Dba {
 // PUT: /api/spider, Body: SpiderItem
 // 
 // spider a url
-pub fn spider(
+pub async fn spider(
     sp: Json<SpiderItem>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let item = sp.into_inner();
-    result(item.validate())
-        .from_err()
-        .and_then(move |_| db.send(item).from_err())
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    // result(item.validate())
+    
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<SpiderItem> for Dba {
@@ -72,17 +72,16 @@ impl Handler<SpiderItem> for Dba {
 
 // PUT: /api/items
 // 
-pub fn update(
+pub async fn update(
     item: Json<UpdateItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(item.into_inner())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+) -> Result<HttpResponse, Error>  {
+    let res = db.send(item.into_inner()).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<UpdateItem> for Dba {
@@ -96,83 +95,79 @@ impl Handler<UpdateItem> for Dba {
 
 // GET: /api/items/{slug}
 // 
-pub fn get(
+pub async fn get(
     qb: Path<String>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("GET"),
         uname: String::new()
     };
-    db.send(item)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // PATCH: /api/items/{slug}
 // 
-pub fn toggle_top(
+pub async fn toggle_top(
     qb: Path<String>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("PATCH"),
         uname: auth.uname
     };
-    db.send(item)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // PUT: /api/items/{slug}?action=vote|veto
 // 
-pub fn vote_or_veto(
+pub async fn vote_or_veto(
     qb: Path<String>,
     aq: Query<ActionQuery>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: aq.action.to_uppercase(),
         uname: auth.uname
     };
-    db.send(item)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b.vote)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b.vote)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // DELETE: /api/items/{slug}
 // 
-pub fn del(
+pub async fn del(
     qb: Path<String>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("DELETE"),
         uname: auth.uname
     };
-    db.send(item)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b.slug)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b.slug)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryItem> for Dba {
@@ -195,11 +190,11 @@ impl Handler<QueryItem> for Dba {
 
 // GET: api/items/{per}?per=topic|author&kw=&page=p&perpage=42
 // 
-pub fn get_list(
+pub async fn get_list(
     pt: Path<String>,
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let p = pt.into_inner();
     // extract query param
     let perpage = pq.perpage;
@@ -216,19 +211,18 @@ pub fn get_list(
         // kw-topic: rust|go.., per-ty: art|book|..
         _ => QueryItems::Tt(kw, per, perpage, page),
     };
-    db.send(item)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => {
-                use crate::api::ItemsMsg;
-                let res = ItemsMsg {
-                    items: b.0,
-                    count: b.1,
-                };
-                Ok(HttpResponse::Ok().json(res))
-            },
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(item).await?;
+    match res {
+        Ok(b) => {
+            use crate::api::ItemsMsg;
+            let res = ItemsMsg {
+                items: b.0,
+                count: b.1,
+            };
+            Ok(HttpResponse::Ok().json(res))
+        },
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryItems> for Dba {

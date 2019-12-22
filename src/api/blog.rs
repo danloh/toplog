@@ -1,9 +1,10 @@
 
-use futures::{future::result, Future};
+//use futures::{Future};
 use actix::{Handler, Message};
 use actix_web::{
     web::{Data, Json, Path, Query},
     Error, HttpResponse, ResponseError,
+    Result,
 };
 use base64::decode;
 use diesel::prelude::*;
@@ -17,17 +18,16 @@ use crate::schema::{blogs};
 
 // POST: /api/blogs
 // 
-pub fn new(
+pub async fn new(
     blog: Json<NewBlog>,
     _can: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(blog.into_inner())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+) -> Result<HttpResponse, Error>  {
+    let res = db.send(blog.into_inner()).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<NewBlog> for Dba {
@@ -41,17 +41,16 @@ impl Handler<NewBlog> for Dba {
 
 // PUT: /api/blogs
 // 
-pub fn update(
+pub async fn update(
     blog: Json<UpdateBlog>,
     _can: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(blog.into_inner())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+) -> Result<HttpResponse, Error>  {
+    let res = db.send(blog.into_inner()).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<UpdateBlog> for Dba {
@@ -65,61 +64,58 @@ impl Handler<UpdateBlog> for Dba {
 
 // GET: /api/blogs/{id}
 // 
-pub fn get(
+pub async fn get(
     qb: Path<i32>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("GET"),
         uname: String::new()
     };
-    db.send(blog)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(blog).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // PUT: /api/blogs/{id}
 // 
-pub fn toggle_top(
+pub async fn toggle_top(
     qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("PUT"),
         uname: auth.uname
     };
-    db.send(blog)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(blog).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // DELETE: /api/blogs/{id}
 // 
-pub fn del(
+pub async fn del(
     qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("DELETE"),
         uname: auth.uname
     };
-    db.send(blog)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b.aname)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(blog).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b.aname)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryBlog> for Dba {
@@ -140,10 +136,10 @@ impl Handler<QueryBlog> for Dba {
 
 // GET: api/blogs?per=topic&kw=&page=p&perpage=42
 // 
-pub fn get_list(
+pub async fn get_list(
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let perpage = pq.perpage;
     let page = pq.page;
     let kw = pq.clone().kw;
@@ -153,12 +149,11 @@ pub fn get_list(
         "top" => QueryBlogs::Top(kw, perpage, page),
         _ => QueryBlogs::Index(kw, perpage, page),
     };
-    db.send(blog)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(blog).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryBlogs> for Dba {
