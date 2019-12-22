@@ -1,5 +1,5 @@
 
-use futures::{Future, future::result};
+//use futures::{Future};
 use actix::{Handler, Message};
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::auth::{verify_token, CheckUser, CheckCan};
@@ -11,12 +11,13 @@ use actix_http::http;
 use actix_web::{
     web::{Data, Path, Query},
     Error, HttpResponse, ResponseError,
+    Result
 };
 use chrono::{SecondsFormat, Utc};
 
 // GET /
 //
-pub fn index() -> Result<HttpResponse, Error> {
+pub async fn index() -> Result<HttpResponse, Error> {
     let res = String::from_utf8(
         std::fs::read("www/all-index.html")
             .unwrap_or("Not Found".to_owned().into_bytes()), // handle not found
@@ -24,22 +25,24 @@ pub fn index() -> Result<HttpResponse, Error> {
     .unwrap_or_default();
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(res))
+        .body(res)
+    )
 }
 
 // GET /a/{ty} // special: /index, /Misc
 //
 // static file default, otherwise generate
-pub fn index_either(
+pub async fn index_either(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let home_msg = TopicEither { 
         topic: String::from("all"), 
         ty: p.into_inner(),
     };
     
-    db.send(home_msg).from_err().and_then(|res| match res {
+    let res = db.send(home_msg).await?; 
+    match res {
         Ok(msg) => {
             if msg.status == 201 {
                 let mut ctx = tera::Context::new();
@@ -65,16 +68,16 @@ pub fn index_either(
             }
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /a/{ty}/dyn // special: /index, /Misc, /newest
 //
 // response dynamically
-pub fn index_dyn(
+pub async fn index_dyn(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let ty = p.into_inner();
     let home_msg = Topic { 
         topic: String::from("all"), 
@@ -82,7 +85,8 @@ pub fn index_dyn(
         page: 1, 
     };
     
-    db.send(home_msg).from_err().and_then(|res| match res {
+    let res = db.send(home_msg).await?;
+    match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
@@ -101,47 +105,48 @@ pub fn index_dyn(
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /index
 //
 // redirect to index_dyn
-pub fn dyn_index(
+pub async fn dyn_index(
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let p: Path<String> = String::from("index").into();
-    index_dyn(db, p)
+    index_dyn(db, p).await
 }
 
 // GET /all/newest
 //
 // redirect to index_dyn
-pub fn index_newest(
+pub async fn index_newest(
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let p: Path<String> = String::from("newest").into();
-    index_dyn(db, p)
+    index_dyn(db, p).await
 }
 
 // GET /t/{topic}/{ty}/dyn
 //
 // response dynamically
-pub fn topic_dyn(
+pub async fn topic_dyn(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let pa = p.into_inner();
     let topic = pa.0;
     let ty = pa.1;
 
     let topic_msg = Topic{ topic, ty, page: 1 };
-    result(
-        topic_msg.validate()
-    )
-    .from_err()
-    .and_then(move |_| db.send(topic_msg).from_err())
-    .and_then(|res| match res {
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
+    
+    let res = db.send(topic_msg).await?;
+    match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
@@ -160,27 +165,28 @@ pub fn topic_dyn(
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /t/{topic}/{ty}
 //
 // static file default, otherwise generate
-pub fn topic_either(
+pub async fn topic_either(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let pa = p.into_inner();
     let topic = pa.0;
     let ty = pa.1;
 
     let topic_msg = TopicEither{ topic, ty };
-    result(
-        topic_msg.validate()
-    )
-    .from_err()
-    .and_then(move |_| db.send(topic_msg).from_err())
-    .and_then(|res| match res {
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(topic_msg).await?;
+    match res {
         Ok(msg) => {
             if msg.status == 201 {
                 // println!(">> via dyn 201");
@@ -208,16 +214,16 @@ pub fn topic_either(
             }
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /from?by=
 //
 // response dynamically
-pub fn item_from(
+pub async fn item_from(
     db: Data<DbAddr>,
     bq: Query<ByQuery>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     // extract Query
     let bq_by = bq.into_inner().by.unwrap_or_default();
     use crate::util::helper::de_base64;
@@ -228,12 +234,13 @@ pub fn item_from(
         ty: by,
         page: 1, 
     };
-    result(
-        topic_msg.validate()
-    )
-    .from_err()
-    .and_then(move |_| db.send(topic_msg).from_err())
-    .and_then(|res| match res {
+    
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(topic_msg).await?;
+    match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             ctx.insert("items", &msg.items);
@@ -251,16 +258,16 @@ pub fn item_from(
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /more/{topic}/{ty}?page=&perpage=42
 //
-pub fn more_item(
+pub async fn more_item(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
     pq: Query<PageQuery>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let pa = p.into_inner();
     let topic = pa.0;
     let p_ty = pa.1;
@@ -275,12 +282,13 @@ pub fn more_item(
     let perpage = pq.clone().perpage;
 
     let topic_msg = Topic{ topic, ty, page };
-    result(
-        topic_msg.validate()
-    )
-    .from_err()
-    .and_then(move |_| db.send(topic_msg).from_err())
-    .and_then(|res| match res {
+
+    if let Err(e) = topic_msg.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res =  db.send(topic_msg).await?;
+    match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
@@ -296,15 +304,15 @@ pub fn more_item(
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /item/{slug}
 //
-pub fn item_view(
+pub async fn item_view(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let slug = p.into_inner();
     use crate::api::item::QueryItem;
 
@@ -314,7 +322,8 @@ pub fn item_view(
         uname: String::new(),
     };
 
-    db.send(item_msg).from_err().and_then(|res| match res {
+    let res = db.send(item_msg).await?; 
+    match res {
         Ok(msg) => {
             let mut ctx = tera::Context::new();
             ctx.insert("item", &msg);
@@ -327,13 +336,13 @@ pub fn item_view(
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // GET /me/index.html // spa
 // try_uri for spa
 // 
-pub fn spa_index() -> Result<HttpResponse, Error> {
+pub async fn spa_index() -> Result<HttpResponse, Error> {
     let res = String::from_utf8(
         std::fs::read("spa/index.html")
             .unwrap_or("Not Found".to_owned().into_bytes()),
@@ -341,13 +350,14 @@ pub fn spa_index() -> Result<HttpResponse, Error> {
     .unwrap_or_default();
     Ok(HttpResponse::build(http::StatusCode::OK)
         .content_type("text/html; charset=utf-8")
-        .body(res))
+        .body(res
+    ))
 }
 
 // GET /site/{name}
 //
 // site: about, help, terms, etc.
-pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
+pub async fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
     let p = p_info.into_inner();
     let tpl_dir = p + ".html";
     let dir = "www/".to_owned() + &tpl_dir;
@@ -360,7 +370,8 @@ pub fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
 
     Ok(HttpResponse::build(http::StatusCode::OK)
         .content_type("text/html; charset=utf-8")
-        .body(t))
+        .body(t)
+    )
 }
 
 // generate static html
@@ -423,21 +434,22 @@ pub fn del_html(name: &str) -> ServiceResult<()> {
 // GET /api/generate-staticsite
 //
 // statify site
-pub fn statify_site(
+pub async fn statify_site(
     db: Data<DbAddr>,
     _auth: CheckCan,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let ss = StaticSite();
-    db.send(ss).from_err().and_then(|res| match res {
+    let res = db.send(ss).await?; 
+    match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // DELETE /api/stfile/{t-t}  // any potential issue??
 //
 // delete static file.
-pub fn del_static_file(
+pub async fn del_static_file(
     p: Path<String>
 ) -> Result<HttpResponse, Error> {
     del_html(&p.into_inner())?;
@@ -449,14 +461,15 @@ pub fn del_static_file(
 // alt statify site
 //
 // non auth, only for background job,  do not expose!
-pub fn statify_site_(
+pub async fn statify_site_(
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let ss = StaticSite();
-    db.send(ss).from_err().and_then(|res| match res {
+    let res = db.send(ss).await?; 
+    match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 pub struct StaticSite();
@@ -499,7 +512,7 @@ pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
 
 // GET /generate-sitemap
 //
-pub fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
+pub async fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
     let mut s_ctx = tera::Context::new();
     s_ctx.insert(
         "lastmod",

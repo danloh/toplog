@@ -1,8 +1,10 @@
 // api.auth view handler
 
-use futures::{future::result, Future};
+//use futures::Future;
+use futures::future::{ok, err, Ready};
 use actix::{Handler, Message};
 use actix_web::{
+    Result,
     dev::Payload,
     web::{Data, Json, Path},
     Error, HttpResponse, ResponseError,
@@ -34,10 +36,10 @@ pub const ADMIN_PERMIT: i16 = 0x80; // admin
 
 // POST: api/signup
 //
-pub fn signup(
+pub async fn signup(
     reg_user: Json<RegUser>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let reg_usr = reg_user.into_inner();
 
     // for decode password
@@ -48,13 +50,15 @@ pub fn signup(
         ..reg_usr
     };
 
-    result(reg.validate())
-        .from_err()
-        .and_then(move |_| db.send(reg).from_err())
-        .and_then(|res| match res {
-            Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-            Err(e) => Ok(e.error_response()),
-        })
+    if let Err(e) = reg.validate() {
+        return Ok(e.error_response());
+    }
+    
+    let res = db.send(reg).await?;
+    match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 impl Handler<RegUser> for Dba {
@@ -69,10 +73,10 @@ impl Handler<RegUser> for Dba {
 
 // POST: api/signin
 //
-pub fn signin(
+pub async fn signin(
     auth: Json<AuthUser>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let auth_usr = auth.into_inner();
 
     // for decode password
@@ -83,26 +87,28 @@ pub fn signin(
         ..auth_usr
     };
 
-    result(auth_user.validate())
-        .from_err()
-        .and_then(move |_| db.send(auth_user).from_err())
-        .and_then(|res| match res {
-            Ok(user) => {
-                let token = encode_token(&user)?;
-                let admin = dotenv::var("ADMIN").unwrap_or("".to_string());
-                let check_omg = user.uname == admin || user.can(EIDT_PERMIT);
-                let auth_msg = AuthMsg {
-                    status: 200,
-                    message: String::from("Success"),
-                    token: token,
-                    exp: 5, // unit: day
-                    user: user,
-                    omg: check_omg,
-                };
-                Ok(HttpResponse::Ok().json(auth_msg))
-            }
-            Err(e) => Ok(e.error_response()),
-        })
+    if let Err(e) = auth_user.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(auth_user).await?;
+    match res {
+        Ok(user) => {
+            let token = encode_token(&user)?;
+            let admin = dotenv::var("ADMIN").unwrap_or("".to_string());
+            let check_omg = user.uname == admin || user.can(EIDT_PERMIT);
+            let auth_msg = AuthMsg {
+                status: 200,
+                message: String::from("Success"),
+                token: token,
+                exp: 5, // unit: day
+                user: user,
+                omg: check_omg,
+            };
+            Ok(HttpResponse::Ok().json(auth_msg))
+        }
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 impl Handler<AuthUser> for Dba {
@@ -116,24 +122,23 @@ impl Handler<AuthUser> for Dba {
 
 // GET: api/users/{uname}
 //
-pub fn get(
+pub async fn get(
     path_uname: Path<String>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let uname = path_uname.into_inner();
-    db.send(QueryUser { uname })
-        .from_err()
-        .and_then(|res| match res {
-            Ok(user) => {
-                let user_msg = UserMsg {
-                    status: 200,
-                    message: String::from("Success"),
-                    user: user,
-                };
-                Ok(HttpResponse::Ok().json(user_msg))
-            }
-            Err(er) => Ok(er.error_response()),
-        })
+    let res = db.send(QueryUser { uname }).await?;
+    match res {
+        Ok(user) => {
+            let user_msg = UserMsg {
+                status: 200,
+                message: String::from("Success"),
+                user: user,
+            };
+            Ok(HttpResponse::Ok().json(user_msg))
+        }
+        Err(er) => Ok(er.error_response()),
+    }
 }
 
 impl Handler<QueryUser> for Dba {
@@ -153,11 +158,11 @@ impl Handler<QueryUser> for Dba {
 
 // POST: api/users/{uname}
 //
-pub fn update(
+pub async fn update(
     db: Data<DbAddr>,
     user: Json<UpdateUser>,
     auth: CheckUser,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let up_user = user.into_inner();
 
     // auth.uname == user.uname
@@ -165,26 +170,28 @@ pub fn update(
         panic!("No Permission"); // to have a better way!!
     }
 
-    result(up_user.validate())
-        .from_err()
-        .and_then(move |_| db.send(up_user).from_err())
-        .and_then(|res| match res {
-            Ok(user) => {
-                let token = encode_token(&user)?;
-                let admin = dotenv::var("ADMIN").unwrap_or("".to_string());
-                let check_omg = user.uname == admin || user.can(EIDT_PERMIT);
-                let auth_msg = AuthMsg {
-                    status: 200,
-                    message: String::from("Success"),
-                    token: token,
-                    exp: 5, // unit: day
-                    user: user,
-                    omg: check_omg,
-                };
-                Ok(HttpResponse::Ok().json(auth_msg))
-            }
-            Err(e) => Ok(e.error_response()),
-        })
+    if let Err(e) = up_user.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(up_user).await?;
+    match res {
+        Ok(user) => {
+            let token = encode_token(&user)?;
+            let admin = dotenv::var("ADMIN").unwrap_or("".to_string());
+            let check_omg = user.uname == admin || user.can(EIDT_PERMIT);
+            let auth_msg = AuthMsg {
+                status: 200,
+                message: String::from("Success"),
+                token: token,
+                exp: 5, // unit: day
+                user: user,
+                omg: check_omg,
+            };
+            Ok(HttpResponse::Ok().json(auth_msg))
+        }
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 impl Handler<UpdateUser> for Dba {
@@ -198,11 +205,11 @@ impl Handler<UpdateUser> for Dba {
 
 // PUT: api/users/{uname}
 //
-pub fn change_psw(
+pub async fn change_psw(
     db: Data<DbAddr>,
     psw: Json<ChangePsw>,
     auth: CheckUser,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let usr_psw = psw.into_inner();
 
     // auth.uname == user.uname
@@ -220,13 +227,15 @@ pub fn change_psw(
         ..usr_psw
     };
 
-    result(user_psw.validate())
-        .from_err()
-        .and_then(move |_| db.send(user_psw).from_err())
-        .and_then(|res| match res {
-            Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-            Err(e) => Ok(e.error_response()),
-        })
+    if let Err(e) = user_psw.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(user_psw).await?;
+    match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 impl Handler<ChangePsw> for Dba {
@@ -272,29 +281,32 @@ impl Handler<ChangePsw> for Dba {
 // POST api/reset
 //
 // 1-request reset, send mail  '/reset'
-pub fn reset_psw_req(
+pub async fn reset_psw_req(
     db: Data<DbAddr>,
     re_req: Json<ResetReq>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    let req = re_req.into_inner(); // need uname and email
-    result(req.validate())
-        .from_err()
-        .and_then(move |_| db.send(req).from_err())
-        .and_then(|res| match res {
-            Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 401 or 404
-            Err(e) => Ok(e.error_response()),
-        })
+) -> Result<HttpResponse, Error>  {
+    let psw_req = re_req.into_inner(); // need uname and email
+
+    if let Err(e) = psw_req.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(psw_req).await?;
+    match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 401 or 404
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 // POST api/reset/{token}
 //
 // 2- using token in mail to verify
 // reset user password  '/reset/{token}'
-pub fn reset_psw(
+pub async fn reset_psw(
     db: Data<DbAddr>,
     p_info: Path<String>,
     newpsw: Json<ResetPsw>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     use base64::decode;
 
     let reset_psw = newpsw.into_inner().re_psw;
@@ -315,13 +327,16 @@ pub fn reset_psw(
         email,
         exp,
     };
-    result(reset.validate())
-        .from_err()
-        .and_then(move |_| db.send(reset).from_err())
-        .and_then(|res| match res {
-            Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 404
-            Err(e) => Ok(e.error_response()),
-        })
+    
+    if let Err(e) = reset.validate() {
+        return Ok(e.error_response());
+    }
+
+    let res = db.send(reset).await?;
+    match res {
+        Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 404
+        Err(e) => Ok(e.error_response()),
+    }
 }
 
 impl Handler<ResetReq> for Dba {
@@ -397,15 +412,16 @@ impl Handler<ResetPsw> for Dba {
 // GET /confirm/{token}
 //
 // confirm user email
-pub fn confirm_email(
+pub async fn confirm_email(
     p_info: Path<String>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error>  {
     let tok = p_info.into_inner();
     let de_tok = de_base64(&tok);
     let tc = verify_token(&de_tok);
 
-    db.send(tc).from_err().and_then(|res| match res {
+    let res = db.send(tc).await?; 
+    match res {
         Ok(check) => {
             let mut ctx = tera::Context::new();
             let res = if check { "Success!" } else { "Failed!" };
@@ -417,7 +433,7 @@ pub fn confirm_email(
             Ok(HttpResponse::Ok().content_type("text/html").body(cfm))
         }
         Err(e) => Ok(e.error_response()),
-    })
+    }
 }
 
 // handle msg from tmpl.confirm_email
@@ -535,6 +551,10 @@ impl CheckUser {
     pub fn can(&self, permission: i16) -> bool {
         (self.permission & permission) == permission
     }
+
+    pub fn default() -> Self {
+        BuildUser::default().into()
+    }
 }
 
 impl From<User> for CheckUser {
@@ -583,16 +603,17 @@ impl Message for CheckUser {
 impl FromRequest for CheckUser {
     type Config = ();
     type Error = ServiceError;
-    type Future = Result<CheckUser, ServiceError>;
+    type Future = Ready<Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
         if let Some(auth_token) = req.headers().get("authorization") {
             if let Ok(auth) = auth_token.to_str() {
-                let user: CheckUser = decode_token(auth)?;
-                return Ok(user);
+                if let Ok(user) = decode_token(auth) {
+                    return ok(user);
+                }
             }
         }
-        Err(ServiceError::Unauthorized.into())
+        err(ServiceError::Unauthorized.into())
     }
 }
 
@@ -622,22 +643,24 @@ impl From<CheckUser> for CheckCan {
 impl FromRequest for CheckCan {
     type Config = ();
     type Error = ServiceError;
-    type Future = Result<CheckCan, ServiceError>;
+    type Future = Ready<Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
         if let Some(auth_token) = req.headers().get("authorization") {
             if let Ok(auth) = auth_token.to_str() {
-                let user: CheckCan = decode_token(auth)?.into();
-                // check permission, to be optimazed
-                let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
-                let check_permission: bool = 
-                    user.uname == admin_env || user.can(EIDT_PERMIT);
-                if check_permission {
-                    return Ok(user);
+                if let Ok(user) = decode_token(auth) {
+                    let u: CheckCan = user.into();
+                    // check permission, to be optimazed
+                    let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
+                    let check_permission: bool = 
+                        u.uname == admin_env || u.can(EIDT_PERMIT);
+                    if check_permission {
+                        return ok(u);
+                    }
                 }
             }
         }
-        Err(ServiceError::Unauthorized.into())
+        err(ServiceError::Unauthorized.into())
     }
 }
 

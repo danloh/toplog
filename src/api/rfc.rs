@@ -1,9 +1,10 @@
 
-use futures::{future::result, Future};
+//use futures::{Future};
 use actix::{Handler, Message};
 use actix_web::{
     web::{Data, Json, Path, Query},
     Error, HttpResponse, ResponseError,
+    Result
 };
 use base64::decode;
 use diesel::prelude::*;
@@ -18,100 +19,96 @@ use crate::schema::{issues, issuelabels};
 
 // POST: /api/issues
 // 
-pub fn new(
+pub async fn new(
     issue: Json<NewIssue>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    db.send(issue.into_inner())
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+) -> Result<HttpResponse, Error> {
+    let res = db.send(issue.into_inner()).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<NewIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, ni: NewIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         ni.new(conn)
     }
 }
 
 // PUT: /api/issues
 // 
-pub fn update(
+pub async fn update(
     issue: Json<UpdateIssue>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let up = UpdateIssue {
         author: auth.uname,
         ..issue.into_inner()
     };
-    db.send(up)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(up).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<UpdateIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, u: UpdateIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         u.update(conn)
     }
 }
 
 // GET: /api/issues/{id}
 // 
-pub fn get(
+pub async fn get(
     qb: Path<String>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let issue = QueryIssue{
         slug: qb.into_inner(), 
         method: String::from("GET"),
         uname: String::new()
     };
-    db.send(issue)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(issue).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // DELETE: /api/issues/{id}
 // 
-pub fn del(
+pub async fn del(
     qb: Path<String>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let issue = QueryIssue{
         slug: qb.into_inner(), 
         method: String::from("DELETE"),
         uname: auth.uname
     };
-    db.send(issue)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(issue).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryIssue> for Dba {
     type Result = ServiceResult<Issue>;
 
     fn handle(&mut self, qb: QueryIssue, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = &qb.method.trim();
         if method == "GET" {
             qb.get(conn)
@@ -123,10 +120,10 @@ impl Handler<QueryIssue> for Dba {
 
 // GET: api/issues?per=topic&kw=&page=p&perpage=42
 // 
-pub fn get_list(
+pub async fn get_list(
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let perpage = pq.perpage;
     let page = pq.page;
     let kw = pq.clone().kw;
@@ -135,68 +132,65 @@ pub fn get_list(
         "label" => QueryIssues::Label(kw, perpage, page),
         _ => QueryIssues::Index(kw, perpage, page),
     };
-    db.send(issue)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(issue).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<QueryIssues> for Dba {
     type Result = ServiceResult<(Vec<Issue>, i64)>;
 
     fn handle(&mut self, qis: QueryIssues, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         qis.get(conn)
     }
 }
 
 // POST: /api/labelissues
 // 
-pub fn label_isuue(
+pub async fn label_isuue(
     il: Json<NewIssueLabel>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let new_label = NewIssueLabel {
         uname: auth.uname,
         method: String::from("POST"),
         ..il.into_inner()
     };
-    db.send(new_label)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(new_label).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 // DELETE: /api/labelissues
 // 
-pub fn del_label_isuue(
+pub async fn del_label_isuue(
     il: Json<NewIssueLabel>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> Result<HttpResponse, Error> {
     let new_label = NewIssueLabel {
         uname: auth.uname,
         method: String::from("DELETE"),
         ..il.into_inner()
     };
-    db.send(new_label)
-        .from_err()
-        .and_then(|res| match res {
-            Ok(b) => Ok(HttpResponse::Ok().json(b)),
-            Err(err) => Ok(err.error_response()),
-        })
+    let res = db.send(new_label).await?;
+    match res {
+        Ok(b) => Ok(HttpResponse::Ok().json(b)),
+        Err(err) => Ok(err.error_response()),
+    }
 }
 
 impl Handler<NewIssueLabel> for Dba {
     type Result = ServiceResult<IssueLabel>;
 
     fn handle(&mut self, ni: NewIssueLabel, _: &mut Self::Context) -> Self::Result {
-        let conn: &PooledConn = &self.0.get().unwrap();
+        let conn: &PooledConn = &self.0.get()?;
         let method: &str = ni.method.trim();
         if method == "POST" {
             ni.new(conn)

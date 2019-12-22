@@ -65,7 +65,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     );
 
     for url in url_list {
-        let page = WebPage::new(url);
+        let page = WebPage::new(url).unwrap_or_default();
         links.append(&mut page.clean_links());
     }
     // println!("{:?}", links);
@@ -101,7 +101,9 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     // spider the diff_links and build item
     let mut new_items: Vec<NewItem> = Vec::new();
     for l in diff_links {
-        let sp_item = WebPage::new(l).into_item();
+        let sp_item = WebPage::new(l)
+            .unwrap_or_default()
+            .into_item();
         new_items.push(sp_item);
     }
     // save to db

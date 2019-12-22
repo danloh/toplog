@@ -79,16 +79,17 @@ pub fn init_fern_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 
-pub fn init_server() -> std::io::Result<()> {
+#[actix_rt::main]
+pub async fn init_server() -> std::io::Result<()> {
     // init logger
     init_fern_logger().unwrap_or_default();
     // new runtime
-    let sys = actix_rt::System::new("server");
+    //let sys = actix_rt::System::new("server");
     // init actor
     let addr: DbAddr = init_dba();
 
     let bind_host =
-        dotenv::var("BIND_ADDRESS").unwrap_or("127.0.0.1:8083".to_string());
+        dotenv::var("BIND_ADDRESS").unwrap_or("127.0.0.1:8085".to_string());
     // config Server, App, AppState, middleware, service
     HttpServer::new(move || {
         App::new()
@@ -101,78 +102,78 @@ pub fn init_server() -> std::io::Result<()> {
                 // to auth
                 .service(
                     resource("/signin")
-                        .route(post().to_async(api::auth::signin))
+                        .route(post().to(api::auth::signin))
                 )
                 // to register
                 .service(
                     resource("/signup")
-                        .route(post().to_async(api::auth::signup))
+                        .route(post().to(api::auth::signup))
                 )
                 .service(
                     resource("/reset")   // reset-1: request rest psw, send mail
-                        .route(post().to_async(api::auth::reset_psw_req))
+                        .route(post().to(api::auth::reset_psw_req))
                 )
                 .service(
                     resource("/reset/{token}")   // reset-2: copy token, new psw
-                        .route(post().to_async(api::auth::reset_psw))
+                        .route(post().to(api::auth::reset_psw))
                 )
                 .service(
                     resource("/users/{uname}")
-                        .route(get().to_async(api::auth::get))
-                        .route(post().to_async(api::auth::update))
-                        .route(put().to_async(api::auth::change_psw))
+                        .route(get().to(api::auth::get))
+                        .route(post().to(api::auth::update))
+                        .route(put().to(api::auth::change_psw))
                 )
                 .service(
                     resource("/blogs")
-                        .route(post().to_async(api::blog::new))
-                        .route(put().to_async(api::blog::update))
+                        .route(post().to(api::blog::new))
+                        .route(put().to(api::blog::update))
                         // get_list: ?per=topic&kw=&perpage=20&page=p
-                        .route(get().to_async(api::blog::get_list)) 
+                        .route(get().to(api::blog::get_list)) 
                 )
                 .service(
                     resource("/blogs/{id}")
-                        .route(get().to_async(api::blog::get))
-                        .route(put().to_async(api::blog::toggle_top))
-                        .route(delete().to_async(api::blog::del))
+                        .route(get().to(api::blog::get))
+                        .route(put().to(api::blog::toggle_top))
+                        .route(delete().to(api::blog::del))
                 )
                 .service(
                     resource("/items")
-                        .route(post().to_async(api::item::new))
-                        .route(put().to_async(api::item::update))
+                        .route(post().to(api::item::new))
+                        .route(put().to(api::item::update))
                 )
                 .service(
                     resource("/spider")
-                        .route(put().to_async(api::item::spider))
+                        .route(put().to(api::item::spider))
                 )
                 .service(
                     resource("/getitems/{per}")
                         // get_list: ?per=topic&kw=&perpage=20&page=p
-                        .route(get().to_async(api::item::get_list)) 
+                        .route(get().to(api::item::get_list)) 
                 )
                 .service(
                     resource("/items/{slug}")
-                        .route(get().to_async(api::item::get))
-                        .route(patch().to_async(api::item::toggle_top))
+                        .route(get().to(api::item::get))
+                        .route(patch().to(api::item::toggle_top))
                         // vote or veto: ?action=vote|veto
-                        .route(put().to_async(api::item::vote_or_veto))
-                        .route(delete().to_async(api::item::del))
+                        .route(put().to(api::item::vote_or_veto))
+                        .route(delete().to(api::item::del))
                 )
                 .service(
                     resource("/issues")
-                        .route(post().to_async(api::rfc::new))
-                        .route(put().to_async(api::rfc::update))
+                        .route(post().to(api::rfc::new))
+                        .route(put().to(api::rfc::update))
                         // get_list: ?per=label&kw=&perpage=20&page=p
-                        .route(get().to_async(api::rfc::get_list)) 
+                        .route(get().to(api::rfc::get_list)) 
                 )
                 .service(
                     resource("/issues/{slug}")
-                        .route(get().to_async(api::rfc::get))
-                        .route(delete().to_async(api::rfc::del))
+                        .route(get().to(api::rfc::get))
+                        .route(delete().to(api::rfc::del))
                 )
                 .service(
                     resource("/labelissues")
-                        .route(post().to_async(api::rfc::label_isuue))
-                        .route(delete().to_async(api::rfc::del_label_isuue))
+                        .route(post().to(api::rfc::label_isuue))
+                        .route(delete().to(api::rfc::del_label_isuue))
                 )
                 .service(
                     resource("/generate-sitemap")
@@ -180,15 +181,15 @@ pub fn init_server() -> std::io::Result<()> {
                 )
                 .service(
                     resource("/generate-staticsite")
-                        .route(get().to_async(view::tmpl::statify_site))
+                        .route(get().to(view::tmpl::statify_site))
                 )
                 // .service(
                 //     resource("/stfile/{p}")
-                //         .route(delete().to_async(view::tmpl::del_static_file))
+                //         .route(delete().to(view::tmpl::del_static_file))
                 // )
                 .service(
                     resource("/generate-staticsite-noexpose")  // do not expose!!
-                        .route(get().to_async(view::tmpl::statify_site_))
+                        .route(get().to(view::tmpl::statify_site_))
                 )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
@@ -203,43 +204,43 @@ pub fn init_server() -> std::io::Result<()> {
             )
             .service(
                 resource("/confirm/{token}")
-                    .route(get().to_async(api::auth::confirm_email))
+                    .route(get().to(api::auth::confirm_email))
             )
             .service(
                 resource("/index")
-                    .route(get().to_async(view::tmpl::dyn_index))
+                    .route(get().to(view::tmpl::dyn_index))
             )
             .service(
                 resource("/from")  // per author: /from?by=
-                    .route(get().to_async(view::tmpl::item_from))
+                    .route(get().to(view::tmpl::item_from))
             )
             .service(
                 resource("/a/{ty}")  // special case: /index
-                    .route(get().to_async(view::tmpl::index_either))
+                    .route(get().to(view::tmpl::index_either))
             )
             .service(
                 resource("/all/newest")  // special
-                    .route(get().to_async(view::tmpl::index_newest))
+                    .route(get().to(view::tmpl::index_newest))
             )
             .service( 
                 resource("/t/{topic}/{ty}")
-                    .route(get().to_async(view::tmpl::topic_either))
+                    .route(get().to(view::tmpl::topic_either))
             )
             .service(
                 resource("/a/{ty}/dyn")
-                    .route(get().to_async(view::tmpl::index_dyn))
+                    .route(get().to(view::tmpl::index_dyn))
             )
             .service( 
                 resource("/t/{topic}/{ty}/dyn")
-                    .route(get().to_async(view::tmpl::topic_dyn))
+                    .route(get().to(view::tmpl::topic_dyn))
             )
             .service( 
                 resource("/more/{topic}/{ty}") // ?page=&perpage=42
-                    .route(get().to_async(view::tmpl::more_item))
+                    .route(get().to(view::tmpl::more_item))
             )
             .service( 
                 resource("/item/{slug}")
-                    .route(get().to_async(view::tmpl::item_view))
+                    .route(get().to(view::tmpl::item_view))
             )
             .service(
                 resource("/site/{name}")
@@ -248,16 +249,17 @@ pub fn init_server() -> std::io::Result<()> {
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("all-index.html")
-                    .default_handler(route().to_async(view::tmpl::dyn_index))
+                    .default_handler(route().to(view::tmpl::dyn_index))
             )
             .default_service(route().to(|| HttpResponse::NotFound()))
     })
     .bind(&bind_host)
     .expect("Can not bind to host")
-    .start();
+    .start()
+    .await
 
-    println!("Starting http server: {}", bind_host);
+    //println!("Starting http server: {}", bind_host);
 
     // start runtime
-    sys.run()
+    //sys.run()
 }
