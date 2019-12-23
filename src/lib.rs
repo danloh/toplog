@@ -83,8 +83,10 @@ pub fn init_fern_logger() -> Result<(), fern::InitError> {
 pub async fn init_server() -> std::io::Result<()> {
     // init logger
     init_fern_logger().unwrap_or_default();
-    // new runtime
+    
+    // new runtime manual
     //let sys = actix_rt::System::new("server");
+    
     // init actor
     let addr: DbAddr = init_dba();
 
@@ -256,10 +258,12 @@ pub async fn init_server() -> std::io::Result<()> {
     .bind(&bind_host)
     .expect("Can not bind to host")
     .start()
-    .await
+    .await;
 
-    //println!("Starting http server: {}", bind_host);
+    println!("Starting http server: {}", bind_host);
 
-    // start runtime
+    // start runtime manual
     //sys.run()
+
+    Ok(())
 }
