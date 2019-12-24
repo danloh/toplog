@@ -218,7 +218,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: async-std
         "async.rs" => {
             for link in raw_links {
-                if link.starts_with("/blog/") && !(link.contains("/tags/")) && !(link.contains("/page/")) {
+                if link.starts_with("/blog/") && !(link.contains("/tags/"))
+                    && !(link.contains("/page/")) 
+                {
                     let f_link = "https://async.rs".to_string() + &link;
                     links.push(f_link)
                 }
@@ -227,7 +229,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: tokio
         "tokio.rs" => {
             for link in raw_links {
-                if link.starts_with("https://tokio.rs/blog/2") && !(link.contains("/#")) {
+                if link.starts_with("https://tokio.rs/blog/2") 
+                    && !(link.contains("/#")) 
+                {
                     links.push(link)
                 }
             }
@@ -296,7 +300,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Jan-Erik Rediger
         "fnordig.de" => {
             for link in raw_links {
-                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") 
+                    || link.starts_with("/2018/") 
+                {
                     let f_link = "https://fnordig.de".to_string() + &link;
                     links.push(f_link)
                 }
@@ -331,7 +337,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Nick Fitzgerald
         "fitzgeraldnick.com" => {
             for link in raw_links {
-                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                if link.starts_with("/2020/") || link.starts_with("/2019/") 
+                    || link.starts_with("/2018/") 
+                {
                     let f_link = "https://fitzgeraldnick.com".to_string() + &link;
                     links.push(f_link)
                 }
@@ -340,7 +348,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Daniel Silverstone
         "blog.digital-scurf.org" => {
             for link in raw_links {
-                if link.starts_with("./posts/") && link.len() > 8 && !(link.contains("/#")) {
+                if link.starts_with("./posts/") && link.len() > 8 
+                    && !(link.contains("/#")) 
+                {
                     let f_link = "https://blog.digital-scurf.org".to_string() 
                         + &link.replacen("./", "/", 1);
                     links.push(f_link)
@@ -351,7 +361,8 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         "blog.x5ff.xyz" => {
             for link in raw_links {
                 if link.starts_with("/blog/") && link.len() > 6 
-                    && !(link.contains("/page/")) && !(link.contains(".xml")) {
+                    && !(link.contains("/page/")) && !(link.contains(".xml")) 
+                {
                     let f_link = "https://blog.x5ff.xyz".to_string() + &link;
                     links.push(f_link)
                 }
@@ -360,7 +371,10 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Andre Bogus
         "llogiq.github.io" => {
             for link in raw_links {
-                if link.starts_with("/2020/") || link.starts_with("/2019/") || link.starts_with("/2018/") {
+                if link.starts_with("/2020/") 
+                    || link.starts_with("/2019/") 
+                    || link.starts_with("/2018/") 
+                {
                     let f_link = "https://llogiq.github.io".to_string() + &link;
                     links.push(f_link)
                 }
@@ -377,7 +391,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Rust: Yoshua Wuyts
         "blog.yoshuawuyts.com" => {
             for link in raw_links {
-                if link.starts_with("https://blog.yoshuawuyts.com/") && !(link.contains(".xml"))  {
+                if link.starts_with("https://blog.yoshuawuyts.com/") 
+                    && !(link.contains(".xml"))  
+                {
                     links.push(link)
                 }
             }
@@ -390,10 +406,23 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Ryan Levick
+        "blog.ryanlevick.com" => {
+            for link in raw_links {
+                if link.starts_with("https://blog.ryanlevick.com/") 
+                    && link.len() > 28  
+                {
+                    links.push(link)
+                }
+            }
+        }
         // Go: Team Blog
         "blog.golang.org" => {
             for link in raw_links {
-                if link.starts_with("/") && link.len() > 2 && !(link.contains("/index")) && !(link.contains("//")) {
+                if link.starts_with("/") && link.len() > 2 
+                    && !(link.contains("/index")) 
+                    && !(link.contains("//")) 
+                {
                     let f_link = "https://blog.golang.org".to_string() + &link;
                     links.push(f_link)
                 }
@@ -411,7 +440,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         // Web: Mozilla
         "hacks.mozilla.org" => {
             for link in raw_links {
-                if link.starts_with("https://hacks.mozilla.org/2020/") || link.starts_with("https://hacks.mozilla.org/2019/") {
+                if link.starts_with("https://hacks.mozilla.org/2020/") 
+                    || link.starts_with("https://hacks.mozilla.org/2019/") 
+                {
                     links.push(link)
                 }
             }
@@ -480,6 +511,7 @@ lazy_static! {
         map.insert("tonyarcieri.com", ("Tony Arcieri", "Rust"));
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
         map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
+        map.insert("blog.ryanlevick.com", ("Ryan Levick", "Rust"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
         map.insert("research.swtch.com", ("Russ Cox", "Go"));
