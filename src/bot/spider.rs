@@ -416,6 +416,17 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Rust-Station
+        "rustacean-station.org" => {
+            for link in raw_links {
+                if link.starts_with("/episode/") 
+                    && link.len() > 10  
+                {
+                    let f_link = "https://rustacean-station.org".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
         // Go: Team Blog
         "blog.golang.org" => {
             for link in raw_links {
@@ -452,6 +463,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
             for link in raw_links {
                 if link.starts_with("https://devblogs.microsoft.com/") 
                 && !(link.contains("/#"))
+                && !(link.contains("?"))
                 && !(link.contains("/tag/"))
                 && !(link.contains("/category/"))
                 && !(link.contains("/blog/"))
@@ -512,6 +524,7 @@ lazy_static! {
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
         map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
         map.insert("blog.ryanlevick.com", ("Ryan Levick", "Rust"));
+        map.insert("rustacean-station.org", ("rustacean-station", "Rust"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
         map.insert("research.swtch.com", ("Russ Cox", "Go"));

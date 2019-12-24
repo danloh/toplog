@@ -54,6 +54,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://blog.yoshuawuyts.com/", // Yoshua Wuyts
         "https://seanmonstar.com/",
         "https://blog.ryanlevick.com/", // Ryan Levick
+        "https://rustacean-station.org/",
         // ## Golang
         "https://blog.golang.org/index",
         "https://research.swtch.com/",  // Russ Cox
