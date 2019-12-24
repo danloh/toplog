@@ -19,10 +19,10 @@ const routes: Routes = [
     path: 'item',
     loadChildren: () => import('./item/item.module').then(m => m.ItemModule),
   },
-  {
-    path: 'issue',
-    loadChildren: () => import('./rfc/rfc.module').then(m => m.RfcModule),
-  },
+  // {
+  //   path: 'issue',
+  //   loadChildren: () => import('./rfc/rfc.module').then(m => m.RfcModule),
+  // },
   {
     path: '404',
     component: NotFoundComponent,

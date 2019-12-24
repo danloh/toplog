@@ -1,6 +1,6 @@
 <div class="s-create-page">
   <div class="s-create-title"><b>Update</b></div>
-  <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="s-create-form">
+  <form nz-form nzLayout="vertical" [formGroup]="updateForm" (ngSubmit)="onUpdate()" class="s-create-form">
     <nz-form-label>Title*</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="title" nzAutosize maxlength="255"></textarea>

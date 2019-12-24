@@ -52,7 +52,7 @@ window.onclick = function(event) {
 function onSearch(selector) {
   let q = document.getElementById(selector);
   if (q && q.value != "") {
-    let openUrl = 'https://www.google.com/search?q=site:newdin.com/%20';
+    let openUrl = 'https://www.google.com/search?q=site:toplog.cc/%20';
     window.open(openUrl + q.value, "_blank");
   }
 }

@@ -43,7 +43,7 @@ export class ProfileComponent implements OnInit {
       this.uname = this.user.uname;
       this.canEditProfile = (this.actname === this.uname) && this.ifAuthed;
     
-      this.title.setTitle('@' + this.uname.toUpperCase() + ' - Newdin');
+      this.title.setTitle('@' + this.uname.toUpperCase() + ' - Toplog');
     });
   }
 }

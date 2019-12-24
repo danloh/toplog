@@ -38,7 +38,7 @@ fn build_email(
     let sender = mail_config
         .as_ref()
         .map(|s| s.smtp_login.as_str())
-        .unwrap_or("test@Newdin");
+        .unwrap_or("test@Toplog");
 
     let email = Email::builder()
         .to(recipient)
@@ -98,7 +98,7 @@ pub fn try_send_confirm_email(
     let subject = "Please verify your email address";
     use crate::util::helper::en_base64;
     let body = format!(
-        "Hello {}: \n\n Welcome to newdin.com. Please click or copy to browser the link below to verify your email address. Thank you! \n\n https://newdin.com/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Newdin Team",
+        "Hello {}: \n\n Welcome to toplog.cc. Please click or copy to browser the link below to verify your email address. Thank you! \n\n https://toplog.cc/confirm/{} \n\n This link will expire in 48 hours. \n\n\n The Toplog Team",
         user_name, en_base64(token)
     );
 
@@ -112,7 +112,7 @@ pub fn try_send_reset_email(
 ) -> Result<(), ServiceError> {
     let subject = "Please Reset Your password";
     let body = format!(
-        "Hello {}: \n\n Someone (hopefully you) requested we reset your password at Newdin. \n\n The Token to reset password as below:\n\n {} \n\n This Token will expire in 2 hours. If not you, just ignore this message. \n\n\n The Newdin Team",
+        "Hello {}: \n\n Someone (hopefully you) requested we reset your password at Toplog. \n\n The Token to reset password as below:\n\n {} \n\n This Token will expire in 2 hours. If not you, just ignore this message. \n\n\n The Toplog Team",
         user_name, base64::encode(token)
     );
     //println!("reset: {:?}", token);
@@ -146,7 +146,7 @@ mod tests {
     #[test]
     fn sending_to_invalid_email_fails() {
         let result = send_email(
-            "String.Format(\"{0}.{1}@Newdin.com\", FirstName, LastName)",
+            "String.Format(\"{0}.{1}@toplog.cc\", FirstName, LastName)",
             "test",
             "test",
         );

@@ -126,10 +126,10 @@ mod tests {
     #[test]
     fn test_host() {
         let result = host(
-            &to_value("https://newdin.com/rlist/r-when").unwrap(),
+            &to_value("https://toplog.cc/rlist/r-when").unwrap(),
             &HashMap::new(),
         );
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), to_value("newdin.com").unwrap());
+        assert_eq!(result.unwrap(), to_value("toplog.cc").unwrap());
     }
 }
