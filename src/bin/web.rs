@@ -2,7 +2,8 @@
 
 use srv::init_server;
 
-fn main() -> std::io::Result<()> {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
 
     /*
     // to test spider works
@@ -15,5 +16,5 @@ fn main() -> std::io::Result<()> {
     // end
     */
     
-    init_server()
+    init_server().await
 }

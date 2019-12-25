@@ -79,7 +79,7 @@ pub fn init_fern_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 
-#[actix_rt::main]
+//#[actix_rt::main]
 pub async fn init_server() -> std::io::Result<()> {
     // init logger
     init_fern_logger().unwrap_or_default();
