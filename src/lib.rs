@@ -257,7 +257,7 @@ pub async fn init_server() -> std::io::Result<()> {
     })
     .bind(&bind_host)
     .expect("Can not bind to host")
-    .start()
+    .run()
     .await;
 
     println!("Starting http server: {}", bind_host);

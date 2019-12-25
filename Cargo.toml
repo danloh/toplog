@@ -11,7 +11,7 @@ futures = "0.3"
 actix = "0.9.0"
 actix-rt = "1.0"
 actix-http = "1.0"
-actix-web = "2.0.0-rc"
+actix-web = "2.0.0"
 actix-cors = "0.2"
 diesel = { version = "1.4.3", features = ["postgres","chrono","serde_json","r2d2"] }
 r2d2 = "0.8.7"
