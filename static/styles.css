@@ -62,11 +62,10 @@ blockquote {
 .search-box {
   display: inline-block; 
   margin-left: 10px;
-  width: 200px;
 }
 .search-box .search-text {
-  width: 12rem;
   height: 18px;
+  width: 120px;
 }
 .nav-menu .right-menu {
   float: right;
