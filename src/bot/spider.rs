@@ -416,6 +416,40 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Aleksey Kladov
+        "matklad.github.io" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") 
+                    || link.starts_with("/2019/")  
+                {
+                    let f_link = "https://matklad.github.io".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // Rust: Embedded Rust
+        "rust-embedded.github.io" => {
+            for link in raw_links {
+                if link.starts_with("https://rust-embedded.github.io/blog/") 
+                    && link.len() > 38  
+                    && !(link.contains(".xml")) 
+                    && !(link.contains("/page/")) 
+                {
+                    links.push(link)
+                }
+            }
+        }
+        // Rust: Aleksey Kladov
+        "blog.troutwine.us" => {
+            for link in raw_links {
+                if link.starts_with("/2020/") 
+                    || link.starts_with("/2019/")  
+                {
+                    let f_link = "https://blog.troutwine.us".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
         // Rust: Rust-Station
         "rustacean-station.org" => {
             for link in raw_links {
@@ -524,6 +558,9 @@ lazy_static! {
         map.insert("blog.yoshuawuyts.com", ("Yoshua Wuyts", "Rust"));
         map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
         map.insert("blog.ryanlevick.com", ("Ryan Levick", "Rust"));
+        map.insert("matklad.github.io", ("Aleksey Kladov", "Rust"));
+        map.insert("blog.troutwine.us", ("WoM", "Rust"));
+        map.insert("rust-embedded.github.io", ("Embedded Rust", "Rust"));
         map.insert("rustacean-station.org", ("rustacean-station", "Rust"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
