@@ -66,7 +66,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://hacks.mozilla.org/",
         
         // ## Mic
-        "https://devblogs.microsoft.com",
+        //"https://devblogs.microsoft.com",
     );
 
     for url in url_list {

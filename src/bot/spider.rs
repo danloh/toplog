@@ -493,23 +493,23 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
             }
         }
         // Misc, Microsoft
-        "devblogs.microsoft.com" => {
-            for link in raw_links {
-                if link.starts_with("https://devblogs.microsoft.com/") 
-                && !(link.contains("/#"))
-                && !(link.contains("?"))
-                && !(link.contains("/tag/"))
-                && !(link.contains("/category/"))
-                && !(link.contains("/blog/"))
-                && !(link.contains("/page/"))
-                && !(link.contains("/author/"))
-                && !(link.contains("/wp-login"))
-                && !(link.contains("/feed/"))
-                {
-                    links.push(link)
-                }
-            }
-        }
+        // "devblogs.microsoft.com" => {
+        //     for link in raw_links {
+        //         if link.starts_with("https://devblogs.microsoft.com/") 
+        //         && !(link.contains("/#"))
+        //         && !(link.contains("?"))
+        //         && !(link.contains("/tag/"))
+        //         && !(link.contains("/category/"))
+        //         && !(link.contains("/blog/"))
+        //         && !(link.contains("/page/"))
+        //         && !(link.contains("/author/"))
+        //         && !(link.contains("/wp-login"))
+        //         && !(link.contains("/feed/"))
+        //         {
+        //             links.push(link)
+        //         }
+        //     }
+        // }
         
         _ => {}  // to deal with
     }
