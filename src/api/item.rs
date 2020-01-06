@@ -273,7 +273,7 @@ pub struct NewItem {
     pub content: String,
     pub logo: String,
     pub author: String,
-    pub ty: String, 
+    pub ty: String,
     pub lang: String,
     pub topic: String,
     pub link: String,

@@ -461,6 +461,18 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+         // CPP: fluentcpp
+         "fluentcpp.com" => {
+            for link in raw_links {
+                if link.starts_with("https://www.fluentcpp.com/20") 
+                    && link.len() > 32  
+                    && !(link.contains("/#")) 
+                {
+                    // let f_link = "https://www.fluentcpp.com/".to_string() + &link;
+                    links.push(link)
+                }
+            }
+        }
         // Go: Team Blog
         "blog.golang.org" => {
             for link in raw_links {
@@ -559,9 +571,11 @@ lazy_static! {
         map.insert("seanmonstar.com", ("Sean McArthur", "Rust"));
         map.insert("blog.ryanlevick.com", ("Ryan Levick", "Rust"));
         map.insert("matklad.github.io", ("Aleksey Kladov", "Rust"));
-        map.insert("blog.troutwine.us", ("WoM", "Rust"));
+        map.insert("blog.troutwine.us", ("Troutwine", "Rust"));
         map.insert("rust-embedded.github.io", ("Embedded Rust", "Rust"));
         map.insert("rustacean-station.org", ("rustacean-station", "Rust"));
+        // c++
+        map.insert("fluentcpp.com", ("Jonathan Boccara", "CPP"));
         // Golang
         map.insert("blog.golang.org", ("Go Team", "Go"));
         map.insert("research.swtch.com", ("Russ Cox", "Go"));

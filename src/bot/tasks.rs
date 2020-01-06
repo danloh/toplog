@@ -58,6 +58,8 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://blog.troutwine.us/", // 
         "https://rust-embedded.github.io/blog/", // Embedded Rust Working Group
         "https://rustacean-station.org/",
+        // cpp
+        "https://www.fluentcpp.com/",
         // ## Golang
         "https://blog.golang.org/index",
         "https://research.swtch.com/",  // Russ Cox

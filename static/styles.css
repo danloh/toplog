@@ -143,10 +143,7 @@ blockquote {
   top: 1px;
   right: 1px;
 } */
-.menu-bar {
-  margin: 10px auto -15px auto;
-  border-top: 2px solid #eaf7f3;
-}
+
 .topic-tab, .ty-tab,
 .topic-tab-active, .ty-tab-active {
   margin-right: 10px;
@@ -483,9 +480,6 @@ section.item-sum:hover {
   }
   .toolbtn {
     background-color: #2e2f3b;
-  }
-  .menu-bar {
-    border-top: 2px solid #282827;
   }
   pre {
     background-color: rgb(56, 55, 55);

@@ -1,12 +1,6 @@
 // =================================================================
 //## show dropdown
-function showMenu() { 
-  showDrop("drop-menu"); 
-}
-function showOption() { 
-  showDrop("drop-opt"); 
-}
-function showDrop(id_name) {
+function showMenu(id_name = "drop-menu") {
   let show = document.getElementById(id_name);
   if (show) { show.classList.toggle("show");}
 }
