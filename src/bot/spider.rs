@@ -88,7 +88,7 @@ impl WebPage {
         let dmn = domain.trim();
         match dmn {
             _ => {
-                let page = parse_common_page(url, html);
+                let page = parse_common_page(html, &url);
                 let title = page.title.trim();
                 NewItem {
                     title: replace_space(title, " "),
@@ -109,70 +109,106 @@ impl WebPage {
 
 }
 
+pub fn page_ele_paser(
+    html: &Html,
+    sel_str: &str,
+    attr_str: &str,
+    alt_txt: &str,
+) -> Vec<String> {
+    let a_selector = Selector::parse(sel_str).unwrap();
+    let a_vec: Vec<_> = html.select(&a_selector).collect();
 
-pub fn parse_common_page(url: String, html: Html) -> PageInfo {
-    let title_selector = Selector::parse("head > title").unwrap();
-    let img_selector = Selector::parse("img").unwrap();
-    let meta_selector = Selector::parse(r#"meta[name="description"]"#).unwrap();
+    if a_vec.len() == 0 {
+        return Vec::new();
+    }
 
+    let mut a_txt_vec = Vec::new();
+    for a in a_vec {
+        let a_txt =  if attr_str.trim().len() == 0 {
+            a.inner_html()
+        } else {
+            match a.value().attr(attr_str) {
+                Some(s) => s.to_owned(),
+                None => String::from(alt_txt),
+            }
+        };
+        a_txt_vec.push(a_txt);
+    }
+    
+    // test
+    // println!(">>{:?} -> {:?}", sel_str, a_txt_vec);
+
+    a_txt_vec
+}
+
+pub fn parse_common_page(html: Html, url: &str) -> PageInfo {
+    
     // get title
-    let titles: Vec<_> = html.select(&title_selector).collect();
-    let title_text: String = if let Some(t) = titles.first() {
-        t.inner_html()
-    } else {
-        "untitled, please help to update".to_owned()
-    };
+    let title_text: String = 
+        page_ele_paser(
+            &html, "head > title", "", "untitled"
+        )
+        .first()
+        .unwrap_or(&String::from(""))
+        .to_string();
 
     // get image url
-    let imgs: Vec<_> = html.select(&img_selector).collect();
-    let img_src: String = if let Some(img) = imgs.first() {
-        match img.value().attr("src") {
-            Some(src) => {
-                if re_test_img_url(src) {
-                    src.to_owned()
-                } else {
-                    "".to_owned()
-                }
-            }
-            None => "".to_owned(),
-        }
+    //
+    // og:image og:image:url
+    let og_img: String = page_ele_paser(
+            &html, r#"meta[property="og:image"]"#, "content", ""
+        )
+        .first()
+        .unwrap_or(&String::from(""))
+        .to_string();
+    
+    let img_src: String = if og_img.len() == 0 {
+        // random body img
+        page_ele_paser(
+            &html, "body img", "src", ""
+        )
+        .first()
+        .unwrap_or(&String::from(""))
+        .to_string()
     } else {
-        "".to_owned()
+        og_img
     };
 
-    // get content -- meta description or og
-    // for og:description
-    let mut og_descript = |html: Html| -> String {
-        let og_selector = 
-            Selector::parse(r#"meta[property="og:description"]"#).unwrap();
-        let descript: Vec<_> = html.select(&og_selector).collect();
-        let content: String = if let Some(p) = descript.first() {
-            match p.value().attr("content") {
-                Some(c) => { c.to_owned() }
-                None => { title_text.clone() }
-            }
-        } else {
-            title_text.clone()
-        };
-
-        content
-    };
+    // get content descript -- meta description or og:description
+    //
     // meta description
-    let descript: Vec<_> = html.select(&meta_selector).collect();
-    let content: String = if let Some(p) = descript.first() {
-        match p.value().attr("content") {
-            Some(c) => { c.to_owned() }
-            None => { og_descript(html) }
-        }
+    let meta_descript: String = page_ele_paser(
+        &html, r#"meta[name="description"]"#, "content", ""
+    )
+    .first()
+    .unwrap_or(&String::from(""))
+    .to_string();
+
+    let content: String = if meta_descript.len() == 0 {
+        // og:description
+        page_ele_paser(
+            &html, r#"meta[property="og:description"]"#, "content", ""
+        )
+        .first()
+        .unwrap_or(&String::from(""))
+        .to_string()
     } else {
-        og_descript(html)
+        meta_descript
     };
 
+    // get canonical link
+    let c_link: String = page_ele_paser(
+        &html, r#"link[rel="canonical"]"#, "href", url
+    )
+    .first()
+    .unwrap_or(&String::from(url))
+    .to_string();
+    
     PageInfo {
         title: title_text,
-        url: url,
+        url: c_link,
         img: img_src,
-        content: content,
+        content,
     }
 }
 

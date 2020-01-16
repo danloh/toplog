@@ -264,16 +264,10 @@ impl Handler<ChangePsw> for Dba {
                         message: String::from("Success"),
                     })
                 }
-                _ => Ok(Msg {
-                    status: 401,
-                    message: String::from("Somehing Wrong"),
-                }),
+                _ => { return Err(ServiceError::BadRequest("Failed Auth".into()));},
             }
         } else {
-            Ok(Msg {
-                status: 404,
-                message: String::from("No Existing"),
-            })
+            return Err(ServiceError::BadRequest("Not Existing".into()));
         }
     }
 }
@@ -352,10 +346,7 @@ impl Handler<ResetReq> for Dba {
 
         let rq_email = check_user.email;
         if !re_test_email(&rq_email) {
-            return Ok(Msg {
-                status: 400,
-                message: String::from("No Valid Email or User"),
-            })
+            return Err(ServiceError::BadRequest("InValid Email or Username".into()));
         }
 
         let rq_uname = req.uname; 
@@ -396,15 +387,9 @@ impl Handler<ResetPsw> for Dba {
                     message: String::from("Success"),
                 });
             }
-            Ok(Msg {
-                status: 401,
-                message: String::from("Something Wrong"),
-            })
+            return Err(ServiceError::BadRequest("Auth Failed".into()));
         } else {
-            Ok(Msg {
-                status: 404,
-                message: String::from("No Existing User"),
-            })
+            return Err(ServiceError::BadRequest("Not Existing".into()));
         }
     }
 }
@@ -776,10 +761,9 @@ impl RegUser {
             .load::<User>(conn)?
             .pop();
         match check_user {
-            Some(_) => Ok(Msg {
-                status: 409,
-                message: String::from("Duplicated"),
-            }),
+            Some(_) => {
+                return Err(ServiceError::BadRequest("Duplicated Username".into()));
+            },
             None => {
                 // hash password
                 let pswd: String = hash_password(&self.password)?;
@@ -865,7 +849,7 @@ impl AuthUser {
                         .get_result::<User>(conn)?;
                     return Ok(logged.into());
                 }
-                _ => (),
+                _ => { return Err(ServiceError::BadRequest("Auth Failed".into()));}
             }
         }
         Err(ServiceError::BadRequest("Auth Failed".into()))
