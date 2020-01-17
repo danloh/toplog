@@ -282,6 +282,9 @@ section.item-sum:hover {
   padding: 0px 2px;
   border-radius: 25%;
 }
+.more-opt-btn {
+  padding: 1px 2px;
+}
 
 .badge, .badge-circle, .badge-heart,
 .badge-bead, .badge-oval {

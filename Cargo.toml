@@ -1,6 +1,6 @@
 [package]
 name = "srv"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["danloh"]
 edition = "2018"
 
@@ -26,7 +26,7 @@ oauth2 = "=1.3.0"
 rand = "0.7"
 
 derive_more = "0.99.2"
-regex = "1.3.1"
+regex = "1.3"
 lazy_static = "1.4.0"
 deunicode = "1.0.0"
 bcrypt = "0.6.1"
@@ -35,7 +35,7 @@ log = "0.4.8"
 fern = "0.5.9"
 dotenv = "0.15.0"
 base64 = "0.11.0"
-num_cpus = "1.11.1"
+num_cpus = "1.12"
 
 actix-files = "0.2"
 tera = "1.0"

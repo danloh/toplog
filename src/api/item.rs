@@ -17,6 +17,7 @@ use crate::api::{
     auth::{CheckUser, CheckCan},
     re_test_url,
 };
+use crate::view::tmpl::del_html;
 use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{items, voteitems};
@@ -325,11 +326,10 @@ impl NewItem {
 
         // ==========================
         // way-2: del related html, re-generate when visit, clean cache
-        use crate::view::tmpl::del_html;
         let name1 = "all-Misc";
         let name2 = tpc + "-Misc";
-        del_html(name1);
-        del_html(&name2);
+        del_html(name1).unwrap_or(());
+        del_html(&name2).unwrap_or(());
         // ==========================
         
         Ok(item_new)
@@ -443,17 +443,16 @@ impl UpdateItem {
 
         // ==========================
         // way-2: del related html, re-generate when visit, clean cache
-        use crate::view::tmpl::del_html;
         let name0 = "all-index";
         let name1 = "all-Misc";
         let name2 = tpc.clone() + "-Misc";
         let name3 = tpc + "-" + &itmty;
         let name4 = String::from("all-") + &itmty;
-        del_html(name0);
-        del_html(name1);
-        del_html(&name2);
-        del_html(&name3);
-        del_html(&name4);
+        del_html(name0).unwrap_or(());
+        del_html(name1).unwrap_or(());
+        del_html(&name2).unwrap_or(());
+        del_html(&name3).unwrap_or(());
+        del_html(&name4).unwrap_or(());
         // ==========================
         
         Ok(item_update)
@@ -495,7 +494,7 @@ impl SpiderItem {
             String::from("Article")
         }; 
         let item_new = NewItem {
-            topic,
+            topic: topic.clone(),
             ty,
             ..sp_item
         };
@@ -504,6 +503,14 @@ impl SpiderItem {
             .values(&item_new)
             .on_conflict_do_nothing()
             .get_result::<Item>(conn)?;
+        
+        // ==========================
+        // del related html
+        del_html("all-Misc").unwrap_or(());
+        let name1 = topic + "-Misc";
+        del_html(&name1).unwrap_or(());
+        // ==========================
+
         Ok(new_item)
     }
 
@@ -595,14 +602,19 @@ impl QueryItem {
             .get_result::<Item>(conn)?;
 
         // ========================
-        // gen html
+        // del html
         let itm = item.clone();
         let tpc = itm.topic;
         let typ = itm.ty;
-        use crate::view::tmpl::gen_html;
         // println!("here {}, {}", tpc, typ);
-        gen_html(tpc.clone(), typ, conn);   // TODO: ignor error but log
-        gen_html(tpc, "Misc".into(), conn);
+        let name1 = tpc.clone() + "-" + &typ;
+        let name2 = tpc +  "-Misc";
+        let name3 = String::from("all-") + &typ;
+        del_html(&name1).unwrap_or(());
+        del_html(&name2).unwrap_or(());
+        del_html(&name3).unwrap_or(());
+        del_html("all-Misc").unwrap_or(());
+        del_html("all-index").unwrap_or(());
         // =========================
 
         Ok(item)
