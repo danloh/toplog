@@ -54,7 +54,7 @@ CREATE TABLE items (
   ty VARCHAR NOT NULL, -- article|media|event|book| etc..
   lang VARCHAR NOT NULL DEFAULT 'English',
   topic VARCHAR NOT NULL DEFAULT '',
-  link VARCHAR NOT NULL DEFAULT '',
+  link VARCHAR UNIQUE NOT NULL,
   link_host VARCHAR NOT NULL DEFAULT '',
   origin_link VARCHAR NOT NULL DEFAULT '',
   post_by VARCHAR NOT NULL DEFAULT '',

@@ -3,7 +3,7 @@
     <b>Suggest a New Item: </b><small class="s-help-tips">Article / Book / Event / etc.</small>
   </div>
   <form nz-form nzLayout="vertical" [formGroup]="createForm" (ngSubmit)="onSubmit()" class="s-create-form">
-    <nz-form-label>Please Submit Source Link</nz-form-label>
+    <nz-form-label>Please Submit Source Link*</nz-form-label>
     <nz-form-control>
       <textarea nz-input formControlName="link" nzAutosize maxlength="255"></textarea>
     </nz-form-control>

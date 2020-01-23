@@ -14,7 +14,7 @@ table! {
         id -> Int4,
         aname -> Varchar,
         avatar -> Varchar,
-        intro -> Text,
+        intro -> Varchar,
         topic -> Varchar,
         blog_link -> Varchar,
         blog_host -> Varchar,

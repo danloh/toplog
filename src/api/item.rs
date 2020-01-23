@@ -287,9 +287,10 @@ impl NewItem {
         self, 
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::items;
+        use crate::schema::items::dsl::{items, link};
         let title = self.title.trim();
         let a_slug = gen_slug(title);
+        let ilink = self.link.trim();
         let new_item = NewItem {
             title: title.to_owned(),
             slug: a_slug,
@@ -299,7 +300,7 @@ impl NewItem {
             ty: self.ty.trim().to_owned(),
             lang: self.lang.trim().to_owned(),
             topic: self.topic.trim().to_owned(),
-            link: self.link.trim().to_owned(),
+            link: ilink.to_owned(),
             origin_link: self.origin_link.trim().to_owned(),
             post_by: self.post_by.trim().to_owned(),
         };
@@ -311,10 +312,17 @@ impl NewItem {
             NewBlog::save_name_as_blog(aname, conn);  // ignore potential error
         }
 
-        let item_new = diesel::insert_into(items)
+        let try_save_new_item = diesel::insert_into(items)
             .values(&new_item)
             .on_conflict_do_nothing()
-            .get_result::<Item>(conn)?;
+            .get_result::<Item>(conn);
+        
+        let item_new = if let Ok(itm) = try_save_new_item {
+                itm
+        } else {
+            items.filter(link.eq(ilink))
+                .get_result::<Item>(conn)?
+        };
 
         // ========================
         // way-1: gen html, renew cache, heavy!
@@ -476,9 +484,10 @@ impl SpiderItem {
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
         use crate::bot::spider::{WebPage};
-        use crate::schema::items::dsl::items;
+        use crate::schema::items::dsl::{items, link};
         let sp = self.clone();
-        let sp_item = WebPage::new(&self.url)?.into_item();
+        let ilink = self.url.trim();
+        let sp_item = WebPage::new(&ilink)?.into_item();
 
         let sp_topic = sp.topic;
         use crate::view::{TY_VEC};
@@ -499,10 +508,17 @@ impl SpiderItem {
             ..sp_item
         };
         // save to db
-        let new_item = diesel::insert_into(items)
+        let try_save_new_item = diesel::insert_into(items)
             .values(&item_new)
             .on_conflict_do_nothing()
-            .get_result::<Item>(conn)?;
+            .get_result::<Item>(conn);
+        
+        let new_item = if let Ok(itm) = try_save_new_item {
+                itm
+        } else {
+            items.filter(link.eq(ilink))
+                .get_result::<Item>(conn)?
+        };
         
         // ==========================
         // del related html

@@ -208,9 +208,10 @@ impl NewBlog {
         &self, 
         conn: &PooledConn,
     ) -> ServiceResult<Blog> {
-        use crate::schema::blogs::dsl::blogs;
+        use crate::schema::blogs::dsl::{blogs, aname};
+        let blog_name = self.aname.trim();
         let new_blog = NewBlog {
-            aname: self.aname.trim().to_owned(),
+            aname: blog_name.to_owned(),
             avatar: self.avatar.trim().to_owned(),
             intro: self.intro.trim().to_owned(),
             topic: self.topic.trim().to_owned(),
@@ -221,10 +222,17 @@ impl NewBlog {
             other_link: self.other_link.trim().to_owned(),
             is_top: self.is_top,
         };
-        let blog_new = diesel::insert_into(blogs)
+        let try_save_new_blog = diesel::insert_into(blogs)
             .values(self)
             .on_conflict_do_nothing()
-            .get_result::<Blog>(conn)?;
+            .get_result::<Blog>(conn);
+
+        let blog_new = if let Ok(blg) = try_save_new_blog {
+                blg
+        } else {
+            blogs.filter(aname.eq(blog_name))
+                .get_result::<Blog>(conn)?
+        };
 
         Ok(blog_new)
     }

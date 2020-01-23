@@ -48,7 +48,7 @@ export class NewComponent implements OnInit {
     this.createForm = this.formBuild.group(
       { 'title': [''],
         'content': ['', [Validators.required]],
-        'link': [''],
+        'link': ['', [Validators.required]],
         'author': [null, [Validators.required]],
         'topic': [ this.newFor || '', [Validators.required]],
         'ty': [ this.newTo || 'Article'],
