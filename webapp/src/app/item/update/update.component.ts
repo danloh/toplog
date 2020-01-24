@@ -54,7 +54,7 @@ export class UpdateComponent implements OnInit {
         'ty': [ this.item.ty, [Validators.required]],
         'lang': [ this.item.lang || 'English'],
         'topic': [ this.item.topic, [Validators.required, Validators.pattern(regTopic)]],
-        'link': [ this.item.link, [Validators.required]],
+        'link': [ this.item.link],
         'origin_link': [ this.item.origin_link || ''],
         'pub_at': [ this.item.pub_at, [Validators.pattern(regDate)]],
       }

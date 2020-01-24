@@ -290,7 +290,14 @@ impl NewItem {
         use crate::schema::items::dsl::{items, link};
         let title = self.title.trim();
         let a_slug = gen_slug(title);
-        let ilink = self.link.trim();
+        let nlink = self.link.trim();
+        let ilink = if nlink.len() > 0 {
+            nlink.to_string()
+        } else {
+            let base = dotenv::var("DOMAIN_HOST")
+                .unwrap_or(String::from("https://toplog.cc/"));
+            base + "item/" + &a_slug
+        };
         let new_item = NewItem {
             title: title.to_owned(),
             slug: a_slug,
@@ -300,7 +307,7 @@ impl NewItem {
             ty: self.ty.trim().to_owned(),
             lang: self.lang.trim().to_owned(),
             topic: self.topic.trim().to_owned(),
-            link: ilink.to_owned(),
+            link: ilink.clone(),
             origin_link: self.origin_link.trim().to_owned(),
             post_by: self.post_by.trim().to_owned(),
         };
@@ -409,6 +416,21 @@ impl UpdateItem {
         } else {
             (&old).slug.to_owned()
         };
+
+        let ilink = if new_link.len() > 0 {
+            // check link if existing
+            let check_link = items.filter(link.eq(new_link))
+                .select(link)
+                .get_result::<String>(conn);
+            match check_link {
+                Ok(l) => l,
+                _ => new_link.to_string()
+            }            
+        } else {
+            let base = dotenv::var("DOMAIN_HOST")
+                .unwrap_or(String::from("https://toplog.cc/"));
+            base + "item/" + &a_slug
+        };
         // post_by
         let postBy = 
             if &old.post_by == "bot" { &self.post_by } else { &old.post_by};
@@ -422,7 +444,7 @@ impl UpdateItem {
             ty: new_ty.to_owned(),
             lang: new_lang.to_owned(),
             topic: new_topic.to_owned(),
-            link: new_link.to_owned(),
+            link: ilink,
             origin_link: new_origin.to_owned(),
             post_by: postBy.to_owned(),
             pub_at: new_pub_at,
