@@ -5,7 +5,6 @@ use crate::errors::{ServiceError, ServiceResult};
 use crate::api::auth::{verify_token, CheckUser, CheckCan};
 use crate::api::item::{Item, QueryItems};
 use crate::api::blog::{Blog, QueryBlogs};
-use crate::view::TEMPLATE as tmpl;
 use crate::{Dba, DbAddr, PooledConn};
 use actix_web::{
     web::{Data, Path, Query},
@@ -13,6 +12,11 @@ use actix_web::{
     Result
 };
 use chrono::{SecondsFormat, Utc};
+
+use crate::view::{
+    Template, TY_VEC, TOPIC_VEC, 
+    IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, SiteMapTmpl
+};
 
 // GET /
 //
@@ -69,18 +73,18 @@ pub async fn index_dyn(
     let res = db.send(home_msg).await?;
     match res {
         Ok(msg) => {
-            let mut ctx = tera::Context::new();
-            ctx.insert("items", &msg.items);
-            ctx.insert("blogs", &msg.blogs);
-
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let typ = mesg[1];
-            ctx.insert("ty", &typ);
-            ctx.insert("topic", "all");
 
-            let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let index_tmpl = IndexTmpl {
+                ty: &typ,
+                topic: "all",
+                items: &msg.items,
+                blogs: &msg.blogs,
+                tys: &TY_VEC,
+            };
+
+            let h = index_tmpl.render().unwrap_or("Rendering failed".into());
             let dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
@@ -129,18 +133,19 @@ pub async fn topic_dyn(
     let res = db.send(topic_msg).await?;
     match res {
         Ok(msg) => {
-            let mut ctx = tera::Context::new();
-            ctx.insert("items", &msg.items);
-            ctx.insert("blogs", &msg.blogs);
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let tpc = mesg[0];
             let typ = mesg[1];
-            ctx.insert("ty", typ);
-            ctx.insert("topic", tpc);
 
-            let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let tpc_tmpl = IndexTmpl {
+                ty: typ,
+                topic: tpc,
+                items: &msg.items,
+                blogs: &msg.blogs,
+                tys: &TY_VEC,
+            };
+
+            let h = tpc_tmpl.render().unwrap_or("Rendering failed".into());
             let t_dir = "www/".to_owned() + &msg.message + ".html";
             std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
@@ -201,17 +206,18 @@ pub async fn item_from(
     let res = db.send(topic_msg).await?;
     match res {
         Ok(msg) => {
-            let mut ctx = tera::Context::new();
-            ctx.insert("items", &msg.items);
-            ctx.insert("blogs", &msg.blogs);
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let by = mesg[1];
-            ctx.insert("ty", by);
-            ctx.insert("topic", "from");
 
-            let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let by_tmpl = IndexTmpl {
+                ty: by,
+                topic: "from",
+                items: &msg.items,
+                blogs: &msg.blogs,
+                tys: &TY_VEC,
+            };
+
+            let h = by_tmpl.render().unwrap_or("Rendering failed".into());
             // let t_dir = "www/".to_owned() + &msg.message + ".html";
             // std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
@@ -249,17 +255,17 @@ pub async fn more_item(
     let res =  db.send(topic_msg).await?;
     match res {
         Ok(msg) => {
-            let mut ctx = tera::Context::new();
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let tpc = mesg[0];
-            let typ = mesg[1];
-            ctx.insert("ty", typ);
-            ctx.insert("topic", tpc);
-            ctx.insert("items", &msg.items);
+            //let typ = mesg[1];
 
-            let h = tmpl.render("more_item.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let items_tmpl = ItemsTmpl {
+                items: &msg.items,
+                topic: tpc,
+            };
+
+            let h = items_tmpl.render().unwrap_or("Rendering failed".into());
+
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
@@ -284,14 +290,11 @@ pub async fn item_view(
     let res = db.send(item_msg).await?; 
     match res {
         Ok(msg) => {
-            let mut ctx = tera::Context::new();
-            ctx.insert("item", &msg);
-            ctx.insert("ty", "all");
-            ctx.insert("topic", "all");
+            let item_tmpl = ItemTmpl {
+                item: &msg,
+            };
 
-            let h = tmpl.render("item.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let h = item_tmpl.render().unwrap_or("Rendering failed".into());
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
@@ -320,16 +323,13 @@ pub async fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
     let p = p_info.into_inner();
     let tpl_dir = p + ".html";
     let dir = "www/".to_owned() + &tpl_dir;
-    let mut ctx = tera::Context::new();
-    ctx.insert("ty", "all");
-    ctx.insert("topic", "all");
-    let t = tmpl.render(&tpl_dir, &ctx)
-        .map_err(|_| ServiceError::NotFound("404".into()))?;
-    std::fs::write(dir, t.as_bytes())?;
+    let about = AboutTmpl();
+    let s = about.render().unwrap_or("Rendering failed".into());
+    std::fs::write(dir, s.as_bytes())?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(t)
+        .body(s)
     )
 }
 
@@ -341,29 +341,25 @@ pub fn gen_html(
 ) -> ServiceResult<()> {
 
     let dir = topic.clone() + "-" + &ty;
-    let mut ctx = tera::Context::new();
-    ctx.insert("ty", &ty);
-    ctx.insert("topic", &topic);
-
     let tp = topic.trim().to_lowercase();
 
     let (query_item, query_blog) = match tp.trim() {
         "all" => {
             (
-                QueryItems::Index(ty, 42, 1),
+                QueryItems::Index(ty.clone(), 42, 1),
                 QueryBlogs::Index("index".into(), 42, 1)
             )
         }
         "from" => {
             (
                 QueryItems::Author(ty.clone(), 42, 1),
-                QueryBlogs::Name(ty, 42, 1)
+                QueryBlogs::Name(ty.clone(), 42, 1)
             )
         } 
         _ => {
             (
-                QueryItems::Tt(topic.clone(), ty, 42, 1),
-                QueryBlogs::Top(topic, 42, 1)
+                QueryItems::Tt(topic.clone(), ty.clone(), 42, 1),
+                QueryBlogs::Top(topic.clone(), 42, 1)
             )
         }
     };
@@ -371,12 +367,15 @@ pub fn gen_html(
     let (i_list, _) = query_item.get(conn)?;
     let (b_list, _) = query_blog.get(conn)?;
 
-    ctx.insert("items", &i_list);
-    ctx.insert("blogs", &b_list);
+    let by_tmpl = IndexTmpl {
+        ty: &ty,
+        topic: &topic,
+        items: &i_list,
+        blogs: &b_list,
+        tys: &TY_VEC,
+    };
 
-    let h = tmpl.render("home.html", &ctx).map_err(|_| {
-        ServiceError::NotFound("failed".into())
-    })?;
+    let h = by_tmpl.render().unwrap_or("Rendering failed".into());
     let t_dir = "www/".to_owned() + &dir + ".html";
     std::fs::write(&t_dir, h.as_bytes())?;
             
@@ -472,15 +471,14 @@ pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
 // GET /generate-sitemap
 //
 pub async fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
-    let mut s_ctx = tera::Context::new();
-    s_ctx.insert(
-        "lastmod",
-        &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
-    );
-    let s = tmpl.render("sitemap/sitemap.xml", &s_ctx).map_err(|_| {
-        ServiceError::InternalServerError("tmpl failed".into())
-    })?;
-    std::fs::write("www/sitemap.xml", s.as_bytes())?;
+    let sitemap_tmpl = SiteMapTmpl {
+        tys: &TY_VEC,
+        topics: &TOPIC_VEC,
+        lastmod: &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+    };
+
+    let h = sitemap_tmpl.render().unwrap_or("Rendering failed".into());
+    std::fs::write("www/sitemap.xml", h.as_bytes())?;
 
     Ok(HttpResponse::Ok().json("Done".to_owned()))
 }

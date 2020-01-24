@@ -408,13 +408,11 @@ pub async fn confirm_email(
     let res = db.send(tc).await?; 
     match res {
         Ok(check) => {
-            let mut ctx = tera::Context::new();
-            let res = if check { "Success!" } else { "Failed!" };
-            ctx.insert("res", res);
-            use crate::view::TEMPLATE as tmpl;
-            let cfm = tmpl.render("confirm.html", &ctx).map_err(|_| {
-                ServiceError::NotFound("failed".into())
-            })?;
+            let cfm = if check { 
+                "Thanks for Confirming your Email!<br> Back to <a href='/'>Home</a>" 
+            } else { 
+                "Ooops...Failed!<br> Back to <a href='/'>Home</a>" 
+            }.to_string();
             Ok(HttpResponse::Ok().content_type("text/html").body(cfm))
         }
         Err(e) => Ok(e.error_response()),

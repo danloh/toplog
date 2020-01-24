@@ -1,6 +1,6 @@
 [package]
 name = "srv"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["danloh"]
 edition = "2018"
 
@@ -39,7 +39,6 @@ base64 = "0.11.0"
 num_cpus = "1.12"
 
 actix-files = "0.2"
-tera = "1.0"
 unic-segment = "0.9.0"
 pulldown-cmark = { version = "0.6", default-features = false }
 ammonia = "3"
