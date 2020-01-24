@@ -1,53 +1,53 @@
 <section class="item-sum">
-  {%- set a_url = item.link -%}
-  {%- set a_content = item.content -%}
-  {%- set a_author = item.author | enbase -%}
-  {%- set a_slug = item.slug -%}
-  {%- set a_topic = item.topic -%}
-  {%- set a_ty = item.ty -%}
+  {%- let a_url = item.clone().link -%}
+  {%- let a_content = item.clone().content -%}
+  {%- let a_author = item.clone().author|b64_encode -%}
+  {%- let a_slug = item.clone().slug -%}
+  {%- let a_topic = item.clone().topic -%}
+  {%- let a_ty = item.clone().ty -%}
   <a href ="{{ a_url }}" target="_blank" rel="noopener">
     <b class="title">{{ item.title }}</b>
     <span class="host"> | </span>
-    <span style="color: #37a">{{ a_url | safe | host }}</span>
+    <span style="color: #37a">{{ a_url|host }}</span>
   </a>
-  <div id="{{'md-' ~ a_slug}}" class="meta-sum hide-part">
-    {{ a_content | md | safe }}
+  <div id="md-{{ a_slug }}" class="meta-sum hide-part">
+    {{ a_content }}
   </div>
   <a href="javascript:void(0);" 
     onclick="showFull('{{ a_slug }}')" 
-    id="{{'btn-' ~ a_slug}}" class="help-tips"
+    id="btn-{{ a_slug }}" class="help-tips"
   >
     more...
   </a>
-  {%- set logo = item.logo -%}
-  {%- if logo -%}
+  {%- let logo = item.clone().logo -%}
+  {%- if logo.len() > 0 -%}
   <a href ="{{ a_url }}" target="_blank" rel="noopener">
     <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
   </a>
   {%- endif -%}
   <div class="item-meta">
-    <span class="{{ 'badge ' ~ a_ty }}"></span> <!-- type badge-->
+    <span class="badge {{ a_ty }}"></span> <!-- type badge-->
     <span class="meta-tag">{{ a_ty }}</span> 
     <span class="badge-bead"></span> <!-- author badge-->
-    <span class="meta-tag"><a href="{{ '/from?by=' ~ a_author }}">{{ item.author }}</a></span>
-    <span class="{{ 'badge-circle tab-' ~ a_topic }}"></span> <!-- topic badge -->
+    <span class="meta-tag"><a href="/from?by={{ a_author }}">{{ item.author }}</a></span>
+    <span class="badge-circle tab-{{ a_topic }}"></span> <!-- topic badge -->
     {%- if a_topic != topic -%}
-      <span class="meta-tag"><a href="{{ '/t/' ~ a_topic ~ '/' ~ a_ty }}">{{ a_topic }}</a></span>
+      <span class="meta-tag"><a href="/t/{{ a_topic }}/{{ a_ty }}">{{ a_topic }}</a></span>
     {%- else -%}
       <span class="meta-tag">{{ a_topic }}</span>
     {%- endif -%}
     <span class="badge-oval"></span> <!-- date badge -->
-    <span class="meta-tag">{{ item.pub_at | date(format="%b %d %Y") }}</span> 
-    <a id="{{'up-' ~ a_slug}}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
+    <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span> 
+    <a id="up-{{ a_slug }}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
       <span class="badge-heart"></span>
     </a> 
-    <span id="{{'vote-' ~ a_slug}}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
+    <span id="vote-{{ a_slug }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
     <div class="menudown">
-      <button onclick="showMenu('{{ `item-opt-` ~ a_slug }}')" class="toolbtn more-opt-btn" title="More">:::</button>
-      <div id="{{ 'item-opt-' ~ a_slug }}" class="dropdown-content">
-        <li><a onclick= "openLink('{{`/me/item/update/` ~ a_slug }}')" href="javascript:void(0);" class="help-tips">
+      <button onclick="showMenu('item-opt-{{ a_slug }}')" class="toolbtn more-opt-btn" title="More">:::</button>
+      <div id="item-opt-{{ a_slug }}" class="dropdown-content">
+        <li><a onclick= "openLink('/me/item/update/{{ a_slug }}')" href="javascript:void(0);" class="help-tips">
           Eidt</a></li>
-        <li><a id="{{'t-' ~ a_slug}}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
+        <li><a id="t-{{ a_slug }}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
           {%- if item.is_top -%} UnPin {%- else -%} Pin {%- endif -%}
         </a></li>
       </div>

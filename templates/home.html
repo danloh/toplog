@@ -1,53 +1,45 @@
-{%- extends "base.html" -%}
-
-{%- block title -%} 
-  {%- if topic == 'all' or topic == 'from' -%}
-    {{ ty }}
-  {%- else -%}
-    {{ ty ~ 's on ' ~ topic }} 
-  {%- endif -%}
-{%- endblock title -%}
+{% extends "base.html" %}
 
 {%- block mainview -%}
 <div class="main-page">
   <div class="note">
-    {%- if ty == 'Article' -%}
+    {%- if ty == "Article" -%}
     <span class="note-content">Highlights</span>
     {%- endif -%}
-    {%- if ty == 'Book' -%}
+    {%- if ty == "Book" -%}
     <span class="note-content">Guided learning journey & Featured books</span>
     {%- endif -%}
-    {%- if ty == 'Event' -%}
+    {%- if ty == "Event" -%}
     <span class="note-content">Events, Talks and Playlist</span>
     {%- endif -%}
-    {%- if ty == 'Job' -%}
+    {%- if ty == "Job" -%}
     <span class="note-content">Who is Hiring?</span>
     {%- endif -%}
-    {%- if ty == 'Media' -%}
+    {%- if ty == "Media" -%}
     <span class="note-content">Podcast or Video or Cartoon...</span>
     {%- endif -%}
-    {%- if ty == 'Product' -%}
+    {%- if ty == "Product" -%}
     <span class="note-content">Show your creations</span>
     {%- endif -%}
-    {%- if ty == 'Translate' -%}
+    {%- if ty == "Translate" -%}
     <span class="note-content">Share your translation</span>
     {%- endif -%}
-    {%- if ty == 'Misc' -%}
+    {%- if ty == "Misc" -%}
     <span class="note-content">
       The <a href="/all/newest">newest-s</a> that have not yet hoisted or Raw links via spider...
     </span>
     {%- endif -%}
-    {%- if topic == 'from' -%}
+    {%- if topic == "from" -%}
     <span class="note-content">By {{ ty }} :</span>
     {%- endif -%}
   </div>
   <div class="home-view" id="item-list">
     {%- for item in items -%}
-    {%- include '_item_sum.html' -%}
+    {%- include "_item_sum.html" -%}
     {%- endfor -%}
   </div>
-  {%- if topic == 'from' -%}
-  <button class="toolbtn full-width" onclick="loadMoreItems('{{ topic }}', '{{ ty | enbase }}')">More</button>
+  {%- if topic == "from" -%}
+  <button class="toolbtn full-width" onclick="loadMoreItems('{{ topic }}', '{{ ty|b64_encode }}')">More</button>
   {%- else -%}
   <button class="toolbtn full-width" onclick="loadMoreItems('{{ topic }}', '{{ ty }}')">More</button>
   {%- endif -%}
@@ -55,9 +47,10 @@
     <h4 class="right-title">Featured Contributors</h4>
     <div class="right-body">
       {%- for c in blogs -%}
-      {%- include '_blog_sum.html' -%}
+      {%- include "_blog_sum.html" -%}
       {%- endfor -%}
     </div>
   </div>
+  
 </div>
 {%- endblock mainview -%}

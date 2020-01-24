@@ -10,7 +10,6 @@ edition = "2018"
 futures = "0.3"
 actix = "0.9.0"
 actix-rt = "1.0"
-actix-http = "1.0"
 actix-web = "2.0.0"
 actix-cors = "0.2"
 diesel = { version = "1.4.3", features = ["postgres","chrono","serde_json","r2d2"] }
@@ -31,6 +30,8 @@ lazy_static = "1.4.0"
 deunicode = "1.0.0"
 bcrypt = "0.6.1"
 chrono = { version = "0.4.10", features = ["serde"] }
+chrono-tz = "0.5"
+
 log = "0.4.8"
 fern = "0.5.9"
 dotenv = "0.15.0"
@@ -41,6 +42,8 @@ actix-files = "0.2"
 tera = "1.0"
 unic-segment = "0.9.0"
 pulldown-cmark = { version = "0.6", default-features = false }
+ammonia = "3"
+askama = "0.9"
 
 reqwest = "0.9"
 scraper = "0.11.0"

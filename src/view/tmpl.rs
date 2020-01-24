@@ -7,7 +7,6 @@ use crate::api::item::{Item, QueryItems};
 use crate::api::blog::{Blog, QueryBlogs};
 use crate::view::TEMPLATE as tmpl;
 use crate::{Dba, DbAddr, PooledConn};
-use actix_http::http;
 use actix_web::{
     web::{Data, Path, Query},
     Error, HttpResponse, ResponseError,
@@ -36,38 +35,20 @@ pub async fn index_either(
     db: Data<DbAddr>,
     p: Path<String>,
 ) -> Result<HttpResponse, Error>  {
-    let home_msg = TopicEither { 
-        topic: String::from("all"), 
-        ty: p.into_inner(),
-    };
-    
-    let res = db.send(home_msg).await?; 
-    match res {
-        Ok(msg) => {
-            if msg.status == 201 {
-                let mut ctx = tera::Context::new();
-                ctx.insert("items", &msg.items.unwrap_or(Vec::new()));
-                ctx.insert("blogs", &msg.blogs.unwrap_or(Vec::new()));
-
-                let mesg: Vec<&str> = (&msg.message).split("-").collect();
-                let typ = mesg[1];
-                ctx.insert("ty", &typ);
-                ctx.insert("topic", "all");
-
-                let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                    ServiceError::NotFound("failed".into())
-                })?;
-                let dir = "www/".to_owned() + &msg.message + ".html";
-                std::fs::write(dir, h.as_bytes())?;
-                Ok(HttpResponse::Ok().content_type("text/html").body(h))
-            } else {
-                let html = msg.html.unwrap_or_default();
-                Ok(HttpResponse::build(http::StatusCode::OK)
-                    .content_type("text/html; charset=utf-8")
-                    .body(html))
-            }
+    let ty = p.clone();
+    let dir = "www/".to_owned() + "all-" + &ty + ".html"; 
+    let s_html = std::fs::read(dir);
+    match s_html {
+        Ok(s) => {
+            let html = String::from_utf8(s).unwrap_or_default();
+            return Ok(HttpResponse::Ok()
+                .content_type("text/html; charset=utf-8")
+                .body(html)
+            )
         }
-        Err(e) => Ok(e.error_response()),
+        _ => {
+            return index_dyn(db, p).await
+        }
     }
 }
 
@@ -175,45 +156,23 @@ pub async fn topic_either(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
 ) -> Result<HttpResponse, Error>  {
-    let pa = p.into_inner();
+    let pa = p.clone();
     let topic = pa.0;
     let ty = pa.1;
 
-    let topic_msg = TopicEither{ topic, ty };
-    
-    if let Err(e) = topic_msg.validate() {
-        return Ok(e.error_response());
-    }
-
-    let res = db.send(topic_msg).await?;
-    match res {
-        Ok(msg) => {
-            if msg.status == 201 {
-                // println!(">> via dyn 201");
-                let mut ctx = tera::Context::new();
-                ctx.insert("items", &msg.items.unwrap_or(Vec::new()));
-                ctx.insert("blogs", &msg.blogs.unwrap_or(Vec::new()));
-
-                let mesg: Vec<&str> = (&msg.message).split("-").collect();
-                let tpc = mesg[0];
-                let typ = mesg[1];
-                ctx.insert("topic", tpc);
-                ctx.insert("ty", typ);
-
-                let h = tmpl.render("home.html", &ctx).map_err(|_| {
-                    ServiceError::NotFound("failed".into())
-                })?;
-                let t_dir = "www/".to_owned() + &msg.message + ".html";
-                std::fs::write(&t_dir, h.as_bytes())?;
-                Ok(HttpResponse::Ok().content_type("text/html").body(h))
-            } else {
-                let html = msg.html.unwrap_or_default();
-                Ok(HttpResponse::build(http::StatusCode::OK)
-                    .content_type("text/html; charset=utf-8")
-                    .body(html))
-            }
+    let dir = "www/".to_owned() + &topic + "-" + &ty + ".html";
+    let s_html = std::fs::read(dir);
+    match s_html {
+        Ok(s) => {
+            let html = String::from_utf8(s).unwrap_or_default();
+            return Ok(HttpResponse::Ok()
+                .content_type("text/html; charset=utf-8")
+                .body(html)
+            )
         }
-        Err(e) => Ok(e.error_response()),
+        _ => {
+            return topic_dyn(db, p).await
+        }
     }
 }
 
@@ -348,7 +307,7 @@ pub async fn spa_index() -> Result<HttpResponse, Error> {
             .unwrap_or("Not Found".to_owned().into_bytes()),
     )
     .unwrap_or_default();
-    Ok(HttpResponse::build(http::StatusCode::OK)
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(res
     ))
@@ -368,7 +327,7 @@ pub async fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
         .map_err(|_| ServiceError::NotFound("404".into()))?;
     std::fs::write(dir, t.as_bytes())?;
 
-    Ok(HttpResponse::build(http::StatusCode::OK)
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(t)
     )
@@ -629,102 +588,6 @@ impl Handler<Topic> for Dba {
             items: i_list,
             blogs: b_list,
         })
-    }
-}
-
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct TopicEither{
-    pub topic: String,
-    pub ty: String,
-}
-
-impl TopicEither {
-    fn validate(&self) -> ServiceResult<()> {
-        let tp: &str = &self.topic.trim();
-        let ty: &str = &self.ty.trim();
-    
-        let check = checker(&ty);
-        if check {
-            Ok(())
-        } else {
-            Err(ServiceError::BadRequest("Invalid Input".into()))
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct EitherMsg {
-    pub status: i32,
-    pub message: String,
-    pub items: Option<Vec<Item>>,
-    pub blogs: Option<Vec<Blog>>,
-    pub html: Option<String>,
-}
-
-impl Message for TopicEither {
-    type Result = ServiceResult<EitherMsg>;
-}
-
-// per topic and ty
-impl Handler<TopicEither> for Dba {
-    type Result = ServiceResult<EitherMsg>;
-
-    fn handle(
-        &mut self,
-        t: TopicEither,
-        _: &mut Self::Context,
-    ) -> Self::Result {
-        let tpc = t.topic;
-        let typ = t.ty;
-        let msg = tpc.clone() + "-" + &typ;
-
-        let dir = "www/".to_owned() + &msg + ".html";
-        let i_html = std::fs::read(dir);
-
-        match i_html {
-            Ok(s) => {
-                let html = String::from_utf8(s).unwrap_or_default();
-                // println!(">> via static");
-                Ok(EitherMsg {
-                    status: 200,
-                    message: msg,
-                    items: None,
-                    blogs: None,
-                    html: Some(html),
-                })
-            }
-            _ => {
-                use crate::schema::items::dsl::*;
-                use crate::schema::blogs::dsl::{blogs};
-                let conn = &self.0.get()?;
-
-                let tp = tpc.trim().to_lowercase();
-
-                let (query_item, query_blog) = if tp == "all" {
-                    (
-                        QueryItems::Index(typ, 42, 1),
-                        QueryBlogs::Index("index".into(), 42, 1)
-                    )
-                } else {
-                    (
-                        QueryItems::Tt(tpc.clone(), typ, 42, 1),
-                        QueryBlogs::Top(tpc, 42, 1)
-                    )
-                };
-
-                let (i_list, _) = query_item.get(conn)?;
-                let (b_list, _) = query_blog.get(conn)?;
-
-                Ok(EitherMsg {
-                    status: 201,
-                    message: msg,
-                    items: Some(i_list),
-                    blogs: Some(b_list),
-                    html: None
-                })
-            }
-        }
     }
 }
 

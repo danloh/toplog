@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-{%- set hostDomain = 'Toplog' -%}
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,14 +7,9 @@
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico" >
   <meta name="google-site-verification" content="kL7hC596rJki-gGYq1HGM6GjdYxrlUVXKJQ1NF6kNPE" />
   {%- block head -%}
-  <title>{{ hostDomain }} |&nbsp;{%- block title -%} {{ title }} {%- endblock title -%}</title>
-  {%- if topic == 'all' or topic == 'from' -%}
-    {%- set t_lang = 'each programming language' -%}
-  {%- else -%}
-    {%- set t_lang = topic -%}
-  {%- endif -%}
+  <title>Toplog |&nbsp;{%- block title -%} Home {%- endblock title -%}</title>
   {%- block metaDescription -%}
-  <meta name="description" content="{{ 'Aggregate great Books, Blog Posts, Articles, Discussions, Podcasts, Talks Video, Events, Tutorials, Courses, Jobs, etc. for ' ~ t_lang }}">
+  <meta name="description" content="Aggregate great Books, Blog Posts, Articles, Discussions, Podcasts, Talks Video, Events, Tutorials, Courses, Jobs, etc. ">
   {%- endblock metaDescription -%}
   {%- endblock head -%}
 </head>
@@ -25,7 +19,7 @@
   {%- block header -%}
     <nav class="nav-menu">
     {%- block nav -%}
-      <a href="/"><b class="logo">{{ hostDomain }}</b></a><sub class="logo-sub">.cc</sub><sup class="logo-sup">beta</sup>
+      <a href="/"><b class="logo">Toplog</b></a><sub class="logo-sub">.cc</sub><sup class="logo-sup">beta</sup>
       <div class="right-menu">
         <a href="/me/" id="login-link" rel="nofollow noopener"><b>Log in</b></a>
         <div class="menudown" id="menu-down" style="display: none">
@@ -39,36 +33,38 @@
     </nav>
   {%- endblock header -%}
   </header>
-  {%- block banner -%}
+  
   <div class="banner">
+    {%- block banner -%}
     <div class="banner-bar">
-      {%- set baseUrl = topic | setbase -%}
-      {%- for t in ['Article', 'Book', 'Event', 'Job', 'Media', 'Product', 'Translate', 'Misc'] -%}
-        {%- if t == ty -%}
-        <a class="ty-tab-active" href="{{ baseUrl ~ t }}">{{ t }}</a>
+      <!-- todo baseurl, active tab -->
+      {%- let baseUrl = topic|set_baseurl -%}
+      {%- for t in tys -%}
+        {%- if t.trim() == ty.trim() -%}
+        <a class="ty-tab-active" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
         {%- else -%}
-        <a class="ty-tab" href="{{ baseUrl ~ t }}">{{ t }}</a>
+        <a class="ty-tab" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
         {%- endif -%}
       {%- endfor -%}
-      {%- if topic != 'all' and topic != 'from' -%}
-        <span class="{{ 'topic-tab-active tab-' ~ topic }}">{{ topic }}</span>
+      {%- if topic != "all" && topic != "from" -%}
+        <span class="topic-tab-active tab-{{ topic }}">{{ topic }}</span>
       {%- endif -%}
-      <a onclick="openLink('{{ `/me/item/new?for=` ~ topic ~ `&to=` ~ ty }}')" 
+      <a onclick="openLink('/me/item/new?for={{ topic }}&to={{ ty }}')" 
         href="javascript:void(0);" 
         style="float:right"
       >
         <small class="help-tips">Suggest An Item...</small>
       </a>
     </div>
+    {%- endblock banner -%}
   </div>
-  {%- endblock banner -%}
   <div class="main-view">
     {%- block mainview -%}{%- endblock mainview -%}
   </div>
   <footer class="footer">
   {%- block foot -%}
     <div class="bottom">
-      ©{{ hostDomain }} | <a href="/about.html">About</a> 
+      ©Toplog | <a href="/about.html">About</a> 
       | <a href="https://github.com/Toplog-cc/toplog.cc/issues/new" title="Bug Report or Any Suggestion? We Appreciate!">Issues</a>
       <!--google site search -->
       <form id="Search" onsubmit="onSearch('q')" class="search-box">
