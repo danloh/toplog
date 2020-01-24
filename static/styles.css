@@ -129,20 +129,6 @@ blockquote {
   padding: 0px;
   position: relative;
 }
-/* .banner-view {
-  box-sizing: border-box;
-  min-height: 85px;
-  margin: 0px auto;
-  padding: 5px 95px 5px 5px;
-  position: relative;
-}
-.banner-thumb {
-  position: absolute;
-  max-width: 80px;
-  max-height: 80px;
-  top: 1px;
-  right: 1px;
-} */
 
 .topic-tab, .ty-tab,
 .topic-tab-active, .ty-tab-active {
@@ -176,16 +162,24 @@ blockquote {
 
 .header .nav-menu, 
 .footer .bottom, 
-/* .banner .banner-view, */
 .banner .banner-bar,
 .main-view {
   max-width: 960px;
   min-width: 240px;
 }
 
-.main-page {
-  padding: 10px 235px 10px 0px;
-  position: relative;
+.main-page, .info-page {
+  display: flex;
+  flex-direction: row;
+}
+.page-main {
+  flex: 7;
+  margin: 10px 0 0 0;
+}
+.page-side {
+  flex: 3;
+  /* background-color: #fafbfa; */
+  margin: 10px 0 30px 10px;
 }
 .note {
   padding: auto;
@@ -195,13 +189,7 @@ blockquote {
   color: #828282;
   padding: 2px;
 }
-.page-side {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  width: 225px;
-  background-color: #fafbfa;
-}
+
 .right-title {
   background-color: #e5ebe4;
   padding: 10px;
@@ -236,7 +224,7 @@ blockquote {
 .item-sum {
   border-bottom: 1px dashed #ddd;
 }
-section.item-sum:hover {
+.item-sum:hover {
   background-color:  #fcfdfc;
 }
 .item-sum .title {
@@ -270,11 +258,11 @@ section.item-sum:hover {
   top: 4px;
   right: 2px;
 }
-.item-thumb:hover {
+/* .item-thumb:hover {
   max-width: 180px;
   max-height: 180px;
   z-index: 999;
-}
+} */
 .vote-num {
   font-size: 0.75em;
   color: #fff;
@@ -445,35 +433,37 @@ section.item-sum:hover {
   border-radius: 50%;
 }
 
+.info-box {
+  flex: 1;
+  max-width: 750px;
+}
+
 @media (max-width: 800px) {
   .main-page {
     padding: 10px;
-  }
-  .page-side {
-    position: relative;
-    width: 95%;
-    padding: 20px;
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .item-sum, .banner-view {
+  .item-sum {
     padding: 10px;
   }
-  .item-thumb, .banner-thumb {
+  .item-thumb {
     position: relative;
-  }
-  .banner-thumb {
-    display: none;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  body, .header, .banner, .footer, section.item-sum:hover {
+  body, .header, .banner, .footer {
     background-color: #282a36;
     color: #e4e4e4;
   }
-  .page-side, .right-title, .dropdown-content, .item-sum, .item-view
+  .item-sum:hover {
+    background-color: #373a47;
+    color: #e4e4e4;
+  }
+  .right-title, .dropdown-content, .item-sum, .item-view
   {
     background-color: #353746;
     color: #e4e4e4;

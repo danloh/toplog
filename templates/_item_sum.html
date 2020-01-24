@@ -38,7 +38,7 @@
     {%- endif -%}
     <span class="badge-oval"></span> <!-- date badge -->
     <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span> 
-    <a id="up-{{ a_slug }}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
+    <a id="up-{{ a_slug }}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="Upvote, Mark or Read Later">
       <span class="badge-heart"></span>
     </a> 
     <span id="vote-{{ a_slug }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;

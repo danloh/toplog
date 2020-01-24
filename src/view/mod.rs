@@ -23,7 +23,7 @@ lazy_static! {
 
     pub static ref TY_VEC: Vec<&'static str> = {
         vec!(
-            "Misc", "Article", "Book", "Event", "Job", "Media", "Product", "Translate"
+            "Article", "Book", "Event", "Job", "Media", "Product", "Translate", "Misc"
         )
     };
 }

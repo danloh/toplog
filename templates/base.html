@@ -33,11 +33,9 @@
     </nav>
   {%- endblock header -%}
   </header>
-  
   <div class="banner">
     {%- block banner -%}
     <div class="banner-bar">
-      <!-- todo baseurl, active tab -->
       {%- let baseUrl = topic|set_baseurl -%}
       {%- for t in tys -%}
         {%- if t.trim() == ty.trim() -%}
@@ -71,7 +69,8 @@
         <input type="text" id="q" placeholder=" Search ..." class="search-text"/>
       </form>
       <!--end google site search -->
-    </div><br>
+    </div>
+    <br>
   {%- endblock foot -%}
   </footer>
 {%- endblock body -%}
