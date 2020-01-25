@@ -101,17 +101,18 @@ pub fn get_host(s: &str) -> String {
 //
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct SpLinks { pub links: Vec<String> }
+pub const LINKS_JSON_DIR: &str = "links.json";
 
 pub fn serde_links(links: Vec<String>) {
     let sp_links = SpLinks { links: links };
     let ser_sp_links = serde_json::to_string(&sp_links)
         .unwrap_or(String::new());
-    std::fs::write("links.json", ser_sp_links.as_bytes()).unwrap_or(());
+    std::fs::write(LINKS_JSON_DIR, ser_sp_links.as_bytes()).unwrap_or(());
 }
 
 pub fn deserde_links() -> Vec<String> {
     let read_links = String::from_utf8(
-        std::fs::read("www/all-index.html")
+        std::fs::read(LINKS_JSON_DIR)
             .unwrap_or("Not Found".to_owned().into_bytes()),
     )
     .unwrap_or_default();
@@ -124,7 +125,7 @@ pub fn deserde_links() -> Vec<String> {
 
 pub fn serde_add_links(mut add: Vec<String>) {
     let read_links = String::from_utf8(
-        std::fs::read("www/all-index.html")
+        std::fs::read(LINKS_JSON_DIR)
             .unwrap_or("Not Found".to_owned().into_bytes()),
     )
     .unwrap_or_default();
@@ -134,6 +135,6 @@ pub fn serde_add_links(mut add: Vec<String>) {
 
     let mut new_links = old_sp_links.links;
     new_links.append(&mut add);
-    
+
     serde_links(new_links)
 }
