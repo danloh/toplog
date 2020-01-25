@@ -80,6 +80,8 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     // println!("{:?}", links);
     
     // diff the links w/ db
+    //
+    // extracted new links
     use std::collections::HashSet;
     let mut links_set = HashSet::new();
     for l in links {
@@ -89,24 +91,31 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
             links_set.insert(l);
         }
     }
-    // TODO: limit the db query
-    /*
-    use chrono::{NaiveDate, Utc, Duration};
-    let now = Utc::now().naive_utc();
-    let limit_day = now - Duration::days(1);
-    */
-    
-    let db_links: Vec<String> = items
-        .filter(link.ne(""))
-        //.filter(post_at.lt(limit_day))  // did nothing
-        .select(link)
-        .load::<String>(conn)?;
-    let mut db_links_set = HashSet::new();
-    for l in db_links {
-        db_links_set.insert(l);
+
+    // deserde spidered links from Json as reduce query db
+    //
+    use crate::util::helper::{deserde_links, serde_links, serde_add_links};
+    let sped_links = deserde_links();
+    let sp_links = if sped_links.len() > 0 {
+        sped_links
+    } else {
+        let db_links: Vec<String> = items
+            .filter(link.ne(""))
+            //.filter(post_at.lt(limit_day))  // did nothing
+            .select(link)
+            .load::<String>(conn)?;
+        serde_links(db_links.clone());
+        db_links
+    };
+    let mut spd_links_set = HashSet::new();
+    for l in sp_links {
+        spd_links_set.insert(l);
     }
-    let diff_links = links_set.difference(&db_links_set);
+
+    // diff the real new links to feed spider
+    let diff_links = links_set.difference(&spd_links_set);
     //println!("{:#?}", diff_links);
+    let mut new_links: Vec<String> = Vec::new();
     // spider the diff_links and build item
     let mut new_items: Vec<NewItem> = Vec::new();
     for l in diff_links {
@@ -114,12 +123,17 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
             .unwrap_or_default()
             .into_item();
         new_items.push(sp_item);
+        new_links.push(l.to_string());
     }
-    // save to db
+
+    // save new items to db
     diesel::insert_into(items)
         .values(&new_items)
         .on_conflict_do_nothing()
         .execute(conn)?;
+    
+    // save new links to json
+    serde_add_links(new_links);
 
     Ok(())
 }

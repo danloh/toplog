@@ -327,9 +327,14 @@ impl NewItem {
         let item_new = if let Ok(itm) = try_save_new_item {
                 itm
         } else {
-            items.filter(link.eq(ilink))
+            items.filter(link.eq(&ilink))
                 .get_result::<Item>(conn)?
         };
+
+        // save new link to json
+        use crate::util::helper::{serde_add_links};
+        let link_vec = vec!(ilink);
+        serde_add_links(link_vec);
 
         // ========================
         // way-1: gen html, renew cache, heavy!
@@ -384,6 +389,7 @@ impl UpdateItem {
             .get_result::<Item>(conn)?;
         
         // check if anything changed
+        let old_link = old.link.trim();
         let new_title = self.title.trim();
         let new_content = self.content.trim();
         let new_logo = self.logo.trim();
@@ -402,7 +408,7 @@ impl UpdateItem {
             || new_ty != old.ty.trim()
             || new_lang != old.lang.trim()
             || new_topic != old.topic.trim()
-            || new_link != old.link.trim()
+            || new_link != old_link
             || new_origin != old.origin_link.trim()
             || new_pub_at != old.pub_at;
         if !check_changed {
@@ -461,6 +467,13 @@ impl UpdateItem {
         let item_update = diesel::update(&old)
             .set(up)
             .get_result::<Item>(conn)?;
+
+        // save new link to json
+        if new_link.len() > 0 && new_link != old_link {
+            use crate::util::helper::{serde_add_links};
+            let link_vec = vec!(new_link.to_string());
+            serde_add_links(link_vec);
+        }
 
         // ========================
         // // way-1: gen html, renew cache, heavy!
@@ -541,6 +554,11 @@ impl SpiderItem {
             items.filter(link.eq(ilink))
                 .get_result::<Item>(conn)?
         };
+
+        // save new link to json
+        use crate::util::helper::{serde_add_links};
+        let link_vec = vec!(ilink.to_string());
+        serde_add_links(link_vec);
         
         // ==========================
         // del related html

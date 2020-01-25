@@ -95,3 +95,45 @@ pub fn get_host(s: &str) -> String {
     let host = RE_P.replace_all(&url, "").replace("www.", "");
     host
 }
+
+
+// serde links vec, save spidered links as json
+//
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct SpLinks { pub links: Vec<String> }
+
+pub fn serde_links(links: Vec<String>) {
+    let sp_links = SpLinks { links: links };
+    let ser_sp_links = serde_json::to_string(&sp_links)
+        .unwrap_or(String::new());
+    std::fs::write("links.json", ser_sp_links.as_bytes()).unwrap_or(());
+}
+
+pub fn deserde_links() -> Vec<String> {
+    let read_links = String::from_utf8(
+        std::fs::read("www/all-index.html")
+            .unwrap_or("Not Found".to_owned().into_bytes()),
+    )
+    .unwrap_or_default();
+
+    let deser_links: SpLinks = serde_json::from_str(&read_links)
+        .unwrap_or_default();
+
+    deser_links.links
+}
+
+pub fn serde_add_links(mut add: Vec<String>) {
+    let read_links = String::from_utf8(
+        std::fs::read("www/all-index.html")
+            .unwrap_or("Not Found".to_owned().into_bytes()),
+    )
+    .unwrap_or_default();
+
+    let old_sp_links: SpLinks = serde_json::from_str(&read_links)
+        .unwrap_or_default();
+
+    let mut new_links = old_sp_links.links;
+    new_links.append(&mut add);
+    
+    serde_links(new_links)
+}
