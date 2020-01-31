@@ -15,7 +15,7 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Duration, Local, NaiveDateTime, Utc};
 use std::convert::From;
-use jsonwebtoken::{decode, encode, Header, Validation};
+use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation};
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{Msg, AuthMsg, UserMsg};
@@ -693,39 +693,6 @@ impl From<Claims> for CheckUser {
     }
 }
 
-// # for jwt auth
-// # encode authed user info as token w/ secret key,
-// # then send to client as cookie;
-// # request w/ such token to server,
-// # decode token to get authed user info w/ secret key
-
-fn get_secret() -> String {
-    dotenv::var("SECRET_KEY").unwrap_or_else(|_| "AHaR9uyS3s5SeCREkY".into())
-}
-
-pub fn encode_token(data: &CheckUser) -> Result<String, ServiceError> {
-    let claims = Claims::new(data.id, data.uname.as_str(), data.permission);
-    encode(&Header::default(), &claims, get_secret().as_ref())
-        .map_err(|_err| ServiceError::BadRequest("encode".into()))
-}
-
-pub fn decode_token(token: &str) -> Result<CheckUser, ServiceError> {
-    decode::<Claims>(token, get_secret().as_ref(), &Validation::default())
-        .map(|data| Ok(data.claims.into()))
-        .map_err(|_err| ServiceError::Unauthorized)?
-}
-
-pub fn hash_password(plain: &str) -> Result<String, ServiceError> {
-    // get the hashing cost from the env variable or use default
-    let hashing_cost: u32 = match dotenv::var("HASH_ROUNDS") {
-        Ok(cost) => cost.parse().unwrap_or(DEFAULT_COST),
-        _ => DEFAULT_COST,
-    };
-    hash(plain, hashing_cost)
-        .map_err(|_| ServiceError::BadRequest("hash".into()))
-}
-
-// # modle for api/handler
 
 // message to sign up user
 #[derive(Deserialize, Serialize, Debug)]
@@ -1053,6 +1020,49 @@ impl Message for TokClaim {
     type Result = Result<bool, ServiceError>;
 }
 
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
+// # for jwt auth
+// # encode authed user info as token w/ secret key,
+// # then send to client as cookie;
+// # request w/ such token to server,
+// # decode token to get authed user info w/ secret key
+
+fn get_secret() -> String {
+    dotenv::var("SECRET_KEY").unwrap_or_else(|_| "AHaR9uyS3s5SeCREkY".into())
+}
+
+pub fn encode_token(data: &CheckUser) -> Result<String, ServiceError> {
+    let claims = Claims::new(data.id, data.uname.as_str(), data.permission);
+    encode(
+        &Header::default(), 
+        &claims, 
+        &EncodingKey::from_secret(get_secret().as_ref())
+    )
+    .map_err(|_err| ServiceError::BadRequest("encode".into()))
+}
+
+pub fn decode_token(token: &str) -> Result<CheckUser, ServiceError> {
+    decode::<Claims>(
+        token, 
+        &DecodingKey::from_secret(get_secret().as_ref()), 
+        &Validation::default()
+    )
+    .map(|data| Ok(data.claims.into()))
+    .map_err(|_err| ServiceError::Unauthorized)?
+}
+
+pub fn hash_password(plain: &str) -> Result<String, ServiceError> {
+    // get the hashing cost from the env variable or use default
+    let hashing_cost: u32 = match dotenv::var("HASH_ROUNDS") {
+        Ok(cost) => cost.parse().unwrap_or(DEFAULT_COST),
+        _ => DEFAULT_COST,
+    };
+    hash(plain, hashing_cost)
+        .map_err(|_| ServiceError::BadRequest("hash".into()))
+}
+
 pub fn generate_token(
     uname: &str,
     email: &str,
@@ -1063,13 +1073,20 @@ pub fn generate_token(
         uname: uname.to_string(),
         email: email.to_string(),
     };
-    encode(&Header::default(), &claim, get_secret().as_ref())
-        .map_err(|_err| ServiceError::BadRequest("encode".into()))
+    encode(
+        &Header::default(), 
+        &claim, 
+        &EncodingKey::from_secret(get_secret().as_ref())
+    )
+    .map_err(|_err| ServiceError::BadRequest("encode".into()))
 }
 
 pub fn verify_token(token: &str) -> TokClaim {
-    let res =
-        decode::<TokClaim>(token, get_secret().as_ref(), &Validation::default());
+    let res = decode::<TokClaim>(
+        token, 
+        &DecodingKey::from_secret(get_secret().as_ref()), 
+        &Validation::default()
+    );
     //let now = Utc::now().timestamp();
     let (exp, uname, email) = match res {
         Ok(t) => {
@@ -1081,6 +1098,8 @@ pub fn verify_token(token: &str) -> TokClaim {
     TokClaim { exp, uname, email }
 }
 
+
+// TODO
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GUser {
     pub sub: Option<String>,  // required
