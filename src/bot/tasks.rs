@@ -60,6 +60,8 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
         "https://rustacean-station.org/",
         "https://raphlinus.github.io/", // Raph Levien
         "https://lucumr.pocoo.org/",  //  Armin Ronacher
+        "https://stjepang.github.io/",  // Stjepan Glavina
+        "https://blog.bastion.rs/", // bastion.rs
         // cpp
         "https://www.fluentcpp.com/",
         // ## Golang
