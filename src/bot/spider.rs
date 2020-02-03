@@ -25,7 +25,19 @@ pub struct WebPage {
 
 impl WebPage {
     pub fn new(url: &str) -> ServiceResult<Self> {
-        let res = reqwest::get(url)?.text()?;
+        // let res = reqwest::get(url)?.text()?;
+
+        let default_html = String::from("");
+        let res = match reqwest::get(url) {
+            Ok(resp) => {
+                let mut resp = resp;
+                match resp.text() {
+                    Ok(s) => s,
+                    _ => default_html
+                }
+            },
+            _ => default_html
+        };
 
         lazy_static! {
             static ref Scheme_re: Regex = Regex::new(r"https?://").unwrap();
@@ -146,10 +158,10 @@ pub fn parse_common_page(html: Html, url: &str) -> PageInfo {
     // get title
     let title_text: String = 
         page_ele_paser(
-            &html, "head > title", "", "untitled"
+            &html, "head > title", "", url
         )
         .first()
-        .unwrap_or(&String::from(""))
+        .unwrap_or(&String::from(url))
         .to_string();
 
     // get image url
