@@ -27,55 +27,9 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
 
     // new WebPages and get all links
     let mut links: Vec<String> = Vec::new();
-    let url_list = vec!(
-        // ## Rust
-        "https://blog.rust-lang.org/",
-        "https://users.rust-lang.org/top",
-        "https://internals.rust-lang.org/top",
-        "http://smallcultfollowing.com/babysteps/", // babystep
-        "https://tokio.rs/blog/2019-11-tokio-0-2/", // tokio
-        "https://async.rs/blog/", // async-std
-        "https://blog.guillaume-gomez.fr/", // Gomez
-        "https://www.ralfj.de/blog/", // ralf
-        "https://fitzgeraldnick.com/", // fitz
-        "https://deterministic.space/", // pascal
-        "https://boats.gitlab.io/blog/", // boats
-        "https://www.pietroalbini.org/", 
-        "https://fnordig.de/posts/",  // badboy
-        "https://kazlauskas.me/", // nagisa
-        "https://manishearth.github.io/", // mg
-        "https://www.ncameron.org/blog/",  // nrc
-        "https://blog.japaric.io/",  // jorge
-        "https://words.steveklabnik.com/",
-        "https://blog.digital-scurf.org/", // Daniel Silverstone
-        "https://blog.x5ff.xyz/blog/",  // Claus Matzinger
-        "https://llogiq.github.io/", // Andre Bogus
-        "https://tonyarcieri.com/",  // Tony Arcieri
-        "https://blog.yoshuawuyts.com/", // Yoshua Wuyts
-        "https://seanmonstar.com/",
-        "https://blog.ryanlevick.com/", // Ryan Levick
-        "https://matklad.github.io/",  // Aleksey Kladov
-        "https://blog.troutwine.us/", // 
-        "https://rust-embedded.github.io/blog/", // Embedded Rust Working Group
-        "https://rustacean-station.org/",
-        "https://raphlinus.github.io/", // Raph Levien
-        "https://lucumr.pocoo.org/",  //  Armin Ronacher
-        "https://stjepang.github.io/",  // Stjepan Glavina
-        "https://blog.bastion.rs/", // bastion.rs
-        // cpp
-        "https://www.fluentcpp.com/",
-        // ## Golang
-        "https://blog.golang.org/index",
-        "https://research.swtch.com/",  // Russ Cox
-        // ## Angular
-        // ## Web
-        "https://hacks.mozilla.org/",
-        
-        // ## Mic
-        //"https://devblogs.microsoft.com",
-    );
-
-    for url in url_list {
+    use crate::bot::cfg::LINK_VEC;
+    let url_list = &LINK_VEC;
+    for url in url_list.iter() {
         let page = WebPage::new(url).unwrap_or_default();
         links.append(&mut page.clean_links());
     }

@@ -6,7 +6,7 @@ use base64::DecodeError;
 use derive_more::Display;
 use diesel::r2d2::PoolError;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
-use oauth2::TokenError;
+// use oauth2::TokenError;
 use reqwest::Error as ReqError;
 use std::convert::{From, Into};
 use std::error::Error as StdError;
@@ -109,12 +109,12 @@ impl From<ReqError> for ServiceError {
     }
 }
 
-// reqwest
-impl From<TokenError> for ServiceError {
-    fn from(_error: TokenError) -> Self {
-        ServiceError::InternalServerError("oauth token".into())
-    }
-}
+// // oauth
+// impl From<TokenError> for ServiceError {
+//     fn from(_error: TokenError) -> Self {
+//         ServiceError::InternalServerError("oauth token".into())
+//     }
+// }
 
 // swirl back-job
 // impl Into<PerformError> for ServiceError {
