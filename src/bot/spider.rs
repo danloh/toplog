@@ -29,7 +29,7 @@ impl WebPage {
         // let res = reqwest::get(url)?.text()?;
 
         let default_html = String::from("");
-        let res = match reqwest::get(url) {
+        let res = match reqwest::blocking::get(url) {
             Ok(resp) => {
                 let mut resp = resp;
                 match resp.text() {
