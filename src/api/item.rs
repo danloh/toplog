@@ -28,7 +28,7 @@ pub async fn new(
     item: Json<NewItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let res = db.send(item.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -51,7 +51,7 @@ impl Handler<NewItem> for Dba {
 pub async fn spider(
     sp: Json<SpiderItem>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let item = sp.into_inner();
     
     if let Err(e) = item.validate() {
@@ -80,7 +80,7 @@ pub async fn update(
     item: Json<UpdateItem>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let res = db.send(item.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -102,7 +102,7 @@ impl Handler<UpdateItem> for Dba {
 pub async fn get(
     qb: Path<String>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("GET"),
@@ -121,7 +121,7 @@ pub async fn toggle_top(
     qb: Path<String>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: String::from("PATCH"),
@@ -141,7 +141,7 @@ pub async fn vote_or_veto(
     aq: Query<ActionQuery>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
         slug: qb.into_inner(), 
         method: aq.action.to_uppercase(),
@@ -160,7 +160,7 @@ pub async fn del(
     qb: Path<String>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     
     let item = QueryItem{
         slug: qb.into_inner(), 
@@ -198,7 +198,7 @@ pub async fn get_list(
     pt: Path<String>,
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let p = pt.into_inner();
     // extract query param
     let perpage = pq.perpage;

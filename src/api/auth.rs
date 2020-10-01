@@ -39,7 +39,7 @@ pub const ADMIN_PERMIT: i16 = 0x80; // admin
 pub async fn signup(
     reg_user: Json<RegUser>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let reg_usr = reg_user.into_inner();
 
     // for decode password
@@ -76,7 +76,7 @@ impl Handler<RegUser> for Dba {
 pub async fn signin(
     auth: Json<AuthUser>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let auth_usr = auth.into_inner();
 
     // for decode password
@@ -125,7 +125,7 @@ impl Handler<AuthUser> for Dba {
 pub async fn get(
     path_uname: Path<String>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let uname = path_uname.into_inner();
     let res = db.send(QueryUser { uname }).await?;
     match res {
@@ -162,7 +162,7 @@ pub async fn update(
     db: Data<DbAddr>,
     user: Json<UpdateUser>,
     auth: CheckUser,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let up_user = user.into_inner();
 
     // auth.uname == user.uname
@@ -209,7 +209,7 @@ pub async fn change_psw(
     db: Data<DbAddr>,
     psw: Json<ChangePsw>,
     auth: CheckUser,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let usr_psw = psw.into_inner();
 
     // auth.uname == user.uname
@@ -278,7 +278,7 @@ impl Handler<ChangePsw> for Dba {
 pub async fn reset_psw_req(
     db: Data<DbAddr>,
     re_req: Json<ResetReq>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let psw_req = re_req.into_inner(); // need uname and email
 
     if let Err(e) = psw_req.validate() {
@@ -300,7 +300,7 @@ pub async fn reset_psw(
     db: Data<DbAddr>,
     p_info: Path<String>,
     newpsw: Json<ResetPsw>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     use base64::decode;
 
     let reset_psw = newpsw.into_inner().re_psw;
@@ -400,7 +400,7 @@ impl Handler<ResetPsw> for Dba {
 pub async fn confirm_email(
     p_info: Path<String>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let tok = p_info.into_inner();
     let de_tok = de_base64(&tok);
     let tc = verify_token(&de_tok);

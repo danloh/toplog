@@ -23,7 +23,7 @@ pub async fn new(
     issue: Json<NewIssue>,
     _auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let res = db.send(issue.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -46,7 +46,7 @@ pub async fn update(
     issue: Json<UpdateIssue>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let up = UpdateIssue {
         author: auth.uname,
         ..issue.into_inner()
@@ -72,7 +72,7 @@ impl Handler<UpdateIssue> for Dba {
 pub async fn get(
     qb: Path<String>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let issue = QueryIssue{
         slug: qb.into_inner(), 
         method: String::from("GET"),
@@ -91,7 +91,7 @@ pub async fn del(
     qb: Path<String>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let issue = QueryIssue{
         slug: qb.into_inner(), 
         method: String::from("DELETE"),
@@ -123,7 +123,7 @@ impl Handler<QueryIssue> for Dba {
 pub async fn get_list(
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse>{
     let perpage = pq.perpage;
     let page = pq.page;
     let kw = pq.clone().kw;
@@ -154,7 +154,7 @@ pub async fn label_isuue(
     il: Json<NewIssueLabel>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let new_label = NewIssueLabel {
         uname: auth.uname,
         method: String::from("POST"),
@@ -173,7 +173,7 @@ pub async fn del_label_isuue(
     il: Json<NewIssueLabel>,
     auth: CheckUser,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     let new_label = NewIssueLabel {
         uname: auth.uname,
         method: String::from("DELETE"),

@@ -20,7 +20,7 @@ use crate::view::{
 
 // GET /
 //
-pub async fn index() -> Result<HttpResponse, Error> {
+pub async fn index() -> ServiceResult<HttpResponse> {
     let res = String::from_utf8(
         std::fs::read("www/all-index.html")
             .unwrap_or("Not Found".to_owned().into_bytes()), // handle not found
@@ -38,7 +38,7 @@ pub async fn index() -> Result<HttpResponse, Error> {
 pub async fn index_either(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let ty = p.clone();
     let dir = "www/".to_owned() + "all-" + &ty + ".html"; 
     let s_html = std::fs::read(dir);
@@ -62,7 +62,7 @@ pub async fn index_either(
 pub async fn index_dyn(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let ty = p.into_inner();
     let home_msg = Topic { 
         topic: String::from("all"), 
@@ -98,7 +98,7 @@ pub async fn index_dyn(
 // redirect to index_dyn
 pub async fn dyn_index(
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let p: Path<String> = String::from("index").into();
     index_dyn(db, p).await
 }
@@ -108,7 +108,7 @@ pub async fn dyn_index(
 // redirect to index_dyn
 pub async fn index_newest(
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let p: Path<String> = String::from("newest").into();
     index_dyn(db, p).await
 }
@@ -119,7 +119,7 @@ pub async fn index_newest(
 pub async fn topic_dyn(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let pa = p.into_inner();
     let topic = pa.0;
     let ty = pa.1;
@@ -160,7 +160,7 @@ pub async fn topic_dyn(
 pub async fn topic_either(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let pa = p.clone();
     let topic = pa.0;
     let ty = pa.1;
@@ -187,7 +187,7 @@ pub async fn topic_either(
 pub async fn item_from(
     db: Data<DbAddr>,
     bq: Query<ByQuery>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     // extract Query
     let bq_by = bq.into_inner().by.unwrap_or_default();
     use crate::util::helper::de_base64;
@@ -232,7 +232,7 @@ pub async fn more_item(
     db: Data<DbAddr>,
     p: Path<(String, String)>,
     pq: Query<PageQuery>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let pa = p.into_inner();
     let topic = pa.0;
     let p_ty = pa.1;
@@ -277,7 +277,7 @@ pub async fn more_item(
 pub async fn item_view(
     db: Data<DbAddr>,
     p: Path<String>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let slug = p.into_inner();
     use crate::api::item::QueryItem;
 
@@ -304,7 +304,7 @@ pub async fn item_view(
 // GET /me/index.html // spa
 // try_uri for spa
 // 
-pub async fn spa_index() -> Result<HttpResponse, Error> {
+pub async fn spa_index() -> ServiceResult<HttpResponse> {
     let res = String::from_utf8(
         std::fs::read("spa/index.html")
             .unwrap_or("Not Found".to_owned().into_bytes()),
@@ -319,7 +319,7 @@ pub async fn spa_index() -> Result<HttpResponse, Error> {
 // GET /site/{name}
 //
 // site: about, help, terms, etc.
-pub async fn site(p_info: Path<String>) -> Result<HttpResponse, Error> {
+pub async fn site(p_info: Path<String>) -> ServiceResult<HttpResponse>{
     let p = p_info.into_inner();
     let tpl_dir = p + ".html";
     let dir = "www/".to_owned() + &tpl_dir;
@@ -395,7 +395,7 @@ pub fn del_html(name: &str) -> ServiceResult<()> {
 pub async fn statify_site(
     db: Data<DbAddr>,
     _auth: CheckCan,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let ss = StaticSite();
     let res = db.send(ss).await?; 
     match res {
@@ -409,7 +409,7 @@ pub async fn statify_site(
 // delete static file.
 pub async fn del_static_file(
     p: Path<String>
-) -> Result<HttpResponse, Error> {
+) -> ServiceResult<HttpResponse> {
     del_html(&p.into_inner())?;
 
     Ok(HttpResponse::Ok().json(String::from("delete")))
@@ -421,7 +421,7 @@ pub async fn del_static_file(
 // non auth, only for background job,  do not expose!
 pub async fn statify_site_(
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let ss = StaticSite();
     let res = db.send(ss).await?; 
     match res {

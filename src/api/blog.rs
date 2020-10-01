@@ -22,7 +22,7 @@ pub async fn new(
     blog: Json<NewBlog>,
     _can: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let res = db.send(blog.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -45,7 +45,7 @@ pub async fn update(
     blog: Json<UpdateBlog>,
     _can: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let res = db.send(blog.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
@@ -67,7 +67,7 @@ impl Handler<UpdateBlog> for Dba {
 pub async fn get(
     qb: Path<i32>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("GET"),
@@ -86,7 +86,7 @@ pub async fn toggle_top(
     qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("PUT"),
@@ -105,7 +105,7 @@ pub async fn del(
     qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let blog = QueryBlog{
         id: qb.into_inner(), 
         method: String::from("DELETE"),
@@ -139,7 +139,7 @@ impl Handler<QueryBlog> for Dba {
 pub async fn get_list(
     pq: Query<ReqQuery>,
     db: Data<DbAddr>,
-) -> Result<HttpResponse, Error>  {
+) -> ServiceResult<HttpResponse> {
     let perpage = pq.perpage;
     let page = pq.page;
     let kw = pq.clone().kw;
