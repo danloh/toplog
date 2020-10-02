@@ -34,35 +34,12 @@
       </div> -->
       {%- endblock navMain -%}
       <div class="right-menu">
-        <a href="/me/" id="login-link" rel="nofollow noopener"><b>Log in</b></a>
+        <a href="/auth?to=signin" id="login-link" rel="nofollow noopener">Log in</a>
       </div>
     {%- endblock nav -%}
     </nav>
   {%- endblock header -%}
   </header>
-  <div class="banner">
-    {%- block banner -%}
-    <div class="banner-bar">
-      {%- let baseUrl = topic|set_baseurl -%}
-      {%- for t in tys -%}
-        {%- if t.trim() == ty.trim() -%}
-        <a class="ty-tab-active" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
-        {%- else -%}
-        <a class="ty-tab" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
-        {%- endif -%}
-      {%- endfor -%}
-      {%- if topic != "all" && topic != "from" -%}
-        <span class="topic-tab-active tab-{{ topic }}">{{ topic }}</span>
-      {%- endif -%}
-      <a onclick="openLink('/me/item/new?for={{ topic }}&to={{ ty }}')" 
-        href="javascript:void(0);" 
-        style="float:right"
-      >
-        <small class="help-tips">Suggest An Item...</small>
-      </a>
-    </div>
-    {%- endblock banner -%}
-  </div>
   <div class="main-view">
     {%- block mainview -%}{%- endblock mainview -%}
   </div>

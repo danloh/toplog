@@ -8,7 +8,7 @@ use actix_web::{
     dev::Payload,
     web::{Data, Json, Path},
     Error, HttpResponse, ResponseError,
-    FromRequest, HttpRequest,
+    FromRequest, HttpRequest, HttpMessage
 };
 use diesel::prelude::*;
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
@@ -33,6 +33,8 @@ pub const BASIC_PERMIT: i16 = 0x02; // create, edit self created...
 pub const EIDT_PERMIT: i16 = 0x04; // edit/del others' creats
 pub const MOD_PERMIT: i16 = 0x10; // mod role
 pub const ADMIN_PERMIT: i16 = 0x80; // admin
+
+pub const COOKIE_TOK: &'static str = "NoSeSNekoTr";  // same as frontend
 
 // POST: api/signup
 //
@@ -596,12 +598,19 @@ impl FromRequest for CheckUser {
                 }
             }
         }
+        if let Some(cooki) = req.cookie(COOKIE_TOK) {
+            let cookie_val = cooki.value();
+            // println!("cookie: {:?}", cookie_val);
+            if let Ok(user) = decode_token(cookie_val) {
+                return ok(user);
+            }
+        }
         err(ServiceError::Unauthorized.into())
     }
 }
 
 // return as user info w/o password  // if can HKT, would be good
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct CheckCan {
     pub uname: String,
     pub permission: i16,
@@ -629,21 +638,71 @@ impl FromRequest for CheckCan {
     type Future = Ready<Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let mut u: CheckCan = CheckCan::default();
         if let Some(auth_token) = req.headers().get("authorization") {
             if let Ok(auth) = auth_token.to_str() {
                 if let Ok(user) = decode_token(auth) {
-                    let u: CheckCan = user.into();
-                    // check permission, to be optimazed
-                    let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
-                    let check_permission: bool = 
-                        u.uname == admin_env || u.can(EIDT_PERMIT);
-                    if check_permission {
-                        return ok(u);
-                    }
+                    u = user.into();
                 }
             }
         }
+        if let Some(cooki) = req.cookie(COOKIE_TOK) {
+            let cookie_val = cooki.value();
+            // println!("cookie: {:?}", cookie_val);
+            if let Ok(user) = decode_token(cookie_val) {
+                u = user.into();
+            }
+        }
+        // check permission, to be optimazed
+        let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
+        let check_permission: bool = 
+            u.uname == admin_env || u.can(EIDT_PERMIT);
+        if check_permission {
+            return ok(u);
+        }
         err(ServiceError::Unauthorized.into())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CheckAuth(pub String);
+
+impl FromRequest for CheckAuth {
+    type Config = ();
+    type Error = ServiceError;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        if let Some(cooki) = req.cookie(COOKIE_TOK) {
+            let cookie_val = cooki.value();
+            // println!("cookie: {:?}", cookie_val);
+            if let Ok(user) = decode_token(cookie_val) {
+                return ok(CheckAuth(user.uname));
+            }
+        } 
+        ok(CheckAuth(String::new()))
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CheckCsrf();
+
+impl FromRequest for CheckCsrf {
+    type Config = ();
+    type Error = ServiceError;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        if let Some(csrf_token) = req.headers().get("CsrfToken") {
+            if let Ok(csrf) = csrf_token.to_str() {
+                // println!(">>CSRF: {:?}", csrf);
+                let tc = verify_token(csrf);
+                if Utc::now().timestamp() <= tc.exp {
+                    return ok(CheckCsrf());
+                }
+            }
+        }
+        err(ServiceError::BadRequest(String::from("c")).into())
     }
 }
 

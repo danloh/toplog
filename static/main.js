@@ -5,27 +5,68 @@ function showMenu(id_name = "drop-menu") {
   if (show) { show.classList.toggle("show");}
 }
 
-const TOK = 'NoSeSNekoTr'; // for get cookie token
-const IDENT = 'YITnEdIr'  // for get cookie identity
-function getCookie(c_name) {
-  let c_start = 0, c_end = 0, ck = document.cookie;
-  if (ck.length > 0) {
-    c_start = ck.indexOf(c_name + "=");
-    if (c_start != -1) {
-      c_start = c_start + c_name.length + 1;
-      c_end = ck.indexOf(";", c_start);
-      if (c_end === -1) { c_end = ck.length;}
+// get query param
+String.prototype.regexIndexOf = function(regex, startpos) {
+  var indexOf = this.substring(startpos || 0).search(regex);
+  return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+}
+
+function getParam(param, query, startwith, delimit1, delimit2) {
+  let start = 0, end = 0;
+  // console.log(query);
+  if (query.length > start && query.startsWith(startwith)) {
+    start = query.search(param + delimit1);
+    if (start != -1) {
+      start = start + param.length + 1;
+      end = query.regexIndexOf(delimit2, start);
+      if (end === -1) { end = query.length;}
     }
-    let c = ck.substring(c_start,c_end);
-    return unescape(c) 
+    let c = query.substring(start, end);
+    return c
   }
   return ""
 }
+
+function getQueryParam(param, query) {
+  return getParam(param, query, startwith='?', delimit1='=', delimit2=/&[\w]+=/)
+}
+function getCookie(param) {
+  return getParam(param, query=document.cookie, startwith='', delimit1='=', delimit2=';')
+}
+
+// extract val or set val
+function getValsByIDs(ids=[], prefix='') {
+  let vals = [];
+  for ( let id of ids ) {
+    let ele = document.getElementById(prefix + id);
+    let val = ele ? ele.value || ele.innerHTML : '';
+    vals.push(val);
+  }
+  return vals;
+}
+function setValsByIDs(ids=[], prefix='', vals={}) {
+  for ( let id of ids ) {
+    let ele = document.getElementById(prefix + id);
+    let val = vals[id]
+    if (ele.value === undefined) {
+      ele.innerHTML = val || '';
+    } else {
+      ele.value = val || '';
+    }
+  }
+}
+
+const TOK = 'NoSeSNekoTr'; // for get cookie token
+const IDENT = 'YITnEdIr'  // for get cookie identity
 //## action once window loaded
-window.addEventListener('load', function() {
+window.addEventListener('DOMContentLoaded', function() {
   //# check if authed
   let iden = getCookie(IDENT);
-  document.getElementById('login-link').style.display = iden ? 'none' : '';
+  let loginLink = document.getElementById('login-link');
+  if (loginLink) { 
+    loginLink.setAttribute('href', `/@${iden}`);
+    loginLink.innerText = 'Profile';
+  } 
 });
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
@@ -89,7 +130,7 @@ function upVote(slug) {
   let tok = getCookie(TOK);
   let check = Boolean(tok);
   if (!check) {
-    window.location.href = "/me";
+    window.location.href = "/auth?to=signin";
     return;
   }
   fetch(`/api/items/${slug}?action=vote`, {
@@ -125,9 +166,64 @@ function openLink(link, admin=false) {
     ? getCookie("oMg") === "true" 
     : Boolean(getCookie(TOK));
   if (!check && !admin) {
-    window.location.href = "/me";
+    window.location.href = "/auth?to=signin";
     return;
   }
   if (!check) return;
   window.location.href = link;
+}
+
+
+// auth 
+// set cookie
+function setCookie (key, value, attributes) {
+  if (typeof document === 'undefined') return;
+
+  attributes = Object.assign({secure: true, sameSite: 'Lax'}, attributes);
+
+  if (typeof attributes.expires === 'number') {
+    attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
+  }
+  if (attributes.expires) {
+    attributes.expires = attributes.expires.toUTCString();
+  }
+
+  key = encodeURIComponent(key)
+    .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+    .replace(/[()]/g, escape);
+  value = encodeURIComponent(value)
+    .replace(/%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g, decodeURIComponent);
+
+  let stringifiedAttributes = '';
+  for (let attributeName in attributes) {
+    if (!attributes[attributeName]) {
+      continue
+    }
+    stringifiedAttributes += '; ' + attributeName;
+    if (attributes[attributeName] === true) {
+      continue
+    }
+    // Considers RFC 6265 section 5.2:
+    // ...
+    // 3.  If the remaining unparsed-attributes contains a %x3B (";")
+    //     character:
+    // Consume the characters of the unparsed-attributes up to,
+    // not including, the first %x3B (";") character.
+    // ...
+    stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
+  }
+
+  return (document.cookie = key + '=' + value + stringifiedAttributes)
+}
+
+function delCookie(key, attributes={}) {
+  setCookie(key, '', Object.assign({expires: -1}, attributes))
+}
+
+function signOut(to='/') {
+  delCookie(TOK);
+  delCookie(IDENT);
+  // delCookie(CAN);
+  delCookie('oMg');
+  window.location.href = to;
 }

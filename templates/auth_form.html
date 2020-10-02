@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{%- block title -%} Welcome {%- endblock title -%}
+
+{%- block navMain -%}{%- endblock navMain -%}
+
+{%- block mainview -%}
+<div class="main-page form-page" id="auth-form-page">
+  <div class="main-box form-box auth-form-box">
+    <h2 id="auth-form-title">Welcome</h2>
+    {%- include "_auth_box.html" -%}
+  </div>
+</div>
+{%- endblock mainview -%}
+
+{%- block script -%}
+<script src="/static/0_auth.js"></script>
+{%- endblock script -%}

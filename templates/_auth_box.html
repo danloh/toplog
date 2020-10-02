@@ -1,0 +1,96 @@
+<div id="sign-in-form">
+  <section>
+    <input id="auth-username" placeholder="Username" required/>
+  </section>
+  <section>
+    <input type="password" id="auth-psw" placeholder="Password" required/>
+  </section>
+  <span class="help-tips">
+    Notice: Use Cookies Here to Assist Authentication.
+  </span>
+  <section>
+    <button onClick="login()" id="auth-loginbtn" class="toolbtn form-submit-btn">
+      Log In
+    </button>
+  </section>
+  <span class="help-tips">
+    If forget Password or New to here, Please<button onClick="onSwitch(1)" class="toolbtn">Create new account</button>.
+  </span>
+</div>
+<div id="sign-up-form" style="display: none;">
+  <section>
+    <input id="auth-newuser" placeholder="Username: 3-16" required/>
+  </section>
+  <section>
+    <input type="password" id="auth-newpsw" placeholder="Password: at least 8" required/>
+  </section>
+  <section>
+    <input type="password" id="auth-repsw" placeholder="Confirm Password" required/>
+  </section>
+  <span class="help-tips">
+    Agree to <a href="/terms.html" target="_blank">Terms and Policy</a> as Sign up and <button onClick="onSwitch()" class="toolbtn">Sign in</button>.
+  </span>
+  <section>
+    <button onClick="signup()" id="auth-signupbtn" class="toolbtn form-submit-btn">
+      Sign Up
+    </button>
+  </section>
+</div>
+<div id="reset-form" style="display: none;">
+  <section>
+    <input id="auth-reset" placeholder="Username" required/>
+  </section>
+  <span class="help-tips">
+    IF no Email provided, Please
+    <a href="/auth?to=signup" class="toolbtn">Create New Account</a>
+  </span>
+  <section>
+    <button onClick="reset()" id="auth-restbtn" class="toolbtn form-submit-btn">
+      Send me Reset Email
+    </button>
+  </section>
+</div>
+<div id="chpsw-form" style="display: none;">
+  <section>
+    <input type="password" id="auth-oldpsw" placeholder="Old Password" required/>
+  </section>
+  <section>
+    <input type="password" id="auth-chpsw" placeholder="New Password" required/>
+  </section>
+  <section>
+    <input type="password" id="auth-rechpsw" placeholder="Confirm Password: Please Store properly, Cannot recovery" required/>
+  </section>
+  <section>
+    <button onClick="changePsw()" id="auth-chpswbtn" class="toolbtn form-submit-btn">
+      Change Password
+    </button>
+  </section>
+</div>
+<div id="update-form" style="display: none;">
+  <input type="hidden" value="{{ uname }}" id="hide-uname" class="csrf-data">
+  <input type="hidden" value="{{ csrf_tok }}" id="auth-csrf" class="csrf-data">
+  <section title="Screen Name">
+    <input id="auth-up-nickname" style="width: 252px;" placeholder="Screen Name"/>
+  </section>
+  <section title="Avatar Link">
+    <textarea id="auth-up-avatar" style="width: 265px; height: 75px;" placeholder="Avatar Link" spellcheck="false"></textarea>
+  </section>
+  <section title="Email">
+    <input type="email" id="auth-up-email" style="width: 252px;" placeholder="Email" />
+  </section>
+  <section title="Location">
+    <input id="auth-up-loc" style="width: 252px;" placeholder="Location" />
+  </section>
+  <section title="Introduce Myself">
+    <textarea id="auth-up-intro" style="width: 265px; height: 145px;" placeholder="Introduce Myself" spellcheck="false"></textarea>
+  </section>
+  <section>
+    <button onClick="updateUser()" id="auth-up-btn" class="toolbtn form-submit-btn">
+      Update My Profile
+    </button>
+  </section>
+  <a href="/@{{ uname }}" class="help-tips">Cancel and Back</a>
+  <span class="form-tips">
+    <button onClick="onSwitch(3)" class="toolbtn">Change Password</button>.
+  </span>
+</div>

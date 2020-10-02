@@ -89,7 +89,7 @@ pub async fn index_dyn(
     let home_msg = Topic { 
         topic: String::from("all"), 
         ty,
-        page: 1, 
+        page: 1,
     };
     
     let res = db.send(home_msg).await?;

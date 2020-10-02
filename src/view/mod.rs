@@ -1,6 +1,7 @@
 // view redered by server side
 
 pub mod tmpl;
+pub mod form;
 
 use regex::Regex;
 use std::collections::HashMap;
