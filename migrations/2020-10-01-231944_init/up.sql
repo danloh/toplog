@@ -28,6 +28,7 @@ CREATE TABLE users (
   UNIQUE (uname, email)
 );
 
+-- AUTHOR: OUTLET
 CREATE TABLE blogs (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
   aname VARCHAR UNIQUE NOT NULL,
@@ -44,6 +45,7 @@ CREATE TABLE blogs (
   UNIQUE (aname, blog_link)
 );
 
+-- article|media|event|book| etc..
 CREATE TABLE items (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
   title VARCHAR NOT NULL,
@@ -52,38 +54,35 @@ CREATE TABLE items (
   logo VARCHAR NOT NULL DEFAULT '',
   author VARCHAR NOT NULL,
   ty VARCHAR NOT NULL, -- article|media|event|book| etc..
-  lang VARCHAR NOT NULL DEFAULT 'English',
+  lang VARCHAR NOT NULL DEFAULT 'en',
   topic VARCHAR NOT NULL DEFAULT '',
   link VARCHAR UNIQUE NOT NULL,
   link_host VARCHAR NOT NULL DEFAULT '',
-  origin_link VARCHAR NOT NULL DEFAULT '',
+  origin_link VARCHAR NOT NULL DEFAULT '', -- for translate
   post_by VARCHAR NOT NULL DEFAULT '',
   post_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   pub_at DATE NOT NULL DEFAULT CURRENT_DATE,
   is_top BOOLEAN NOT NULL DEFAULT FALSE,
-  vote INTEGER NOT NULL DEFAULT 1,
-  UNIQUE (title, author, link)  -- ?
+  vote INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE INDEX items_author_idx ON items (author);
 
-CREATE TABLE issues (
+-- tag
+CREATE TABLE labels (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
-  title VARCHAR UNIQUE NOT NULL,
+  label VARCHAR UNIQUE NOT NULL,
   slug VARCHAR UNIQUE NOT NULL,
-  content TEXT NOT NULL DEFAULT '',
-  topic VARCHAR NOT NULL,
-  author VARCHAR NOT NULL,
-  post_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  vote INTEGER NOT NULL DEFAULT 1,
-  is_closed BOOLEAN NOT NULL DEFAULT FALSE
+  intro TEXT NOT NULL DEFAULT '',
+  logo VARCHAR NOT NULL DEFAULT '',
+  vote INTEGER NOT NULL DEFAULT 1
 );
 
-CREATE TABLE issuelabels (
-  issue_id INTEGER NOT NULL REFERENCES issues (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  label VARCHAR NOT NULL,
+CREATE TABLE itemlabels (
+  item_id INTEGER NOT NULL REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  label VARCHAR NOT NULL REFERENCES labels (label) ON UPDATE CASCADE ON DELETE CASCADE,
   label_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (issue_id, label)
+  PRIMARY KEY (item_id, label)
 );
 
 CREATE TABLE comments (
@@ -95,34 +94,10 @@ CREATE TABLE comments (
   is_closed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE issuecomments (
-  issue_id INTEGER NOT NULL REFERENCES issues (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  comment_id INTEGER NOT NULL REFERENCES comments (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY (issue_id, comment_id)
-);
-
 CREATE TABLE itemcomments (
   item_id INTEGER NOT NULL REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
   comment_id INTEGER NOT NULL REFERENCES comments (id) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY (item_id, comment_id)
-);
-
--- TODO
-CREATE TABLE itemlinks (
-  item_id VARCHAR NOT NULL REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  link VARCHAR NOT NULL,
-  link_ty VARCHAR NOT NULL, -- trans | comment ...
-  link_host VARCHAR NOT NULL,
-  link_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (item_id, link)
-);
-
-CREATE TABLE itemtrans (
-  origin_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
-  trans_slug VARCHAR NOT NULL REFERENCES items (slug) ON UPDATE CASCADE ON DELETE CASCADE,
-  trans_lang VARCHAR NOT NULL, -- language
-  trans_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (origin_slug, trans_slug)
 );
 
 CREATE TABLE voteitems (

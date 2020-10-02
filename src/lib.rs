@@ -159,23 +159,6 @@ pub async fn init_server() -> std::io::Result<()> {
                         .route(delete().to(api::item::del))
                 )
                 .service(
-                    resource("/issues")
-                        .route(post().to(api::rfc::new))
-                        .route(put().to(api::rfc::update))
-                        // get_list: ?per=label&kw=&perpage=20&page=p
-                        .route(get().to(api::rfc::get_list)) 
-                )
-                .service(
-                    resource("/issues/{slug}")
-                        .route(get().to(api::rfc::get))
-                        .route(delete().to(api::rfc::del))
-                )
-                .service(
-                    resource("/labelissues")
-                        .route(post().to(api::rfc::label_isuue))
-                        .route(delete().to(api::rfc::del_label_isuue))
-                )
-                .service(
                     resource("/generate-sitemap")
                         .route(get().to(view::tmpl::gen_sitemap))
                 )
@@ -196,11 +179,6 @@ pub async fn init_server() -> std::io::Result<()> {
             .service(
                 fs::Files::new("/static", "./static/") // static files
                     .default_handler(route().to(|| HttpResponse::NotFound()))
-            )
-            .service(
-                fs::Files::new("/me", "./spa/") // spa static files
-                    .index_file("index.html")
-                    .default_handler(route().to(view::tmpl::spa_index))
             )
             .service(
                 resource("/confirm/{token}")

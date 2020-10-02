@@ -30,6 +30,7 @@ pub fn spider_and_save_item(conn: &PgConnection) -> QueryResult<()> {
     use crate::bot::cfg::LINK_VEC;
     let url_list = &LINK_VEC;
     for url in url_list.iter() {
+        println!("{}", url);
         let page = WebPage::new(url).unwrap_or_default();
         links.append(&mut page.clean_links());
     }

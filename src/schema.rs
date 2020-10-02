@@ -38,38 +38,17 @@ table! {
 }
 
 table! {
-    issuecomments (issue_id, comment_id) {
-        issue_id -> Int4,
-        comment_id -> Int4,
-    }
-}
-
-table! {
-    issuelabels (issue_id, label) {
-        issue_id -> Int4,
-        label -> Varchar,
-        label_at -> Timestamp,
-    }
-}
-
-table! {
-    issues (id) {
-        id -> Int4,
-        title -> Varchar,
-        slug -> Varchar,
-        content -> Text,
-        topic -> Varchar,
-        author -> Varchar,
-        post_at -> Timestamp,
-        vote -> Int4,
-        is_closed -> Bool,
-    }
-}
-
-table! {
     itemcomments (item_id, comment_id) {
         item_id -> Int4,
         comment_id -> Int4,
+    }
+}
+
+table! {
+    itemlabels (item_id, label) {
+        item_id -> Int4,
+        label -> Varchar,
+        label_at -> Timestamp,
     }
 }
 
@@ -96,11 +75,13 @@ table! {
 }
 
 table! {
-    itemtrans (origin_slug, trans_slug) {
-        origin_slug -> Varchar,
-        trans_slug -> Varchar,
-        trans_lang -> Varchar,
-        trans_at -> Timestamp,
+    labels (id) {
+        id -> Int4,
+        label -> Varchar,
+        slug -> Varchar,
+        intro -> Text,
+        logo -> Varchar,
+        vote -> Int4,
     }
 }
 
@@ -145,11 +126,9 @@ table! {
     }
 }
 
-joinable!(issuecomments -> comments (comment_id));
-joinable!(issuecomments -> issues (issue_id));
-joinable!(issuelabels -> issues (issue_id));
 joinable!(itemcomments -> comments (comment_id));
 joinable!(itemcomments -> items (item_id));
+joinable!(itemlabels -> items (item_id));
 joinable!(votecomments -> comments (comment_id));
 joinable!(voteitems -> items (item_id));
 
@@ -157,12 +136,10 @@ allow_tables_to_appear_in_same_query!(
     background_jobs,
     blogs,
     comments,
-    issuecomments,
-    issuelabels,
-    issues,
     itemcomments,
+    itemlabels,
     items,
-    itemtrans,
+    labels,
     users,
     votecomments,
     voteitems,

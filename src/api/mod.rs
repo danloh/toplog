@@ -2,8 +2,6 @@
 pub mod auth;
 pub mod blog;
 pub mod item;
-pub mod rfc;
-
 
 #[derive(Deserialize, Clone)]
 pub struct ReqQuery {
