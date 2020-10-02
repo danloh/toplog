@@ -59,6 +59,10 @@ blockquote {
 .logo-sup {
   margin-left: -1em;
 }
+.main-menu {
+  display: inline-block;
+  padding: 5px 0px 0px 0px;
+}
 .search-box {
   display: inline-block; 
   margin-left: 10px;
@@ -239,11 +243,13 @@ blockquote {
 .meta-sum {
   color: #828282;
   font-size: 16px;
-}
-.hide-part {
-  max-height: 80px;
+  max-height: 160px;
   overflow: hidden;
 }
+.meta-sum:hover {
+  overflow: auto;
+}
+
 .item-view .title {
   font-size: 24px;
 }

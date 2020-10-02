@@ -18,6 +18,28 @@ use crate::view::{
     IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, SiteMapTmpl
 };
 
+// for extrct query param
+// 
+#[derive(Deserialize, Clone)]
+pub struct PageQuery {
+    page: i32,
+    perpage: i32,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct PerQuery {
+    ty: Option<String>,    // Article|Book...
+    tpc: Option<String>,   // topic: Rust|Golang...
+    ord: Option<String>,   // order
+}
+
+#[derive(Deserialize, Clone)]
+pub struct FromQuery {
+    by: Option<String>,
+    site: Option<String>,  // TODO
+    ord: Option<String>,   // TODO
+}
+
 // GET /
 //
 pub async fn index() -> ServiceResult<HttpResponse> {
@@ -186,7 +208,7 @@ pub async fn topic_either(
 // response dynamically
 pub async fn item_from(
     db: Data<DbAddr>,
-    bq: Query<ByQuery>,
+    bq: Query<FromQuery>,
 ) -> ServiceResult<HttpResponse> {
     // extract Query
     let bq_by = bq.into_inner().by.unwrap_or_default();
@@ -301,20 +323,6 @@ pub async fn item_view(
     }
 }
 
-// GET /me/index.html // spa
-// try_uri for spa
-// 
-pub async fn spa_index() -> ServiceResult<HttpResponse> {
-    let res = String::from_utf8(
-        std::fs::read("spa/index.html")
-            .unwrap_or("Not Found".to_owned().into_bytes()),
-    )
-    .unwrap_or_default();
-    Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(res
-    ))
-}
 
 // GET /site/{name}
 //
@@ -486,21 +494,6 @@ pub async fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
 // =====================================================================
 // type model
 // =====================================================================
-
-// for extrct query param
-#[derive(Deserialize, Clone)]
-pub struct PageQuery {
-    page: i32,
-    perpage: i32,
-}
-
-// for extrct query param
-#[derive(Deserialize, Clone)]
-pub struct ByQuery {
-    by: Option<String>,
-    site: Option<String>,  // TODO
-    ord: Option<String>,   // TODO
-}
 
 // result struct in response
 #[derive(Deserialize, Serialize, Debug, Clone)]

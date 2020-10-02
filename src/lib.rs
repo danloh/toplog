@@ -189,7 +189,7 @@ pub async fn init_server() -> std::io::Result<()> {
                     .route(get().to(view::tmpl::dyn_index))
             )
             .service(
-                resource("/from")  // per author: /from?by=
+                resource("/from")  // query: ?by=&site=&ord=
                     .route(get().to(view::tmpl::item_from))
             )
             .service(

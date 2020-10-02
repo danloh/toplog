@@ -26,8 +26,6 @@ window.addEventListener('load', function() {
   //# check if authed
   let iden = getCookie(IDENT);
   document.getElementById('login-link').style.display = iden ? 'none' : '';
-  document.getElementById('menu-down').style.display = iden ? '' : 'none';
-  document.getElementById('profile-link').href = iden ? '/me/p/' + iden : '#';
 });
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
