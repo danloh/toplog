@@ -2,7 +2,7 @@
 //use futures::{Future};
 use actix::{Handler, Message};
 use crate::errors::{ServiceError, ServiceResult};
-use crate::api::auth::{verify_token, CheckUser, CheckCan};
+use crate::api::auth::{verify_token, QueryUser, CheckUser, CheckCan};
 use crate::api::item::{Item, QueryItems};
 use crate::api::blog::{Blog, QueryBlogs};
 use crate::{Dba, DbAddr, PooledConn};
@@ -15,7 +15,8 @@ use chrono::{SecondsFormat, Utc};
 
 use crate::view::{
     Template, TY_VEC, TOPIC_VEC, 
-    IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, SiteMapTmpl
+    IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
+    SiteMapTmpl
 };
 
 // for extrct query param
@@ -323,6 +324,30 @@ pub async fn item_view(
     }
 }
 
+// profile
+// GET /@{uname}
+//
+pub async fn profile(
+    db: Data<DbAddr>,
+    auth: CheckUser,
+    name: Path<String>,
+) -> ServiceResult<HttpResponse> {
+    let uname = name.into_inner();
+    let authuname = auth.uname;
+    let is_self = if uname == authuname { true } else { false };
+    let user = db.send(QueryUser { uname }).await??;
+
+    let profile = ProfileTmpl {
+        user: &user,
+        is_self,
+    };
+    let s = profile.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}
 
 // GET /site/{name}
 //

@@ -227,3 +227,76 @@ function signOut(to='/') {
   delCookie('oMg');
   window.location.href = to;
 }
+
+// gen avatar
+//
+const bgColors = [
+  '#F48FB1', '#FF4081', '#9C27B0', '#673AB7', '#3F51B5', 
+  '#2196F3', '#03A9F4', '#795548', '#9E9E9E', '#53B6CB',
+  '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', 
+  '#FFC107', '#FF9800', '#B3E5FC', '#607D8B', '#D793E7',
+];
+
+function randomColor(seed, colors) {
+  return colors[seed % (colors.length)]
+}
+
+function genStyle(src, size, uname, inline, isImage, rounded) {
+  const style = {
+    width: `${size}px`,
+    height: `${size}px`,
+    'border-radius': rounded ? '50%' : 0,
+  };
+  const backgroundAndFontStyle = isImage
+    ? {
+      background: `transparent url('${src}') no-repeat scroll 0% 0% / ${size}px ${size}px content-box border-box`,
+      'referrer-policy': 'no-referrer'
+    }
+    : {
+      'background-color': randomColor(uname.length, bgColors),
+      font: Math.floor(size / 2) + 'px/100px Helvetica, Arial, sans-serif',
+      'font-weight': 'bold',
+      'line-height': `${(size + Math.floor(size / 20))}px`,
+      display: inline ? 'inline-flex' : 'flex',
+      'align-items': 'center',
+      'justify-content': 'center',
+      // color: randomColor(uname.length + 1, bgColors)
+    };
+  Object.assign(style, backgroundAndFontStyle);
+  let stringStyle = '';
+  for (let attr in style) {
+    if (!style[attr]) {
+      continue
+    }
+    stringStyle += attr + ': ' + style[attr] + '; ';
+  }
+  return stringStyle
+}
+
+function initial(uname) {
+  let parts = uname.split(/[ _-]/);
+  let initials = '';
+  for (let i = 0; i < parts.length; i++) {
+    initials += parts[i].charAt(0);
+  }
+  if (initials.length > 3 && initials.search(/[A-Z]/) !== -1) {
+    initials = initials.replace(/[a-z]+/g, '');
+  }
+  initials = initials.substr(0, 3).toUpperCase();
+  return initials
+}
+
+function initAvatar(ctnID, src, size, uname, rounded=false, inline=false) {
+  let avatar = document.createElement('div');
+  let isImage = Boolean(src);
+  let GenStyle = genStyle(src, size, uname, inline, isImage, rounded);
+  avatar.setAttribute('style', GenStyle);
+  
+  if (!isImage) {
+    let inner = document.createElement('span');
+    inner.innerText = initial(uname);
+    avatar.appendChild(inner);
+  }
+  let avatarCtn = document.getElementById(ctnID);
+  if (avatarCtn) { avatarCtn.appendChild(avatar); }
+}

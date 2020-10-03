@@ -279,6 +279,66 @@ blockquote {
 .more-opt-btn {
   padding: 1px 2px;
 }
+.active-tab {
+  border-bottom: 2px solid #03a87c;
+  color: #03a87c;
+}
+
+.profile-head {
+  display: flex;
+}
+.profile-info, .profile-avatar {
+  padding: 5px 10px;
+}
+.profile-avatar {
+  width: 200px;
+}
+.profile-info {
+  flex: 1;
+}
+.profile-name {
+  font-size: 1.5em;
+}
+.profile-aboutme {
+  font-size: 0.85em;
+  padding: 5px 0px;
+}
+.profile-intro {
+  max-height: 120px;
+  overflow: hidden;
+}
+.profile-intro:hover {
+  overflow: auto;
+}
+.profile-nav {
+  margin-top: 10px;
+  border-bottom: 1px dashed #03a87c;
+  border-top: 1px dashed #03a87c;
+}
+.s-nav {
+  padding: 7px 4px;
+  font-size: 0.85em;
+  color: rgba(0,0,0,.75);
+}
+.s-list {
+  background-color: #f5f7f8;
+}
+.s-sum-info {
+  padding: 10px;
+  border-bottom: 1px dashed #ddd;
+}
+.s-sum-info:hover {
+  background-color: #e7e9e9;
+}
+.s-sum {
+  color: #828282;
+  font-size: 16px;
+  max-height: 160px;
+  overflow: hidden;
+}
+.s-sum:hover {
+  overflow: auto;
+}
 
 .badge, .badge-circle, .badge-heart,
 .badge-bead, .badge-oval {

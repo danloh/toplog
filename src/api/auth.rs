@@ -169,7 +169,7 @@ pub async fn update(
 
     // auth.uname == user.uname
     if auth.uname != up_user.uname {
-        panic!("No Permission"); // to have a better way!!
+        return Ok(ServiceError::Unauthorized.error_response());
     }
 
     if let Err(e) = up_user.validate() {
@@ -216,7 +216,7 @@ pub async fn change_psw(
 
     // auth.uname == user.uname
     if auth.uname != usr_psw.uname {
-        panic!("No Permission"); // to have a better way!!
+        return Ok(ServiceError::Unauthorized.error_response());
     }
 
     // for decode password
@@ -922,7 +922,6 @@ impl UpdateUser {
         };
         let check_len = test_len_limit(&self.location, 0, MID_LEN);
         let check = nickname_test && avatar_test && check_len;
-
         if check {
             Ok(())
         } else {

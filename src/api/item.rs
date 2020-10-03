@@ -192,7 +192,7 @@ impl Handler<QueryItem> for Dba {
     }
 }
 
-// GET: api/items/{per}?per=topic|author&kw=&page=p&perpage=42
+// GET: api/getitems/{pper}?per=topic|author&kw=&page=p&perpage=42
 // 
 pub async fn get_list(
     pt: Path<String>,
@@ -833,7 +833,7 @@ impl QueryItems {
                 match action {
                     "submit" => {
                         let query = items.filter(post_by.eq(u));
-                        //item_count = query.clone().count().get_result(conn)?;
+                        item_count = query.clone().count().get_result(conn)?;
                         item_list = query
                             .order(pub_at.desc())
                             .limit(o.into())
@@ -847,7 +847,7 @@ impl QueryItems {
                             .filter(vote_as.eq(1))
                             .select(item_id)
                             .load::<i32>(conn)?;
-                        //item_count = itemid_list.len() as i64;
+                        item_count = itemid_list.len() as i64;
                         item_list = items
                             .filter(id.eq(any(&itemid_list)))
                             .order(pub_at.desc())

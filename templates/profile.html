@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title -%} {{ user.nickname }}@{{ user.uname }} {% endblock title -%}
+
+{% block mainview -%}
+<div class="main-page">
+  <div class="main-box">
+    <div class="profile-head">
+      <div class="profile-avatar" id="user-avatar">
+        <span id="avatar-src" style="display: none;">{{ user.avatar }}</span>
+        <span id="avatar-name" style="display: none;">{{ user.uname }}</span>
+      </div>
+      <div class="profile-info">
+        {% if user.nickname.len() > 0 %}
+        <b class="profile-name">{{ user.nickname }}</b>
+        {% else %}
+        <b class="profile-name">{{ user.uname }}</b>
+        {% endif %}
+        {% if is_self %}
+        <a href="/auth?to=update"><small> @{{ user.uname }}</small></a>
+        {% else %}
+        <small> @{{ user.uname }}</small>
+        {% endif %}
+        <div class="profile-aboutme">
+          <div class="profile-joinat"><small>Joined {{ user.join_at|dt_fmt("%b %d, %Y") }}</small></div>
+          <div class="profile-location"><small >{{ user.location }}</small></div>
+          <div class="profile-intro">{{ user.intro }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="profile-nav">
+      <a class="s-nav" onclick="navTo('submit', 'a')" id="a" href="javascript:void(0);">
+        Articles
+      </a>
+      <a class="s-nav" onclick="navTo('vote', 'rl')" id="rl" href="javascript:void(0);">
+        Read Later
+      </a>
+    </div>
+    <div class="nav-box s-list-view">
+      <div class="s-list" id="nav-list-box"></div>
+      <button class="toolbtn" id="loadmore-btn" onclick="loadMoreAny()">Show More</button>
+    </div>
+  </div>
+  <aside class="right-box">
+    <div class="profile-box">
+      
+    </div>
+  </aside>
+</div>
+{% endblock mainview -%}
+
+{%- block script -%}
+<script src="/static/profile.js"></script>
+{%- endblock script -%}

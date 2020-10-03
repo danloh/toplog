@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     let userRes = await getUser.json();
     let userInfo = Object.assign({ },userRes.user);
     // console.log(userInfo);
-    let ids = ['nickname', 'avatar', 'email', 'loc', 'intro'];
+    let ids = ['nickname', 'avatar', 'email', 'location', 'intro'];
     setValsByIDs(ids, 'auth-up-', userInfo);
   } 
 
@@ -173,7 +173,7 @@ function setAuth(reg) {
 
 async function updateUser() {
   if (!getCookie(TOK)) return;
-  let ids = ['nickname', 'avatar', 'email', 'loc', 'intro'];
+  let ids = ['nickname', 'avatar', 'email', 'location', 'intro'];
   let info = getValsByIDs(ids, 'auth-up-');
   let uname = getCookie(IDENT);
   let upUser = {
@@ -181,7 +181,7 @@ async function updateUser() {
     avatar: info[ids.indexOf('avatar')],
     email: info[ids.indexOf('email')],
     intro: info[ids.indexOf('intro')],
-    loc: info[ids.indexOf('loc')],
+    location: info[ids.indexOf('location')],
     nickname: info[ids.indexOf('nickname')],
   };
   let options = {

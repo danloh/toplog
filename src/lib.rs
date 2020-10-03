@@ -146,7 +146,7 @@ pub async fn init_server() -> std::io::Result<()> {
                         .route(put().to(api::item::spider))
                 )
                 .service(
-                    resource("/getitems/{per}")
+                    resource("/getitems/{pper}")
                         // get_list: ?per=topic&kw=&perpage=20&page=p
                         .route(get().to(api::item::get_list)) 
                 )
@@ -219,6 +219,10 @@ pub async fn init_server() -> std::io::Result<()> {
             .service( 
                 resource("/item/{slug}")
                     .route(get().to(view::tmpl::item_view))
+            )
+            .service(
+                resource("/@{uname}")
+                    .route(get().to(view::tmpl::profile))
             )
             .service(
                 resource("/site/{name}")

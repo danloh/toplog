@@ -11,6 +11,7 @@ pub use askama::Template;
 
 use crate::api::item::{Item};
 use crate::api::blog::{Blog};
+use crate::api::auth::CheckUser;
 
 
 lazy_static! {
@@ -51,6 +52,13 @@ pub struct ItemTmpl<'a> {
 pub struct ItemsTmpl<'a> {
     pub items: &'a Vec<Item>,
     pub topic: &'a str,
+}
+
+#[derive(Template)]
+#[template(path = "profile.html")]
+pub struct ProfileTmpl<'a> {
+    pub user: &'a CheckUser,
+    pub is_self: bool,
 }
 
 #[derive(Template)]
@@ -97,6 +105,22 @@ mod filters {
         let res = n.to_string() + u;
 
         Ok(res)
+    }
+
+    pub fn dt_fmt(
+        value: &NaiveDateTime, 
+        fmt: &str, 
+    ) -> TmplResult<String> {
+        
+        let format: &str = if fmt.len() > 0 {
+            fmt
+        } else {
+            "%Y-%m-%d %R"
+        };
+        // https://docs.rs/chrono/0.4.15/chrono/format/strftime/index.html
+        let formatted = value.format(format).to_string();
+            
+        Ok(formatted)
     }
 
     pub fn md(s: &str) -> TmplResult<String> {
