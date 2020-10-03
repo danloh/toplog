@@ -1,6 +1,9 @@
 
 <div class="banner-bar">
   {%- let baseUrl = topic|set_baseurl -%}
+  {%- if topic != "all" && topic != "from" -%}
+    <span class="topic-tab-active tab-{{ topic }}">{{ topic }}</span>
+  {%- endif -%}
   {%- for t in tys -%}
     {%- if t.trim() == ty.trim() -%}
     <a class="ty-tab-active" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
@@ -8,9 +11,6 @@
     <a class="ty-tab" href="{{ baseUrl }}{{ t }}">{{ t }}</a>
     {%- endif -%}
   {%- endfor -%}
-  {%- if topic != "all" && topic != "from" -%}
-    <span class="topic-tab-active tab-{{ topic }}">{{ topic }}</span>
-  {%- endif -%}
   <a onclick="openLink('/me/item/new?for={{ topic }}&to={{ ty }}')" href="javascript:void(0);">
     <small class="help-tips">Suggest An Item...</small>
   </a>

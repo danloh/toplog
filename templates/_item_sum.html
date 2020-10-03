@@ -1,24 +1,26 @@
 <section class="item-sum">
-  {%- let a_url = item.clone().link -%}
-  {%- let a_content = item.clone().content -%}
-  {%- let a_author = item.clone().author|b64_encode -%}
-  {%- let a_slug = item.clone().slug -%}
-  {%- let a_topic = item.clone().topic -%}
-  {%- let a_ty = item.clone().ty -%}
-  <a href ="{{ a_url }}" target="_blank" rel="noopener">
-    <b class="title">{{ item.title }}</b>
-    <span class="host"> | </span>
-    <span style="color: #37a">{{ a_url|host }}</span>
-  </a>
-  <div id="md-{{ a_slug }}" class="meta-sum">
-    {{ a_content }}
+  {%- let a_url = item.link.clone() -%}
+  {%- let a_content = item.content.clone() -%}
+  {%- let a_author = item.author.clone()|b64_encode -%}
+  {%- let a_slug = item.slug.clone() -%}
+  {%- let a_topic = item.topic.clone() -%}
+  {%- let a_ty = item.ty.clone() -%}
+  <div class="item-info">
+    <div class="item-box">
+      <a href ="{{ a_url }}" target="_blank" rel="noopener">
+        <b class="item-title">{{ item.title }}</b>
+        <span class="host"> | </span>
+        <span style="color: #37a">{{ a_url|host }}</span>
+      </a>
+      <div id="md-{{ a_slug }}" class="meta-sum">{{ a_content }}</div>
+    </div>
+    {%- let logo = item.logo.clone() -%}
+    {%- if logo.len() > 0 -%}
+    <div class="thumb-box">
+      <img class="item-thumb" src="{{ logo }}" loading="lazy" referrerPolicy="no-referrer">
+    </div>
+    {%- endif -%}
   </div>
-  {%- let logo = item.clone().logo -%}
-  {%- if logo.len() > 0 -%}
-  <a href ="{{ a_url }}" target="_blank" rel="noopener">
-    <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
-  </a>
-  {%- endif -%}
   <div class="item-meta">
     <span class="badge {{ a_ty }}"></span> <!-- type badge-->
     <span class="meta-tag">{{ a_ty }}</span> 

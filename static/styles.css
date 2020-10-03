@@ -221,9 +221,8 @@ blockquote {
 
 .item-sum, .item-view {
   background-color:#f5f7f8;
-  padding: 10px 75px 10px 10px;
+  padding: 10px;
   min-height: 75px;
-  position: relative;
 }
 .item-sum {
   border-bottom: 1px dashed #ddd;
@@ -231,12 +230,25 @@ blockquote {
 .item-sum:hover {
   background-color:  #fcfdfc;
 }
-.item-sum .title {
+.item-info {
+  display: flex;
+  flex-direction: row;
+}
+.item-box {
+  flex: 9;
+  padding: 2px;
+}
+.thumb-box {
+  flex: 1;
+  padding: 2px;
+}
+.item-title {
   font-size: 22px;
 }
 .item-meta {
   font-size: 14px;
 }
+
 .meta-tag {
   margin-right: 8px;
 }
@@ -258,17 +270,10 @@ blockquote {
   font-size: 18px;
 }
 .item-thumb {
-  position: absolute;
-  max-width: 70px;
-  max-height: 70px;
-  top: 4px;
-  right: 2px;
+  border-radius: 2.5%;
+  max-width: 160px;
+  max-height: 160px;
 }
-/* .item-thumb:hover {
-  max-width: 180px;
-  max-height: 180px;
-  z-index: 999;
-} */
 .vote-num {
   font-size: 0.75em;
   color: #fff;
@@ -286,6 +291,7 @@ blockquote {
 
 .profile-head {
   display: flex;
+  flex-direction: row;
 }
 .profile-info, .profile-avatar {
   padding: 5px 10px;
@@ -505,18 +511,15 @@ blockquote {
 }
 
 @media (max-width: 800px) {
-  .main-page {
+  .main-page, .profile-head {
     padding: 10px;
     flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .item-sum {
-    padding: 10px;
-  }
-  .item-thumb {
-    position: relative;
+  .item-info {
+    flex-direction: column;
   }
 }
 
