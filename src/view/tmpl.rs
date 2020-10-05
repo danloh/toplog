@@ -12,7 +12,6 @@ use actix_web::{
     Result
 };
 use chrono::{SecondsFormat, Utc};
-
 use crate::view::{
     Template, TY_VEC, TOPIC_VEC, 
     IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
@@ -481,20 +480,9 @@ impl Handler<StaticSite> for Dba {
 }
 
 pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
-    let tpcs = vec!(
-        "all", 
-        "Rust", "Go", "Swift", "TypeScript", "Angular", "Vue", "React", "Dart", "Flutter",
-        "Python", "C-sharp", "C", "CPP", "JavaScript", "Java", "PHP", "Kotlin", "DataBase"
-    );
-    let typs = vec!(
-        "index", "Misc", 
-        "Article", "Book", "Event", "Job", "Media", 
-        "Product", "Translate"
-    );
-
-    for tpc in tpcs {
-        for typ in typs.clone() {
-            gen_html(tpc.into(), typ.into(), conn);
+    for tpc in TOPIC_VEC.iter() {
+        for typ in TY_VEC.clone() {
+            gen_html(tpc.to_string(), typ.into(), conn);
         }
     }
           
@@ -616,7 +604,7 @@ fn checker(ty: &str) -> bool {
         || ty == "Event" 
         || ty == "Job" 
         || ty == "Media" 
-        || ty == "Product" 
+        || ty == "Project" 
         || ty == "Translate"
         || ty == "Misc"
         || ty == "newest";

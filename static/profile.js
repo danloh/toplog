@@ -41,9 +41,13 @@ async function loadAndAppend(action, isMore=false) {
   hasMore = page <= Math.floor(totalCount / PerPage);
 
   let moreBtn = document.getElementById('loadmore-btn');
-  if (moreBtn && !hasMore) { 
-    moreBtn.setAttribute('disabled', true); 
-    moreBtn.style.display = 'none';
+  if (moreBtn) { 
+    if (hasMore) { 
+      moreBtn.removeAttribute('disabled');
+    } else { 
+      moreBtn.setAttribute('disabled', true); 
+    }
+    moreBtn.style.display = hasMore ? '' : 'none';
   }
 
   let sList = document.getElementById('nav-list-box');

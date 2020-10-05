@@ -18,14 +18,14 @@ lazy_static! {
     pub static ref TOPIC_VEC: Vec<&'static str> = {
         vec!(
             "all", 
-            "Rust", "Go", "Swift", "TypeScript", "Angular", "Vue", "React", "Dart", "Flutter",
+            "Rust", "Go", "Swift", "TypeScript", "Dart", 
             "Python", "C-sharp", "C", "CPP", "JavaScript", "Java", "PHP", "Kotlin", "DataBase"
         )
     };
 
     pub static ref TY_VEC: Vec<&'static str> = {
         vec!(
-            "Article", "Book", "Event", "Job", "Media", "Product", "Translate", "Misc"
+            "Article", "Book", "Event", "Job", "Media", "Project", "Translate", "Misc"
         )
     };
 }
