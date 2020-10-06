@@ -243,6 +243,7 @@ impl Handler<QueryItems> for Dba {
 // =================================================================================
 // Model
 // =================================================================================
+// =================================================================================
 
 #[derive(Clone, Debug, Serialize, Deserialize, Identifiable, Queryable)]
 #[table_name = "items"]
@@ -266,7 +267,7 @@ pub struct Item {
     pub vote: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Insertable, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "items"]
 pub struct NewItem {
     pub title: String,
@@ -275,11 +276,10 @@ pub struct NewItem {
     pub logo: String,
     pub author: String,
     pub ty: String,
-    pub lang: String,
     pub topic: String,
     pub link: String,
-    pub origin_link: String,
     pub post_by: String,
+    pub pub_at: NaiveDate,
 }
 
 impl NewItem {
@@ -305,11 +305,10 @@ impl NewItem {
             logo: self.logo.trim().to_owned(),
             author: self.author.trim().to_owned(),
             ty: self.ty.trim().to_owned(),
-            lang: self.lang.trim().to_owned(),
             topic: self.topic.trim().to_owned(),
             link: ilink.clone(),
-            origin_link: self.origin_link.trim().to_owned(),
             post_by: self.post_by.trim().to_owned(),
+            pub_at: self.pub_at,
         };
 
         // save item's author to blog, for reference
@@ -371,10 +370,8 @@ pub struct UpdateItem {
     pub logo: String,
     pub author: String,
     pub ty: String, 
-    pub lang: String,
     pub topic: String,
     pub link: String,
-    pub origin_link: String,
     pub post_by: String,
     pub pub_at: NaiveDate,
 }
@@ -395,10 +392,8 @@ impl UpdateItem {
         let new_logo = self.logo.trim();
         let new_author = self.author.trim();
         let new_ty = self.ty.trim();
-        let new_lang = self.lang.trim();
         let new_topic = self.topic.trim();
         let new_link = self.link.trim();
-        let new_origin = self.origin_link.trim();
         let new_pub_at = self.pub_at;
 
         let check_changed: bool = new_title != old.title.trim()
@@ -406,10 +401,8 @@ impl UpdateItem {
             || new_logo != old.logo.trim()
             || new_author != old.author.trim()
             || new_ty != old.ty.trim()
-            || new_lang != old.lang.trim()
             || new_topic != old.topic.trim()
             || new_link != old_link
-            || new_origin != old.origin_link.trim()
             || new_pub_at != old.pub_at;
         if !check_changed {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
@@ -448,10 +441,8 @@ impl UpdateItem {
             logo: new_logo.to_owned(),
             author: new_author.to_owned(),
             ty: new_ty.to_owned(),
-            lang: new_lang.to_owned(),
             topic: new_topic.to_owned(),
             link: ilink,
-            origin_link: new_origin.to_owned(),
             post_by: postBy.to_owned(),
             pub_at: new_pub_at,
             ..self

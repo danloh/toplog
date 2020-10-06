@@ -64,8 +64,8 @@ window.addEventListener('DOMContentLoaded', function() {
   let iden = getCookie(IDENT);
   let loginLink = document.getElementById('login-link');
   if (loginLink) { 
-    loginLink.setAttribute('href', `/@${iden}`);
-    loginLink.innerText = 'Profile';
+    loginLink.setAttribute('href', iden ? `/@${iden}` : '/auth?to=signin');
+    loginLink.innerText = iden ? 'Profile' : 'Log In';
   } 
 });
 // Close the dropdown menu if the user clicks outside of it

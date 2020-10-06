@@ -816,7 +816,7 @@ impl RegUser {
                     }
                 }
 
-                diesel::insert_into(users)
+                let _reg = diesel::insert_into(users)
                     .values(&newUser)
                     .get_result::<User>(conn)?;
 

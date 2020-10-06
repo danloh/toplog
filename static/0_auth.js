@@ -7,9 +7,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   let query = document.location.search;
   let docRefer = document.referrer;
-  RedirectURL = getQueryParam('redirect', query) 
-    || docRefer
-    || '/';
+  RedirectURL = getQueryParam('redirect', query) || docRefer ||'/';
   let toWhat = getQueryParam('to', query);
   let toNum = toWhat == 'signin' 
     ? 0 
@@ -19,11 +17,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         ? 2 
         : toWhat == 'changepsw' 
           ? 3
-          : toWhat == 'update' ? 4 : 0;
+          : toWhat == 'update' ? 4 : 5;
 
   // redirect when authed on signin / signup
   if (toNum < 2 && getCookie(TOK)) {
-    window.location.href = RedirectURL;
+    window.location.href = RedirectURL.search('/auth?to=signin') == -1 ? RedirectURL : '/';
   }
 
   if (toNum >= 3 && !getCookie(TOK)) return;
@@ -97,7 +95,6 @@ async function signup() {
     email: '',
     password: Base64encode(password, true),
     confirm: Base64encode(password, true),
-    invitee_code,
     agree: true,
   };
   let options = {
@@ -107,9 +104,7 @@ async function signup() {
   };
   let regResp = await fetch('/api/signup', options);
   if (!regResp.ok) { alert("Failed.."); return }
-  let reg = await regResp.json();
-  setAuth(reg);
-  window.location.href = RedirectURL;
+  window.location.href = '/auth?to=signin';
 }
 
 function reset() { /*TODO*/ }

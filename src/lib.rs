@@ -233,6 +233,14 @@ pub async fn init_server() -> std::io::Result<()> {
                     .route(get().to(view::form::auth_form))
             )
             .service(
+                resource("/newitem")
+                    .route(get().to(view::form::new_item))
+            )
+            .service(
+                resource("/edititem")  // query: ?id=
+                    .route(get().to(view::form::edit_item))
+            )
+            .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("all-index.html")
                     .default_handler(route().to(view::tmpl::dyn_index))

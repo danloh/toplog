@@ -42,10 +42,11 @@ blockquote {
   height: 45px;
   min-width: 240px;
 }
-.header .nav-menu {
+.nav-menu {
   box-sizing: border-box;
   margin: 0px auto;
   padding: 6px 0px;
+  display: flex;
 }
 .logo {
   color: #03a87c;
@@ -59,8 +60,8 @@ blockquote {
 .logo-sup {
   margin-left: -1em;
 }
-.main-menu {
-  display: inline-block;
+.main-menu, .input-nav {
+  flex: 1;
   padding: 5px 0px 0px 0px;
 }
 .search-box {
@@ -344,6 +345,119 @@ blockquote {
 }
 .s-sum:hover {
   overflow: auto;
+}
+
+.hide-submit-box {
+  display: none;
+  background-color: #f0efee;
+}
+.form-wrap, .form-item-wrap {
+  padding: 10px 5px;
+  display: flex;
+  flex-direction: row;
+}
+.as-select, .input-sum-date {
+  width: 95px;
+  background-color: #f5f5f5;
+  border: 2px solid #fff;
+}
+.input-sum-date {
+  width: 130px;
+}
+.input-box {
+  flex: 1;
+  display: block;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 2px solid #fff;
+}
+.submit-btn {
+  width: 95px;
+}
+
+.input-nav {
+  overflow: hidden;
+}
+.form-page {
+  padding: 5px;
+  border: 1px solid #f3f3f3;
+}
+.form-box {
+  padding: 0 10px 0 0; 
+  border-right: 3px solid #e1ebec;
+}
+
+
+.form-item-label {
+  width: 10px;
+}
+.form-tips {
+  font-size: 14px;
+  padding: 2px 10px;
+  color: green;
+}
+
+.form-input {
+  padding: 5px 10px;
+  box-sizing: border-box;
+  background: #ecebea;
+  width: 100%;
+  line-height: 1.42;
+  border: 0;
+}
+.form-input-title {
+  font-size: 1.1em;
+  line-height: 1.5em;
+  font-weight: 500;
+}
+.form-input-intro {
+  font-size: 0.9em;
+  line-height: 1.5em;
+}
+.form-input-select {
+  font-size: 0.8em;
+  background-color: #f9f9f9;
+}
+.cache-tips, .autosave-tips, .form-help-tips {
+  background-color: #f8f6e3;
+  font-size: 14px;
+  padding: 5px;
+  margin: 5px 0;
+}
+.new-story-tips {
+  font-size: 15px;
+  padding: 5px;
+  margin: 5px 0;
+  border-bottom: 2px solid #dddcdc;
+}
+.viaurl-form {
+  width: 100%;
+  background-color: #f0efee;
+  margin: 5px 0;
+}
+.tags-container {
+  padding: 2px 10px;
+}
+.new-form-tag {
+  padding: 5px;
+  margin-right: 3px;
+  background: #ddd;
+  font-size: 12px;
+}
+.new-form-tag:hover {
+  background: #8fc4d4;
+}
+.edit-tag-btn {
+  font-size: 12px;
+  color: red;
+  cursor: pointer;
+}
+
+.form-submit-btn {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #c5f3e7;
 }
 
 .badge, .badge-circle, .badge-heart,

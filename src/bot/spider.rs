@@ -1,6 +1,7 @@
 // a simple page crawle
 
 use regex::Regex;
+use chrono::{NaiveDate, Utc};
 use scraper::{Html, Selector};
 
 use crate::errors::{ServiceError, ServiceResult};
@@ -110,16 +111,14 @@ impl WebPage {
                     logo: page.img.trim().to_owned(),
                     author: get_author_topic(dmn).0,
                     ty: "Article".to_owned(),
-                    lang: "English".to_owned(),
                     topic: get_author_topic(dmn).1,
                     link: page.url.trim().to_owned(),
-                    origin_link: "".to_owned(),
                     post_by: "bot".to_owned(),
+                    pub_at: Utc::today().naive_utc()
                 }
             }
         }
     }
-
 }
 
 pub fn page_ele_paser(

@@ -31,3 +31,45 @@ pub async fn auth_form(
     )
 }
 
+#[derive(Template)]
+#[template(path = "0_item_form.html")]
+pub struct ItemFormTmpl<'a> {
+    pub csrf_tok: &'a str,
+    pub is_new: bool,
+}
+
+// GET /newstory
+//
+pub async fn new_item(
+    auth: CheckUser,
+) -> Result<HttpResponse, ServiceError> {
+    let tok = generate_token(&auth.uname, "item@new", 1*24*3600)?;
+    let ns = ItemFormTmpl {
+        csrf_tok: &tok,
+        is_new: true,
+    };
+    let s = ns.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}
+
+// GET /edititem?id=
+//
+pub async fn edit_item(
+    auth: CheckUser,
+) -> Result<HttpResponse, ServiceError> {
+    let tok = generate_token(&auth.uname, "item@edit", 1*24*3600)?;
+    let ns = ItemFormTmpl {
+        csrf_tok: &tok,
+        is_new: false,
+    };
+    let s = ns.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}
