@@ -49,13 +49,13 @@
     </section>
     <span class="form-tips">Select Category and Domain*</span>
     <section class="form-item-wrap wrap-layout">
-      <select id="edit-r-ty" class="form-input form-input-select" required>
+      <select id="new-i-ty" class="form-input form-input-select" required>
         <option value="">Select Category</option>
         {%- for c in iCates -%}
         <option value="{{ c }}">{{ c }}</option>
         {%- endfor -%}
       </select>
-      <select id="edit-r-topic" class="form-input form-input-select" required>
+      <select id="new-i-topic" class="form-input form-input-select" required>
         <option value="">Select Topic</option>
         {%- for d in iTopics -%}
         <option value="{{ d }}">{{ d }}</option>
@@ -87,6 +87,6 @@
 </div>
 {%- endblock mainview -%}
 
-{%- block ftscript -%}
+{%- block script -%}
 <script src="/static/0_item.js"></script>
-{%- endblock ftscript -%}
+{%- endblock script -%}

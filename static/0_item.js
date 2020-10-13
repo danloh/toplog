@@ -131,25 +131,33 @@ async function newItem() {
 
 async function newItemViaUrl() {
   if (!getCookie(TOK)) return;
-  let urlBtn = document.getElementById('new-s-url-btn');
+  let urlBtn = document.getElementById('new-i-url-btn');
   if (urlBtn) { urlBtn.innerHTML = "Processing"; }
 
   let urlEle = document.getElementById('new-i-viaurl');
   let url = urlEle ? urlEle.value : '';
   if (url.length < 1) return;
 
-  let csrfTok = document.getElementById('new-s-csrf');
+  let csrfTok = document.getElementById('new-i-csrf');
   let csrf = csrfTok ? csrfTok.value : ''
   if (!csrf) return;
+
+  let sp_data = {
+    url,
+    topic: '',
+    ty: ''
+  };
 
   let options = {
     method: 'PUT', 
     headers: { 
       'Authorization': getCookie(TOK), 
       'CsrfToken': csrf, 
+      'Content-Type': 'application/json'
     },
+    body: JSON.stringify(sp_data)
   };
-  let resp = await fetch('/api/additem?url=' + url, options);
+  let resp = await fetch('/api/spider', options);
 
   if (!resp.ok) {
     alert("Something failed");
@@ -177,25 +185,20 @@ document.addEventListener('DOMContentLoaded', async function() {
     // load item
     let slug = document.location.search.split('?slug=')[1];
     if (!slug) return;
-    let resp = await fetch(`/api/item/${slug}`);
+    let resp = await fetch(`/api/items/${slug}`);
     if (!resp.ok) return;
     let res_item = await resp.json();
 
     UP_ITEM = res_item;
     IS_NEW_OR_NOT = false;
-    let CAN_EDIT_LEVEL = res_item.post_by == getCookie(IDENT) ? true : false;
-    let selectLevel = document.getElementById('new-s-modlevel');
-    if (!CAN_EDIT_LEVEL && selectLevel) {
-      selectLevel.setAttribute('disabled', true);
-    }
 
-    let ids = ['title', 'domain', 'intro', 'modlevel', 'cover'];
+    let ids = ['title', 'content', 'logo', 'author', 'ty','topic', 'link', 'pub_at'];
     setValsByIDs(ids, S_PREFIX, res_item);
     // load tags and init tagsbar
-    await loadTagsInitBar('item', res_item.id);
+    // await loadTagsInitBar('item', res_item.id);
   }
 
-  initAutoSize(['new-s-title', 'new-s-intro', 'new-s-cover']);
+  initAutoSize(['new-i-title', 'new-i-content', 'new-i-logo']);
 
 })
 
@@ -284,10 +287,10 @@ function initTagBar(tags) {
   })
 }
 
-async function loadTagsInitBar(pper, id) {
-  let resp_tags = await fetch(`/api/topics/${pper}?per=${id}&ext=0&page=1&perpage=${PerPage}`)
-  let res_tags = await resp_tags.json();
-  let tags = res_tags.topics.map(tpc => tpc.tname)
-  showTagList.push(...tags);
-  initTagBar(showTagList);
-}
+// async function loadTagsInitBar(pper, id) {
+//   let resp_tags = await fetch(`/api/topics/${pper}?per=${id}&ext=0&page=1&perpage=${PerPage}`)
+//   let res_tags = await resp_tags.json();
+//   let tags = res_tags.topics.map(tpc => tpc.tname)
+//   showTagList.push(...tags);
+//   initTagBar(showTagList);
+// }

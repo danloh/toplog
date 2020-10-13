@@ -43,7 +43,7 @@
         •••
       </button>
       <div id="item-opt-{{ a_slug }}" class="dropdown-content">
-        <li><a onclick= "openLink('/me/item/update/{{ a_slug }}')" href="javascript:void(0);" class="help-tips">
+        <li><a onclick= "openLink('/edititem?slug={{ a_slug }}')" href="javascript:void(0);" class="help-tips">
           Eidt</a></li>
         <li><a id="t-{{ a_slug }}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
           {%- if item.is_top -%} UnPin {%- else -%} Pin {%- endif -%}
