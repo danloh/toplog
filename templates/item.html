@@ -19,16 +19,11 @@
       <div class="item-meta">
         <span class="badge {{ item.ty }}"></span> <!-- type badge-->
         <span class="meta-tag">{{ item.ty }}</span> 
-        <span class="badge-bead"></span> <!-- author badge-->
-        <span class="meta-tag">{{ item.author }}</span>
         <span class="badge-circle tab-{{ item.topic }}"></span> <!-- topic badge -->
         <span class="meta-tag">{{ item.topic }}</span>  
-        <span class="badge-oval"></span> <!-- date badge -->
+        <span class="badge-bead"></span> <!-- author badge-->
+        <span class="meta-tag">{{ item.author }}</span>
         <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span> 
-        <a id="up-{{ a_slug }}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="upvote">
-          <span class="triangle-up"></span>
-        </a> 
-        <span id="vote-{{ a_slug }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp;
         <a onclick= "openLink('/edititem?slug={{ a_slug }}')" 
           href="javascript:void(0);" title="Edit"
         >...</a>&nbsp;&nbsp;
