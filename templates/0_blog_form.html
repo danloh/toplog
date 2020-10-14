@@ -23,14 +23,6 @@
     <section class="form-item-wrap wrap-layout" title="Blog Link" required>
       <textarea class="input-box" id="new-b-blog_link" spellcheck="false" placeholder="Blog Link"></textarea>
     </section>
-    <span class="form-tips">Avatar</span>
-    <section class="form-item-wrap wrap-layout">
-      <textarea class="input-box" id="new-b-avatar" spellcheck="false"></textarea>
-    </section>
-    <span class="form-tips">Introduction</span>
-    <section class="form-item-wrap wrap-layout">
-      <textarea class="input-box form-input-intro" id="new-b-intro" rows="2" spellcheck="false"></textarea>
-    </section>
     <span class="form-tips">Select Domain*</span>
     <section class="form-item-wrap wrap-layout">
       <select id="new-b-topic" class="form-input form-input-select" required>
@@ -39,6 +31,14 @@
         <option value="{{ d }}">{{ d }}</option>
         {%- endfor -%}
       </select>
+    </section>
+    <span class="form-tips">Avatar</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box" id="new-b-avatar" spellcheck="false"></textarea>
+    </section>
+    <span class="form-tips">Introduction</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box form-input-intro" id="new-b-intro" rows="2" spellcheck="false"></textarea>
     </section>
   </div>
   <aside class="page-side">
@@ -50,7 +50,7 @@
       <textarea class="input-box" id="new-b-other_link" spellcheck="false" placeholder="Other Link"></textarea>
     </section>
     <section class="form-item-wrap wrap-layout">
-      <input type="checkbox" class="" id="new-b-is_top" />
+      <input type="checkbox" class="" id="new-b-is_top" value="top" />
       <label for="new-b-is_top">This is Featured Blog</label>
     </section>
     <span class="form-tips">Add Tag</span>

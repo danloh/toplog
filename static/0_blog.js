@@ -6,7 +6,7 @@ let IS_NEW_OR_NOT = true;  // new or edit
 function buildBlog() {
   let ids = [
     'aname', 'avatar', 'intro', 'topic', 'blog_link','blog_host', 
-    'gh_link', 'other_link', 'is_top', 'csrf'
+    'gh_link', 'other_link', 'csrf'
   ];
   let vals = getValsByIDs(ids, S_PREFIX);
 
@@ -18,10 +18,11 @@ function buildBlog() {
   let blog_link = vals[ids.indexOf('blog_link')];
   let gh_link = vals[ids.indexOf('gh_link')];
   let other_link = vals[ids.indexOf('other_link')];
-  let is_top = vals[ids.indexOf('is_top')];
   let csrf = vals[ids.indexOf('csrf')];
 
-  console.log("is top", is_top);
+  let ckb = document.getElementById('new-b-is_top');
+  // console.log(ckb.checked)
+  let is_top = ckb && ckb.checked;
   
   // refer to struct NewBlog
   let new_blog = {
@@ -33,7 +34,7 @@ function buildBlog() {
     blog_host,
     gh_link,
     other_link,
-    is_top: is_top == 'on' ? true : false,
+    is_top,
   };
   // console.log(new_blog);
   return [new_blog, csrf];
@@ -154,10 +155,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     IS_NEW_OR_NOT = false;
 
     let ids = [
-      'aname', 'avatar', 'intro', 'topic', 'blog_link','blog_host', 
-      'gh_link', 'other_link', 'is_top'
+      'aname', 'avatar', 'intro', 'topic', 'blog_link', 
+      'blog_host',  'gh_link', 'other_link'
     ];
     setValsByIDs(ids, S_PREFIX, res_blog);
+    // init checkbox
+    if (res_blog.is_top) {
+      let ckbox = document.getElementById('new-b-is_top');
+      if (ckbox) { ckbox.setAttribute('checked', true); }
+    }
+
     // load tags and init tagsbar
     // await loadTagsInitBar('blog', res_blog.id);
   }
@@ -165,96 +172,3 @@ document.addEventListener('DOMContentLoaded', async function() {
   // initAutoSize(['new-b-intro', 'new-b-avatar']);
 
 })
-
-
-// autosize textarea
-const newEvtListener = (parent, type, listener) => parent.addEventListener(type, listener);
-function initAutoSize(ids=[]) {
-  const autoSize = (id) => {
-    let text = document.getElementById(id);
-    const resize = () => {
-        text.style.height = 'auto';
-        text.style.height = text.scrollHeight + 'px';
-    };
-    const delayedResize = () => {
-        window.setTimeout(resize, 0);
-    };
-    newEvtListener(text, 'change',  resize);
-    newEvtListener(text, 'focus',  resize);
-    newEvtListener(text, 'cut',     delayedResize);
-    newEvtListener(text, 'paste',   delayedResize);
-    newEvtListener(text, 'drop',    delayedResize);
-    newEvtListener(text, 'keydown', delayedResize);
-
-    text.focus();
-    text.select();
-    resize();
-  };
-
-  for (let id of ids) {
-    autoSize(id);
-  }
-}
-
-// load tags and init tag bar
-//
-let showTagList = [];
-let addTagList = [];  // new added 
-let delTagList = [];  // to be deled tags
-
-function addTag(e, id) {
-  if(e.keyCode === 13){
-    e.preventDefault();
-    let tagInput = document.getElementById(id);
-    let tagName = tagInput ? tagInput.value : '';
-    if (tagName.length > 0 && showTagList.indexOf(tagName) == -1) { 
-      showTagList.push(tagName);
-      // console.log(showTagList);
-      tagInput.value = '';
-    };
-    if (tagName.length > 0 && addTagList.indexOf(tagName) == -1) { 
-      addTagList.push(tagName);
-      // console.log(addTagList);
-      tagInput.value = '';
-    };
-
-    initTagBar(showTagList);
-  }
-}
-
-function delTag(tag) {
-  showTagList.splice(showTagList.indexOf(tag), 1);
-  // console.log(showTagList);
-  if (tag.length > 0 && delTagList.indexOf(tag) == -1) { 
-    delTagList.push(tag);
-    // console.log(delTagList);
-  };
-  initTagBar(showTagList);
-}
-
-function initTagBar(tags) {
-  let container = document.getElementById('sa-tags-container');
-  container.innerHTML = '';
-
-  tags.forEach(tagName => {
-    // add html element
-    let tagSpan = document.createElement('span');
-    tagSpan.className = "new-form-tag";
-    tagSpan.innerHTML = `<span class="tag-name">${tagName}</span>`;
-    let tagButton = document.createElement('a');
-    tagButton.className = "edit-tag-btn";
-    tagButton.innerHTML = " x";
-    tagButton.href = 'javascript:void(0);';
-    tagButton.onclick = () => delTag(tagName);
-    tagSpan.appendChild(tagButton);
-    container.appendChild(tagSpan);
-  })
-}
-
-// async function loadTagsInitBar(pper, id) {
-//   let resp_tags = await fetch(`/api/topics/${pper}?per=${id}&ext=0&page=1&perpage=${PerPage}`)
-//   let res_tags = await resp_tags.json();
-//   let tags = res_tags.topics.map(tpc => tpc.tname)
-//   showTagList.push(...tags);
-//   initTagBar(showTagList);
-// }

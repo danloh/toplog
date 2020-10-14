@@ -45,6 +45,11 @@ textarea {
   height: 45px;
   min-width: 240px;
 }
+
+.site-logo {
+  /* width: 75px; */
+  padding: 0 5px;
+}
 .nav-menu {
   box-sizing: border-box;
   margin: 0px auto;
