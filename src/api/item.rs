@@ -18,7 +18,6 @@ use crate::api::{
     re_test_url,
 };
 use crate::view::tmpl::del_html;
-use crate::util::helper::gen_slug;
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{items, voteitems};
 
@@ -169,7 +168,7 @@ pub async fn del(
     };
     let res = db.send(item).await?;
     match res {
-        Ok(b) => Ok(HttpResponse::Ok().json(b.slug)),
+        Ok(b) => Ok(HttpResponse::Ok().json(b.id)),
         Err(err) => Ok(err.error_response()),
     }
 }
@@ -250,7 +249,6 @@ impl Handler<QueryItems> for Dba {
 pub struct Item {
     pub id: i32,
     pub title: String,
-    pub slug: String,
     pub content: String,
     pub logo: String,
     pub author: String,
@@ -288,7 +286,6 @@ impl NewItem {
     ) -> ServiceResult<Item> {
         use crate::schema::items::dsl::{items, link};
         let title = self.title.trim();
-        // let a_slug = gen_slug(title);
         let nlink = self.link.trim();
         let ilink = nlink.to_string();
         let new_item = NewItem {
@@ -408,14 +405,6 @@ impl UpdateItem {
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
         
-        // check if title changed
-        // let check_title_changed: bool = &new_title != &old.title.trim();
-        // let a_slug = if check_title_changed {
-        //     gen_slug(new_title) 
-        // } else {
-        //     (&old).slug.to_owned()
-        // };
-
         let ilink = if new_link.len() > 0 {
             // check link if existing
             let check_link = items.filter(link.eq(new_link))
@@ -519,7 +508,7 @@ impl SpiderItem {
         let topic = if sp_topic.trim() == "all" || sp_topic.trim() == "from" {
             String::from("Rust")
         } else {
-            sp_topic 
+            sp_topic
         };
         let sp_ty = sp.ty;
         let ty = if TY_VEC.contains(&sp_ty.trim()) {
@@ -533,10 +522,10 @@ impl SpiderItem {
             ..sp_item
         };
         // save to db
-        let try_save_new_item = diesel::insert_into(items)
+        let try_save_new_item = dbg!(diesel::insert_into(items)
             .values(&item_new)
             .on_conflict_do_nothing()
-            .get_result::<Item>(conn);
+            .get_result::<Item>(conn));
         
         let new_item = if let Ok(itm) = try_save_new_item {
                 itm

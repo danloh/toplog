@@ -73,7 +73,7 @@ textarea {
   padding: 5px 0px 0px 0px;
 }
 .search-box {
-  display: inline-block; 
+  /* display: inline-block;  */
   margin-left: 10px;
 }
 .search-box .search-text {
@@ -131,6 +131,10 @@ textarea {
   margin: 5px auto;
   font-size: 0.75em;
 }
+.sub-link{
+  color: #03a87c;
+}
+
 .banner {
   background-color: #f6f9f8;
   padding: 5px 5px 0px 5px;

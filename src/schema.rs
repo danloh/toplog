@@ -56,7 +56,6 @@ table! {
     items (id) {
         id -> Int4,
         title -> Varchar,
-        slug -> Varchar,
         content -> Text,
         logo -> Varchar,
         author -> Varchar,

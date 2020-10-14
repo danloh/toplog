@@ -34,6 +34,7 @@
 
 <div class="main-page form-page" id="new-i-form-page">
   <div class="page-main form-box">
+    <span class="form-tips">Title</span>
     <section class="form-item-wrap wrap-layout" title="Title">
       <textarea class="input-box form-input-title" id="new-i-title" spellcheck="false" placeholder="Title" required></textarea>
     </section>
@@ -41,9 +42,11 @@
     <section class="form-item-wrap wrap-layout">
       <textarea class="input-box form-input-intro" id="new-i-content" rows="2" spellcheck="false" required></textarea>
     </section>
+    <span class="form-tips">Link</span>
     <section class="form-item-wrap wrap-layout" title="Link">
       <textarea class="input-box" id="new-i-link" spellcheck="false" placeholder="Link"></textarea>
     </section>
+    <span class="form-tips">Author</span>
     <section class="form-item-wrap wrap-layout" title="Origin Author">
       <input class="input-box" id="new-i-author" placeholder="Origin Author" />
     </section>
@@ -66,9 +69,11 @@
 
   <aside class="page-side">
     <input type="hidden" value="{{ csrf_tok }}" id="new-i-csrf" class="csrf-data">
+    <span class="form-tips">Cover</span>
     <section class="form-item-wrap wrap-layout" title="Cover">
       <textarea class="input-box" id="new-i-logo" spellcheck="false" placeholder="Cover"></textarea>
     </section>
+    <span class="form-tips">Publish Date</span>
     <section class="form-item-wrap wrap-layout" title="Publish Date">
       <input type="date" class="input-box" id="new-i-pub_at" placeholder="Publish Date" />
     </section>

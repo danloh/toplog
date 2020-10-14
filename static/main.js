@@ -18,7 +18,7 @@ function getParam(param, query, startwith, delimit1, delimit2) {
     start = query.search(param + delimit1);
     if (start != -1) {
       start = start + param.length + 1;
-      end = query.regexIndexOf(delimit2, start);
+      end = delimit2 ? query.regexIndexOf(delimit2, start) : query.length;
       if (end === -1) { end = query.length; }
     }
     let c = query.substring(start, end);
@@ -32,6 +32,10 @@ function getQueryParam(param, query) {
 }
 function getCookie(param) {
   return getParam(param, query=document.cookie, startwith='', delimit1='=', delimit2=';')
+}
+// tackle & in redirect query
+function getRedirect(param, query) {
+  return getParam(param, query, startwith='?', delimit1='=', delimit2='')
 }
 
 // extract val or set val

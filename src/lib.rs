@@ -249,6 +249,10 @@ pub async fn init_server() -> std::io::Result<()> {
                     .route(get().to(view::form::edit_blog))
             )
             .service(
+                resource("/submit")  // query: extract data
+                    .route(get().to(view::form::submit_to))
+            )
+            .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap
                     .index_file("all-index.html")
                     .default_handler(route().to(view::tmpl::dyn_index))

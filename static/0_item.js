@@ -20,7 +20,6 @@ function buildItem () {
   // refer to struct NewItem
   let new_item = {
     title,
-    slug: '',
     content,
     logo,
     author,
@@ -169,7 +168,7 @@ async function newItemViaUrl() {
   }
   // console.log(resp);
   let res_item = await resp.json();
-  window.location.href = '/item/' + res_item.slug;
+  window.location.href = '/item/' + res_item.id;
 }
 
 // hide or show viaurl

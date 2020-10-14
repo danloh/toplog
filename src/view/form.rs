@@ -116,3 +116,24 @@ pub async fn edit_blog(
         .body(s)
     )
 }
+
+#[derive(Template)]
+#[template(path = "0_submit_form.html")]
+pub struct SubmitToTmpl<'a> {
+    pub csrf_tok: &'a str,
+}
+
+pub async fn submit_to (
+    auth: CheckAuth,
+) -> Result<HttpResponse, ServiceError> {
+    let tok = generate_token(&auth.0, "submit@item", 1*24*3600)?;
+    let na = SubmitToTmpl {
+        csrf_tok: &tok,
+    };
+    let s = na.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}

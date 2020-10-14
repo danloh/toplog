@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{%- block title -%} Submit An Item {%- endblock title -%}
+
+{%- block navMain -%}
+<div class="input-nav">
+  <span class="input-nav-title">Submit An Item</span>
+</div>
+{%- endblock navMain -%}
+
+{%- block mainview -%}
+<div class="form-help-tips"></div>
+<div class="main-page form-page" id="subtl-form-page">
+  <div class="page-main form-box">
+    <label class="form-tips">Title*</label>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box form-input-title" id="subtl-title" rows="1" spellcheck="false" required></textarea>
+    </section>
+    <span class="form-tips">Link*</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box form-input-link" id="subtl-link" rows="1" spellcheck="false" required></textarea>
+    </section>
+    <span class="form-tips">Author</span>
+    <section class="form-item-wrap wrap-layout">
+      <input class="input-box form-input-author" id="subtl-author">
+    </section>
+    <span class="form-tips">Summary*</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box form-input-intro" id="subtl-content" rows="2" spellcheck="false"></textarea>
+    </section>
+    <span class="form-tips">Select Category and Domain*</span>
+    <section class="form-item-wrap wrap-layout">
+      <select id="subtl-ty" class="form-input form-input-select" required>
+        <option value="">Select Category</option>
+        {%- for c in iCates -%}
+        <option value="{{ c }}">{{ c }}</option>
+        {%- endfor -%}
+      </select>
+    </section>
+    <section class="form-item-wrap wrap-layout">
+      <select id="subtl-topic" class="form-input form-input-select" required>
+        <option value=" ">Select Domain</option>
+        {%- for d in iTopics -%}
+        <option value="{{ d }}">{{ d }}</option>
+        {%- endfor -%}
+      </select>
+    </section>
+  </div>
+
+  <aside class="page-side">
+    <input type="hidden" value="{{ csrf_tok }}" id="subtl-csrf" class="csrf-data">
+    <span class="form-tips">Image Url as Cover</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box" id="subtl-logo" spellcheck="false"></textarea>
+    </section>
+    <span class="form-tips">Publish Date*</span>
+    <section class="form-item-wrap wrap-layout">
+      <input type="date" class="input-box form-input-pubat" id="subtl-pub_at">
+    </section>
+    <section class="form-item-wrap wrap-layout">
+      <button onClick="onSubmit()" id="subtl-btn" class="toolbtn form-submit-btn">
+        Submit
+      </button>
+    </section>
+  </aside>
+</div>
+{%- endblock mainview -%}
+
+{%- block script -%}
+<script src="/static/0_submit.js"></script>
+{%- endblock script -%}

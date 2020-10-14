@@ -49,7 +49,6 @@ CREATE TABLE blogs (
 CREATE TABLE items (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
   title VARCHAR NOT NULL,
-  slug VARCHAR UNIQUE NOT NULL,
   content TEXT NOT NULL DEFAULT '',
   logo VARCHAR NOT NULL DEFAULT '',
   author VARCHAR NOT NULL,
