@@ -32,8 +32,8 @@ lazy_static! {
 
 
 #[derive(Template)]
-#[template(path = "home.html")]
-pub struct IndexTmpl<'a> {
+#[template(path = "collection.html")]
+pub struct CollectionTmpl<'a> {
     pub ty: &'a str,
     pub topic: &'a str,
     pub items: &'a Vec<Item>,

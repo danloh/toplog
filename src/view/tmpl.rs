@@ -14,7 +14,7 @@ use actix_web::{
 use chrono::{SecondsFormat, Utc};
 use crate::view::{
     Template, TY_VEC, TOPIC_VEC, 
-    IndexTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
+    CollectionTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
     SiteMapTmpl
 };
 
@@ -98,7 +98,7 @@ pub async fn index_dyn(
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let typ = mesg[1];
 
-            let index_tmpl = IndexTmpl {
+            let index_tmpl = CollectionTmpl {
                 ty: &typ,
                 topic: "all",
                 items: &msg.items,
@@ -159,7 +159,7 @@ pub async fn topic_dyn(
             let tpc = mesg[0];
             let typ = mesg[1];
 
-            let tpc_tmpl = IndexTmpl {
+            let tpc_tmpl = CollectionTmpl {
                 ty: typ,
                 topic: tpc,
                 items: &msg.items,
@@ -231,7 +231,7 @@ pub async fn item_from(
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
             let by = mesg[1];
 
-            let by_tmpl = IndexTmpl {
+            let by_tmpl = CollectionTmpl {
                 ty: by,
                 topic: "from",
                 items: &msg.items,
@@ -399,7 +399,7 @@ pub fn gen_html(
     let (i_list, _) = query_item.get(conn)?;
     let (b_list, _) = query_blog.get(conn)?;
 
-    let by_tmpl = IndexTmpl {
+    let by_tmpl = CollectionTmpl {
         ty: &ty,
         topic: &topic,
         items: &i_list,

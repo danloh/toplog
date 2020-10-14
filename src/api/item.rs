@@ -522,10 +522,10 @@ impl SpiderItem {
             ..sp_item
         };
         // save to db
-        let try_save_new_item = dbg!(diesel::insert_into(items)
+        let try_save_new_item = diesel::insert_into(items)
             .values(&item_new)
             .on_conflict_do_nothing()
-            .get_result::<Item>(conn));
+            .get_result::<Item>(conn);
         
         let new_item = if let Ok(itm) = try_save_new_item {
                 itm
