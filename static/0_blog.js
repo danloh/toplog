@@ -1,64 +1,69 @@
-let S_PREFIX = "new-i-";
-let UP_ITEM = {title: '', content: '', logo: ''};
+let S_PREFIX = "new-b-";
+let UP_BLOG = {aname: '', intro: '', blog_link: ''};
 
 let IS_NEW_OR_NOT = true;  // new or edit
 
-function buildItem () {
-  let ids = ['title', 'content', 'logo', 'author', 'ty','topic', 'link', 'pub_at', 'csrf'];
+function buildBlog() {
+  let ids = [
+    'aname', 'avatar', 'intro', 'topic', 'blog_link','blog_host', 
+    'gh_link', 'other_link', 'is_top', 'csrf'
+  ];
   let vals = getValsByIDs(ids, S_PREFIX);
 
-  let title = vals[ids.indexOf('title')];
-  let content = vals[ids.indexOf('content')];
+  let aname = vals[ids.indexOf('aname')];
+  let avatar = vals[ids.indexOf('avatar')];
+  let intro = vals[ids.indexOf('intro')];
   let topic = vals[ids.indexOf('topic')];
-  let ty = vals[ids.indexOf('ty')] || 'Article';
-  let logo = vals[ids.indexOf('logo')];
-  let author = vals[ids.indexOf('author')];
-  let link = vals[ids.indexOf('link')];
-  let pub_at = vals[ids.indexOf('pub_at')];
+  let blog_host = vals[ids.indexOf('blog_host')];
+  let blog_link = vals[ids.indexOf('blog_link')];
+  let gh_link = vals[ids.indexOf('gh_link')];
+  let other_link = vals[ids.indexOf('other_link')];
+  let is_top = vals[ids.indexOf('is_top')];
   let csrf = vals[ids.indexOf('csrf')];
+
+  console.log("is top", is_top);
   
-  // refer to struct NewItem
-  let new_item = {
-    title,
-    slug: '',
-    content,
-    logo,
-    author,
-    ty,
+  // refer to struct NewBlog
+  let new_blog = {
+    aname,
+    avatar,
+    intro,
     topic,
-    link,
-    post_by: getCookie(IDENT),
-    pub_at
+    blog_link,
+    blog_host,
+    gh_link,
+    other_link,
+    is_top: is_top == 'on' ? true : false,
   };
-  // console.log(new_item);
-  return [new_item, csrf];
+  // console.log(new_blog);
+  return [new_blog, csrf];
 }
 
-async function newItem() {
+async function newBlog() {
   if (!getCookie(TOK)) return;
-  let bd = buildItem();
-  let new_itm = bd[0];
+  let bd = buildBlog();
+  let new_blg = bd[0];
   let csrf = bd[1];
-  let title = new_itm.title;
-  let topic = new_itm.topic;
-  let content = new_itm.content;
+  let aname = new_blg.aname;
+  let blogLink = new_blg.blog_link;
 
 
-  if (title && topic && content && csrf) {
+  if (aname && blogLink && csrf) {
     let newaBtn = document.getElementById(S_PREFIX + "btn");
     if (newaBtn) { newaBtn.innerHTML = "Processing"; }
 
     // if update, check the change
     let IF_TO_FETCH = true;
     if (!IS_NEW_OR_NOT
-      && UP_ITEM.title == title 
-      && UP_ITEM.content == content
-      && UP_ITEM.logo == new_itm.logo
-      && UP_ITEM.author == new_itm.author
-      && UP_ITEM.topic == topic
-      && UP_ITEM.ty == new_itm.ty
-      && UP_ITEM.link == new_itm.link
-      && UP_ITEM.pub_at == new_itm.pub_at
+      && UP_BLOG.aname == aname 
+      && UP_BLOG.avatar == new_blg.avatar
+      && UP_BLOG.intro == new_blg.intro
+      && UP_BLOG.blog_link == new_blg.blog_link
+      && UP_BLOG.blog_host == new_blg.blog_host
+      && UP_BLOG.gh_link == new_blg.gh_link
+      && UP_BLOG.other_link == new_blg.other_link
+      && UP_BLOG.topic == new_blg.topic
+      && UP_BLOG.is_top == new_blg.is_top
     ) { 
       IF_TO_FETCH = false;
       if (delTagList.length == 0 && addTagList.length == 0) {
@@ -68,8 +73,8 @@ async function newItem() {
     }
 
     let q_data = IS_NEW_OR_NOT 
-      ? new_itm
-      : Object.assign({id: UP_ITEM.id}, new_itm);
+      ? new_blg
+      : Object.assign({id: UP_BLOG.id}, new_blg);
 
     let headers = {
       'Authorization': getCookie(TOK),
@@ -83,7 +88,7 @@ async function newItem() {
       body: JSON.stringify(q_data)
     };
     let resp = IF_TO_FETCH 
-      ? await fetch('/api/items', options) 
+      ? await fetch('/api/blogs', options) 
       : {ok: true, nofetch: true};
     // console.log(resp);
 
@@ -92,13 +97,13 @@ async function newItem() {
       return;
     }
     // console.log(resp);
-    let res_item = resp.nofetch ? {} : await resp.json();
+    let res_blog = resp.nofetch ? {} : await resp.json();
 
     // edit tag
 /*     if (addTagList.length > 0) {
       let addTags = {
         tnames: addTagList,
-        item_id: res_item.id || UP_ITEM.id,
+        blog_id: res_blog.id || UP_BLOG.id,
         method: 1,
       };
       await fetch('/api/topics', 
@@ -112,7 +117,7 @@ async function newItem() {
     if (delTagList.length > 0) {
       let delTags = {
         tnames: delTagList,
-        item_id: res_item.id || UP_ITEM.id,
+        blog_id: res_blog.id || UP_BLOG.id,
         method: 0,
       };
       await fetch('/api/topics', 
@@ -124,83 +129,40 @@ async function newItem() {
       );
     } */
 
-    let itmid = res_item.id || UP_ITEM.id;
-    if (!itmid) return;
-    window.location.href = '/item/' + itmid;
+    let name = res_blog.aname;
+    let b64_name = Base64encode(name, true);
+    window.location.href = '/from?by=' + b64_name;
   } else {
-    alert("Invalid Input");
+    alert("Invalid Input", aname, blogLink, csrf);
+    console.log("Invalid Input", aname, blogLink, csrf);
     return;
   }
-}
-
-async function newItemViaUrl() {
-  if (!getCookie(TOK)) return;
-  let urlBtn = document.getElementById('new-i-url-btn');
-  if (urlBtn) { urlBtn.innerHTML = "Processing"; }
-
-  let urlEle = document.getElementById('new-i-viaurl');
-  let url = urlEle ? urlEle.value : '';
-  if (url.length < 1) return;
-
-  let csrfTok = document.getElementById('new-i-csrf');
-  let csrf = csrfTok ? csrfTok.value : ''
-  if (!csrf) return;
-
-  let sp_data = {
-    url,
-    topic: '',
-    ty: ''
-  };
-
-  let options = {
-    method: 'PUT', 
-    headers: { 
-      'Authorization': getCookie(TOK), 
-      'CsrfToken': csrf, 
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(sp_data)
-  };
-  let resp = await fetch('/api/spider', options);
-
-  if (!resp.ok) {
-    alert("Something failed");
-    return;
-  }
-  // console.log(resp);
-  let res_item = await resp.json();
-  window.location.href = '/item/' + res_item.slug;
-}
-
-// hide or show viaurl
-let showViaUrl = true;
-function showInputUrl(mut=true) {
-  showViaUrl = !showViaUrl && mut;
-  let viaurl = document.getElementById('new-s-form-viaurl');
-  if (viaurl) { viaurl.style.display = showViaUrl ? '' : 'none'; }
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
   if (!getCookie(TOK)) return;
   let docPath = document.location.pathname;
-  if (docPath.startsWith('/edititem')) {
-    // load item
-    let itmid = document.location.search.split('?id=')[1];
-    if (!itmid) return;
-    let resp = await fetch(`/api/items/${itmid}`);
+  if (docPath.startsWith('/editblog')) {
+    // load blog
+    let bid = document.location.search.split('?id=')[1];
+    if (!bid) return;
+    let resp = await fetch(`/api/blogs/${bid}`);
     if (!resp.ok) return;
-    let res_item = await resp.json();
+    let res_blog = await resp.json();
 
-    UP_ITEM = res_item;
+    UP_BLOG = res_blog;
     IS_NEW_OR_NOT = false;
 
-    let ids = ['title', 'content', 'logo', 'author', 'ty','topic', 'link', 'pub_at'];
-    setValsByIDs(ids, S_PREFIX, res_item);
+    let ids = [
+      'aname', 'avatar', 'intro', 'topic', 'blog_link','blog_host', 
+      'gh_link', 'other_link', 'is_top'
+    ];
+    setValsByIDs(ids, S_PREFIX, res_blog);
     // load tags and init tagsbar
-    // await loadTagsInitBar('item', res_item.id);
+    // await loadTagsInitBar('blog', res_blog.id);
   }
 
-  initAutoSize(['new-i-title', 'new-i-content', 'new-i-logo']);
+  // initAutoSize(['new-b-intro', 'new-b-avatar']);
 
 })
 

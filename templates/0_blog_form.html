@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{%- block title -%} Suggest A Blog {%- endblock title -%}
+
+{%- block navMain -%}
+<div class="input-nav">
+  <span class="input-nav-title"> Suggest A Blog </span>
+</div>
+{%- endblock navMain -%}
+
+{%- block mainview -%}
+<div class="main-page form-page" id="new-b-form-page">
+  <div class="page-main form-box">
+    <span class="form-tips">Blogger Name</span>
+    <section class="form-item-wrap wrap-layout" title="Name">
+      <input class="input-box" id="new-b-aname" placeholder="Name" required>
+    </section>
+    <span class="form-tips">Blog Name*</span>
+    <section class="form-item-wrap wrap-layout" title="Blog Name">
+      <input class="input-box" id="new-b-blog_host" placeholder="Blog Name">
+    </section>
+    <span class="form-tips">Blog Link*</span>
+    <section class="form-item-wrap wrap-layout" title="Blog Link" required>
+      <textarea class="input-box" id="new-b-blog_link" spellcheck="false" placeholder="Blog Link"></textarea>
+    </section>
+    <span class="form-tips">Avatar</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box" id="new-b-avatar" spellcheck="false"></textarea>
+    </section>
+    <span class="form-tips">Introduction</span>
+    <section class="form-item-wrap wrap-layout">
+      <textarea class="input-box form-input-intro" id="new-b-intro" rows="2" spellcheck="false"></textarea>
+    </section>
+    <span class="form-tips">Select Domain*</span>
+    <section class="form-item-wrap wrap-layout">
+      <select id="new-b-topic" class="form-input form-input-select" required>
+        <option value=" ">Select Domain</option>
+        {%- for d in iTopics -%}
+        <option value="{{ d }}">{{ d }}</option>
+        {%- endfor -%}
+      </select>
+    </section>
+  </div>
+  <aside class="page-side">
+    <input type="hidden" value="{{ csrf_tok }}" id="new-b-csrf" class="csrf-data">
+    <section class="form-item-wrap wrap-layout" title="GitHub Link">
+      <textarea class="input-box" id="new-b-gh_link" spellcheck="false" placeholder="GitHub Link"></textarea>
+    </section>
+    <section class="form-item-wrap wrap-layout" title="Other Link">
+      <textarea class="input-box" id="new-b-other_link" spellcheck="false" placeholder="Other Link"></textarea>
+    </section>
+    <section class="form-item-wrap wrap-layout">
+      <input type="checkbox" class="" id="new-b-is_top" />
+      <label for="new-b-is_top">This is Featured Blog</label>
+    </section>
+    <span class="form-tips">Add Tag</span>
+    <div id="sa-tags-container" class="tags-container"></div>
+    <section class="form-item-wrap wrap-layout">
+      <input class="input-box" id="new-b-tag" onkeypress="addTag(event, 'new-b-tag')" 
+       placeholder="Input then Enter" />
+    </section>
+    <section class="form-item-wrap wrap-layout">
+      <button onClick="newBlog()" id="new-b-btn" class="toolbtn form-submit-btn">
+        Submit
+      </button>
+    </section>
+  </aside>
+</div>
+{%- endblock mainview -%}
+
+{%- block script -%}
+<script src="/static/base64.js"></script>
+<script src="/static/0_blog.js"></script>
+{%- endblock script -%}

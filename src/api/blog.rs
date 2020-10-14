@@ -197,7 +197,6 @@ pub struct NewBlog {
     pub topic: String,
     pub blog_link: String,
     pub blog_host: String,
-    pub tw_link: String,
     pub gh_link: String,
     pub other_link: String,
     pub is_top: bool,
@@ -217,7 +216,6 @@ impl NewBlog {
             topic: self.topic.trim().to_owned(),
             blog_link: self.blog_link.trim().to_owned(),
             blog_host: self.blog_host.trim().to_owned(),
-            tw_link: self.tw_link.trim().to_owned(),
             gh_link: self.gh_link.trim().to_owned(),
             other_link: self.other_link.trim().to_owned(),
             is_top: self.is_top,
@@ -264,7 +262,6 @@ pub struct UpdateBlog {
     pub topic: String,
     pub blog_link: String,
     pub blog_host: String,
-    pub tw_link: String,
     pub gh_link: String,
     pub other_link: String,
     pub is_top: bool,
@@ -285,7 +282,6 @@ impl UpdateBlog {
         let new_topic = self.topic.trim();
         let new_blog_link = self.blog_link.trim();
         let new_blog_host = self.blog_host.trim();
-        let new_tw_link = self.tw_link.trim();
         let new_gh_link = self.gh_link.trim();
         let new_other_link = self.other_link.trim();
         let new_is_top = self.is_top;
@@ -295,7 +291,6 @@ impl UpdateBlog {
             || new_intro != old.intro.trim()
             || new_topic != old.topic.trim()
             || new_blog_link != old.blog_link.trim()
-            || new_tw_link != old.tw_link.trim()
             || new_gh_link != old.gh_link.trim()
             || new_other_link != old.other_link.trim()
             || new_is_top != old.is_top;
@@ -322,7 +317,6 @@ impl UpdateBlog {
             topic: new_topic.to_owned(),
             blog_link: new_blog_link.to_owned(),
             blog_host: new_blog_host.to_owned(),
-            tw_link: new_tw_link.to_owned(),
             gh_link: new_gh_link.to_owned(),
             other_link: new_other_link.to_owned(),
             is_top: new_is_top,

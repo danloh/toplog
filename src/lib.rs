@@ -151,7 +151,7 @@ pub async fn init_server() -> std::io::Result<()> {
                         .route(get().to(api::item::get_list)) 
                 )
                 .service(
-                    resource("/items/{slug}")
+                    resource("/items/{id}")
                         .route(get().to(api::item::get))
                         .route(patch().to(api::item::toggle_top))
                         // vote or veto: ?action=vote|veto
@@ -217,7 +217,7 @@ pub async fn init_server() -> std::io::Result<()> {
                     .route(get().to(view::tmpl::more_item))
             )
             .service( 
-                resource("/item/{slug}")
+                resource("/item/{id}")
                     .route(get().to(view::tmpl::item_view))
             )
             .service(
@@ -239,6 +239,14 @@ pub async fn init_server() -> std::io::Result<()> {
             .service(
                 resource("/edititem")  // query: ?id=
                     .route(get().to(view::form::edit_item))
+            )
+            .service(
+                resource("/newblog")
+                    .route(get().to(view::form::new_blog))
+            )
+            .service(
+                resource("/editblog")  // query: ?id=
+                    .route(get().to(view::form::edit_blog))
             )
             .service(
                 fs::Files::new("/", "./www/") // for robots.txt, sitemap

@@ -58,7 +58,7 @@ async function loadAndAppend(action, isMore=false) {
     sum.className = 's-sum-info';
     let title = obj.title;
     let intro = obj.content;
-    let link = obj.link || '/item/' + obj.slug;
+    let link = obj.link || '/item/' + obj.id;
     let inner = `
       <a class="title-link" href="${link}" target="_blank" rel="noopener">
         <b class="title">${title}</b>

@@ -38,7 +38,7 @@ pub struct ItemFormTmpl<'a> {
     pub is_new: bool,
 }
 
-// GET /newstory
+// GET /newitem
 //
 pub async fn new_item(
     auth: CheckUser,
@@ -63,6 +63,49 @@ pub async fn edit_item(
 ) -> Result<HttpResponse, ServiceError> {
     let tok = generate_token(&auth.uname, "item@edit", 1*24*3600)?;
     let ns = ItemFormTmpl {
+        csrf_tok: &tok,
+        is_new: false,
+    };
+    let s = ns.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}
+
+#[derive(Template)]
+#[template(path = "0_blog_form.html")]
+pub struct BlogFormTmpl<'a> {
+    pub csrf_tok: &'a str,
+    pub is_new: bool,
+}
+
+// GET /newblog
+//
+pub async fn new_blog(
+    auth: CheckUser,
+) -> Result<HttpResponse, ServiceError> {
+    let tok = generate_token(&auth.uname, "blog@new", 1*24*3600)?;
+    let ns = BlogFormTmpl {
+        csrf_tok: &tok,
+        is_new: true,
+    };
+    let s = ns.render().unwrap_or("Rendering failed".into());
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(s)
+    )
+}
+
+// GET /editblog?id=
+//
+pub async fn edit_blog(
+    auth: CheckUser,
+) -> Result<HttpResponse, ServiceError> {
+    let tok = generate_token(&auth.uname, "blog@edit", 1*24*3600)?;
+    let ns = BlogFormTmpl {
         csrf_tok: &tok,
         is_new: false,
     };

@@ -220,7 +220,6 @@ textarea {
 }
 .hide-link:hover {
   color: #03a87c;
-  font-size: 18px;
 }
 
 .item-sum, .item-view {
@@ -459,7 +458,7 @@ textarea {
   width: 100%;
   padding: 10px 15px;
   font-size: 16px;
-  background-color: #c5f3e7;
+  background-color:#dce6e2;
 }
 
 .badge, .badge-circle, .badge-heart,

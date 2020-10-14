@@ -19,7 +19,7 @@ function getParam(param, query, startwith, delimit1, delimit2) {
     if (start != -1) {
       start = start + param.length + 1;
       end = query.regexIndexOf(delimit2, start);
-      if (end === -1) { end = query.length;}
+      if (end === -1) { end = query.length; }
     }
     let c = query.substring(start, end);
     return c
@@ -65,7 +65,7 @@ window.addEventListener('DOMContentLoaded', function() {
   let loginLink = document.getElementById('login-link');
   if (loginLink) { 
     loginLink.setAttribute('href', iden ? `/@${iden}` : '/auth?to=signin');
-    loginLink.innerText = iden ? 'Profile' : 'Log In';
+    loginLink.innerText = iden ? ':::' : 'Log In';
   } 
 });
 // Close the dropdown menu if the user clicks outside of it
@@ -112,38 +112,38 @@ function loadMoreItems(topic='all', ty='Article') {
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-function toggleTop(slug) {
+function toggleTop(id) {
   let omg = getCookie("oMg");
   if (omg !== 'true') return;
   let tok = getCookie(TOK);
-  fetch(`/api/items/${slug}`, {
+  fetch(`/api/items/${id}`, {
     method: 'PATCH', 
     headers: { 'Authorization': tok },
   }).then(_res => {
-    let toggleEle = document.getElementById("t-" + slug);
+    let toggleEle = document.getElementById("t-" + id);
     if (toggleEle) { toggleEle.hidden = true }
     //console.log(res.data)
   });
 }
 
-function upVote(slug) {
+function upVote(id) {
   let tok = getCookie(TOK);
   let check = Boolean(tok);
   if (!check) {
     window.location.href = "/auth?to=signin";
     return;
   }
-  fetch(`/api/items/${slug}?action=vote`, {
+  fetch(`/api/items/${id}?action=vote`, {
     method: 'PUT', 
     headers: { 'Authorization': tok },
   }).then(res => {
     res.json().then(r => {
       //console.log(r);
-      let voteEle = document.getElementById("vote-" + slug);
+      let voteEle = document.getElementById("vote-" + id);
       if (voteEle) { 
         //let voteNum = Number(voteEle.innerText);
         voteEle.innerText = r; 
-        let upEle = document.getElementById("up-" + slug);
+        let upEle = document.getElementById("up-" + id);
         if (upEle) { upEle.hidden = true }
       }
     }) 
@@ -151,9 +151,9 @@ function upVote(slug) {
 }
 
 // md parse in backend
-function showFull(slug) {
-  let mdSelector = 'md-' + slug;
-  let btnSelector = 'btn-' + slug;
+function showFull(id) {
+  let mdSelector = 'md-' + id;
+  let btnSelector = 'btn-' + id;
   let btn = document.getElementById(btnSelector);
   let full = document.getElementById(mdSelector);
   let ifShowMore = btn.innerText == 'more...' ? true : false

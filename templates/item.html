@@ -10,7 +10,8 @@
       {%- let a_url = item.clone().link -%}
       {%- let a_content = item.clone().content -%}
       {%- let a_author = item.clone().author|b64_encode -%}
-      {%- let a_slug = item.clone().slug -%}
+      
+      {%- let itmid = item.id -%}
       <a href ="{{ a_url }}" target="_blank" rel="noopener">
         <b class="title">{{ item.title }}</b>
         <span class="host"> | </span>
@@ -24,11 +25,11 @@
         <span class="badge-bead"></span> <!-- author badge-->
         <span class="meta-tag">{{ item.author }}</span>
         <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span> 
-        <a onclick= "openLink('/edititem?slug={{ a_slug }}')" 
+        <a onclick= "openLink('/edititem?id={{ itmid }}')" 
           href="javascript:void(0);" title="Edit"
         >...</a>&nbsp;&nbsp;
-        <a id="t-{{ a_slug }}" 
-          onclick="toggleTop('{{a_slug}}')" 
+        <a id="t-{{ itmid }}" 
+          onclick="toggleTop('{{ itmid }}')" 
           href="javascript:void(0);" class="help-tips hide-link">
           {%- if item.is_top -%} .. {%- else -%} ::: {%- endif -%}
         </a>

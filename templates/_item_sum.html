@@ -2,7 +2,8 @@
   {%- let a_url = item.link.clone() -%}
   {%- let a_content = item.content.clone() -%}
   {%- let a_author = item.author.clone()|b64_encode -%}
-  {%- let a_slug = item.slug.clone() -%}
+  
+  {%- let itmid = item.id -%}
   {%- let a_topic = item.topic.clone() -%}
   {%- let a_ty = item.ty.clone() -%}
   <div class="item-info">
@@ -12,7 +13,7 @@
         <span class="host"> | </span>
         <span style="color: #37a">{{ a_url|host }}</span>
       </a>
-      <div id="md-{{ a_slug }}" class="meta-sum">{{ a_content }}</div>
+      <div id="md-{{ itmid }}" class="meta-sum">{{ a_content }}</div>
     </div>
     {%- let logo = item.logo.clone() -%}
     {%- if logo.len() > 0 -%}
@@ -33,18 +34,18 @@
     <span class="badge-bead"></span> <!-- author badge-->
     <span class="meta-tag"><a href="/from?by={{ a_author }}">{{ item.author }}</a></span>
     <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span> 
-    <a id="up-{{ a_slug }}" onclick="upVote('{{a_slug}}')" href="javascript:void(0);" title="Read Later">
+    <a id="up-{{ itmid }}" onclick="upVote('{{ itmid }}')" href="javascript:void(0);" title="Read Later">
       <span class="badge-heart"></span>
     </a> 
-    <!-- <span id="vote-{{ a_slug }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp; -->
+    <!-- <span id="vote-{{ itmid }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp; -->
     <div class="menudown">
-      <button onclick="showMenu('item-opt-{{ a_slug }}')" class="toolbtn more-opt-btn" title="More">
+      <button onclick="showMenu('item-opt-{{ itmid }}')" class="toolbtn more-opt-btn" title="More">
         •••
       </button>
-      <div id="item-opt-{{ a_slug }}" class="dropdown-content">
-        <li><a onclick= "openLink('/edititem?slug={{ a_slug }}')" href="javascript:void(0);" class="help-tips">
+      <div id="item-opt-{{ itmid }}" class="dropdown-content">
+        <li><a onclick= "openLink('/edititem?id={{ itmid }}')" href="javascript:void(0);" class="help-tips">
           Eidt</a></li>
-        <li><a id="t-{{ a_slug }}" onclick="toggleTop('{{a_slug}}')" href="javascript:void(0);" class="help-tips">
+        <li><a id="t-{{ itmid }}" onclick="toggleTop('{{ itmid }}')" href="javascript:void(0);" class="help-tips">
           {%- if item.is_top -%} UnPin {%- else -%} Pin {%- endif -%}
         </a></li>
       </div>

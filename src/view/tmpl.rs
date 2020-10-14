@@ -294,17 +294,17 @@ pub async fn more_item(
     }
 }
 
-// GET /item/{slug}
+// GET /item/{id}
 //
 pub async fn item_view(
     db: Data<DbAddr>,
-    p: Path<String>,
+    p: Path<i32>,
 ) -> ServiceResult<HttpResponse> {
-    let slug = p.into_inner();
+    let id = p.into_inner();
     use crate::api::item::QueryItem;
 
     let item_msg = QueryItem { 
-        slug, 
+        id, 
         method: String::from("GET"), 
         uname: String::new(),
     };

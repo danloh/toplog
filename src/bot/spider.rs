@@ -106,7 +106,6 @@ impl WebPage {
                 let title = page.title.trim();
                 NewItem {
                     title: replace_space(title, " "),
-                    slug: gen_slug(title),
                     content: page.content.trim().to_owned(),
                     logo: page.img.trim().to_owned(),
                     author: get_author_topic(dmn).0,

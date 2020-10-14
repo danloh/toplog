@@ -97,14 +97,14 @@ impl Handler<UpdateItem> for Dba {
     }
 }
 
-// GET: /api/items/{slug}
+// GET: /api/items/{id}
 // 
 pub async fn get(
-    qb: Path<String>,
+    qb: Path<i32>,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
-        slug: qb.into_inner(), 
+        id: qb.into_inner(), 
         method: String::from("GET"),
         uname: String::new()
     };
@@ -115,15 +115,15 @@ pub async fn get(
     }
 }
 
-// PATCH: /api/items/{slug}
+// PATCH: /api/items/{id}
 // 
 pub async fn toggle_top(
-    qb: Path<String>,
+    qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
-        slug: qb.into_inner(), 
+        id: qb.into_inner(), 
         method: String::from("PATCH"),
         uname: auth.uname
     };
@@ -134,16 +134,16 @@ pub async fn toggle_top(
     }
 }
 
-// PUT: /api/items/{slug}?action=vote|veto
+// PUT: /api/items/{id}?action=vote|veto
 // 
 pub async fn vote_or_veto(
-    qb: Path<String>,
+    qb: Path<i32>,
     aq: Query<ActionQuery>,
     auth: CheckUser,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let item = QueryItem{
-        slug: qb.into_inner(), 
+        id: qb.into_inner(), 
         method: aq.action.to_uppercase(),
         uname: auth.uname
     };
@@ -154,16 +154,16 @@ pub async fn vote_or_veto(
     }
 }
 
-// DELETE: /api/items/{slug}
+// DELETE: /api/items/{id}
 // 
 pub async fn del(
-    qb: Path<String>,
+    qb: Path<i32>,
     auth: CheckCan,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     
     let item = QueryItem{
-        slug: qb.into_inner(), 
+        id: qb.into_inner(), 
         method: String::from("DELETE"),
         uname: auth.uname
     };
@@ -271,7 +271,6 @@ pub struct Item {
 #[table_name = "items"]
 pub struct NewItem {
     pub title: String,
-    pub slug: String,
     pub content: String,
     pub logo: String,
     pub author: String,
@@ -289,18 +288,11 @@ impl NewItem {
     ) -> ServiceResult<Item> {
         use crate::schema::items::dsl::{items, link};
         let title = self.title.trim();
-        let a_slug = gen_slug(title);
+        // let a_slug = gen_slug(title);
         let nlink = self.link.trim();
-        let ilink = if nlink.len() > 0 {
-            nlink.to_string()
-        } else {
-            let base = dotenv::var("DOMAIN_HOST")
-                .unwrap_or(String::from("https://toplog.cc/"));
-            base + "item/" + &a_slug
-        };
+        let ilink = nlink.to_string();
         let new_item = NewItem {
             title: title.to_owned(),
-            slug: a_slug,
             content: self.content.trim().to_owned(),  // do some trim
             logo: self.logo.trim().to_owned(),
             author: self.author.trim().to_owned(),
@@ -323,12 +315,21 @@ impl NewItem {
             .on_conflict_do_nothing()
             .get_result::<Item>(conn);
         
-        let item_new = if let Ok(itm) = try_save_new_item {
+        let mut item_new = if let Ok(itm) = try_save_new_item {
                 itm
         } else {
             items.filter(link.eq(&ilink))
                 .get_result::<Item>(conn)?
         };
+
+        if ilink.trim().len() == 0 {
+            let itmlink =  
+                dotenv::var("DOMAIN_HOST").unwrap_or(String::from("https://toplog.cc/"))
+                + "item/" + &item_new.id.to_string();
+            item_new = diesel::update(&item_new)
+                .set(link.eq(itmlink))
+                .get_result::<Item>(conn)?;
+        }
 
         // save new link to json
         use crate::util::helper::{serde_add_links};
@@ -365,7 +366,6 @@ impl Message for NewItem {
 pub struct UpdateItem {
     pub id: i32,
     pub title: String,
-    pub slug: String,
     pub content: String,
     pub logo: String,
     pub author: String,
@@ -409,12 +409,12 @@ impl UpdateItem {
         }
         
         // check if title changed
-        let check_title_changed: bool = &new_title != &old.title.trim();
-        let a_slug = if check_title_changed {
-            gen_slug(new_title) 
-        } else {
-            (&old).slug.to_owned()
-        };
+        // let check_title_changed: bool = &new_title != &old.title.trim();
+        // let a_slug = if check_title_changed {
+        //     gen_slug(new_title) 
+        // } else {
+        //     (&old).slug.to_owned()
+        // };
 
         let ilink = if new_link.len() > 0 {
             // check link if existing
@@ -428,7 +428,7 @@ impl UpdateItem {
         } else {
             let base = dotenv::var("DOMAIN_HOST")
                 .unwrap_or(String::from("https://toplog.cc/"));
-            base + "item/" + &a_slug
+            base + "item/" + &self.id.to_string()
         };
         // post_by
         let postBy = 
@@ -436,7 +436,6 @@ impl UpdateItem {
 
         let up = UpdateItem {
             title: new_title.to_owned(),
-            slug: a_slug,
             content: new_content.to_owned(),  // do some trim
             logo: new_logo.to_owned(),
             author: new_author.to_owned(),
@@ -579,7 +578,7 @@ impl Message for SpiderItem {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct QueryItem {
-    pub slug: String,
+    pub id: i32,
     pub method: String, // get|put|delete|vote
     pub uname: String,
 }
@@ -589,8 +588,8 @@ impl QueryItem {
         &self, 
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::{items, slug};
-        let item = items.filter(slug.eq(&self.slug))
+        use crate::schema::items::dsl::{items, id};
+        let item = items.filter(id.eq(&self.id))
             .get_result::<Item>(conn)?;
         Ok(item)
     }
@@ -600,10 +599,10 @@ impl QueryItem {
         conn: &PooledConn,
         action: &str,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::{items, slug, vote, is_top};
+        use crate::schema::items::dsl::{items, id, vote, is_top};
 
         let old = items
-            .filter(slug.eq(&self.slug))
+            .filter(id.eq(&self.id))
             .get_result::<Item>(conn)?;
         let old_vote = old.vote;
         let old_is_top = old.is_top;
@@ -639,9 +638,9 @@ impl QueryItem {
         &self, 
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::{items, slug, is_top};
+        use crate::schema::items::dsl::{items, id, is_top};
         let old = items
-            .filter(slug.eq(&self.slug))
+            .filter(id.eq(&self.id))
             .get_result::<Item>(conn)?;
         let check_top: bool = old.is_top;
         let item = diesel::update(&old)
@@ -671,7 +670,7 @@ impl QueryItem {
         &self, 
         conn: &PooledConn,
     ) -> ServiceResult<Item> {
-        use crate::schema::items::dsl::{items, slug};
+        use crate::schema::items::dsl::{items, id};
         // check permission
         let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
         let check_permission: bool = self.uname == admin_env;
@@ -679,7 +678,7 @@ impl QueryItem {
             return Err(ServiceError::Unauthorized);
         }
 
-        let item = diesel::delete(items.filter(slug.eq(&self.slug)))
+        let item = diesel::delete(items.filter(id.eq(&self.id)))
             .get_result::<Item>(conn)?;
         Ok(item)
     }
