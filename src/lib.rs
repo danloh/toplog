@@ -127,7 +127,7 @@ pub async fn init_server() -> std::io::Result<()> {
                     resource("/blogs")
                         .route(post().to(api::blog::new))
                         .route(put().to(api::blog::update))
-                        // get_list: ?per=topic&kw=&perpage=20&page=p
+                        // get_list: ?per=topic&kw=&perpage=&page=p
                         .route(get().to(api::blog::get_list)) 
                 )
                 .service(
@@ -170,10 +170,6 @@ pub async fn init_server() -> std::io::Result<()> {
                 //     resource("/stfile/{p}")
                 //         .route(delete().to(view::tmpl::del_static_file))
                 // )
-                .service(
-                    resource("/generate-staticsite-noexpose")  // do not expose!!
-                        .route(get().to(view::tmpl::statify_site_))
-                )
                 .default_service(route().to(|| HttpResponse::NotFound()))
             )
             .service(
@@ -193,27 +189,15 @@ pub async fn init_server() -> std::io::Result<()> {
                     .route(get().to(view::tmpl::item_from))
             )
             .service(
-                resource("/a/{ty}")  // special case: /index
-                    .route(get().to(view::tmpl::index_either))
+                resource("/collection")  // query: ty=&tpc=&ord=
+                    .route(get().to(view::tmpl::collection_either))
             )
             .service(
-                resource("/all/newest")  // special
-                    .route(get().to(view::tmpl::index_newest))
+                resource("/collection/dyn")  // query: ty=&tpc=&ord=
+                    .route(get().to(view::tmpl::collection_dyn))
             )
             .service( 
-                resource("/t/{topic}/{ty}")
-                    .route(get().to(view::tmpl::topic_either))
-            )
-            .service(
-                resource("/a/{ty}/dyn")
-                    .route(get().to(view::tmpl::index_dyn))
-            )
-            .service( 
-                resource("/t/{topic}/{ty}/dyn")
-                    .route(get().to(view::tmpl::topic_dyn))
-            )
-            .service( 
-                resource("/more/{topic}/{ty}") // ?page=&perpage=42
+                resource("/moreitems/{topic}/{ty}") // ?page=&perpage=42
                     .route(get().to(view::tmpl::more_item))
             )
             .service( 

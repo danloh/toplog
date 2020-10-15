@@ -40,29 +40,34 @@ pub struct FromQuery {
     ord: Option<String>,   // TODO
 }
 
-// GET /
+
+// GET /index  // reserve
 //
-pub async fn index() -> ServiceResult<HttpResponse> {
-    let res = String::from_utf8(
-        std::fs::read("www/all-index.html")
-            .unwrap_or("Not Found".to_owned().into_bytes()), // handle not found
-    )
-    .unwrap_or_default();
-    Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(res)
-    )
+pub async fn dyn_index(
+    db: Data<DbAddr>,
+) -> ServiceResult<HttpResponse> {
+    let q = Query(PerQuery{
+        ty: None,
+        tpc: None,
+        ord: None
+    });
+    collection_dyn(db, q).await
 }
 
-// GET /a/{ty} // special: /index, /Misc
+// GET /collection?ty=&tpc=&ord=
 //
 // static file default, otherwise generate
-pub async fn index_either(
+pub async fn collection_either(
     db: Data<DbAddr>,
-    p: Path<String>,
+    q: Query<PerQuery>,
 ) -> ServiceResult<HttpResponse> {
-    let ty = p.clone();
-    let dir = "www/".to_owned() + "all-" + &ty + ".html"; 
+    let pq = q.clone();
+    let ty = pq.ty.unwrap_or(String::from("index"));
+    let mut tpc = pq.tpc.unwrap_or(String::from("all"));
+    if tpc.trim() == "from" {
+        tpc = String::from("all");
+    }
+    let dir = "www/collection/".to_owned() + &tpc +"-" + &ty + ".html";
     let s_html = std::fs::read(dir);
     match s_html {
         Ok(s) => {
@@ -73,133 +78,48 @@ pub async fn index_either(
             )
         }
         _ => {
-            return index_dyn(db, p).await
+            return collection_dyn(db, q).await
         }
     }
 }
 
-// GET /a/{ty}/dyn // special: /index, /Misc, /newest
-//
-// response dynamically
-pub async fn index_dyn(
+pub async fn collection_dyn(
     db: Data<DbAddr>,
-    p: Path<String>,
+    q: Query<PerQuery>,
 ) -> ServiceResult<HttpResponse> {
-    let ty = p.into_inner();
-    let home_msg = Topic { 
-        topic: String::from("all"), 
-        ty,
+    let pq = q.clone();
+    let ty = pq.ty.unwrap_or(String::from("index"));
+    let mut topic = pq.tpc.unwrap_or(String::from("all"));
+    if topic.trim() == "from" {
+        topic = String::from("all");
+    }
+    let tpc_msg = Topic { 
+        topic: topic.clone(), 
+        ty: ty.clone(),
         page: 1,
     };
     
-    let res = db.send(home_msg).await?;
+    let res = db.send(tpc_msg).await?;
     match res {
         Ok(msg) => {
-            let mesg: Vec<&str> = (&msg.message).split("-").collect();
-            let typ = mesg[1];
+            // let mesg: Vec<&str> = (&msg.message).split("-").collect();
+            // let tp = mesg[0];
+            // let typ = mesg[1];
 
-            let index_tmpl = CollectionTmpl {
-                ty: &typ,
-                topic: "all",
+            let tmpl = CollectionTmpl {
+                ty: &ty,
+                topic: &topic,
                 items: &msg.items,
                 blogs: &msg.blogs,
                 tys: &TY_VEC,
             };
 
-            let h = index_tmpl.render().unwrap_or("Rendering failed".into());
-            let dir = "www/".to_owned() + &msg.message + ".html";
+            let h = tmpl.render().unwrap_or("Rendering failed".into());
+            let dir = "www/collection/".to_owned() + &msg.message + ".html";
             std::fs::write(dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
-    }
-}
-
-// GET /index
-//
-// redirect to index_dyn
-pub async fn dyn_index(
-    db: Data<DbAddr>,
-) -> ServiceResult<HttpResponse> {
-    let p: Path<String> = String::from("index").into();
-    index_dyn(db, p).await
-}
-
-// GET /all/newest
-//
-// redirect to index_dyn
-pub async fn index_newest(
-    db: Data<DbAddr>,
-) -> ServiceResult<HttpResponse> {
-    let p: Path<String> = String::from("newest").into();
-    index_dyn(db, p).await
-}
-
-// GET /t/{topic}/{ty}/dyn
-//
-// response dynamically
-pub async fn topic_dyn(
-    db: Data<DbAddr>,
-    p: Path<(String, String)>,
-) -> ServiceResult<HttpResponse> {
-    let pa = p.into_inner();
-    let topic = pa.0;
-    let ty = pa.1;
-
-    let topic_msg = Topic{ topic, ty, page: 1 };
-    
-    if let Err(e) = topic_msg.validate() {
-        return Ok(e.error_response());
-    }
-    
-    let res = db.send(topic_msg).await?;
-    match res {
-        Ok(msg) => {
-            let mesg: Vec<&str> = (&msg.message).split("-").collect();
-            let tpc = mesg[0];
-            let typ = mesg[1];
-
-            let tpc_tmpl = CollectionTmpl {
-                ty: typ,
-                topic: tpc,
-                items: &msg.items,
-                blogs: &msg.blogs,
-                tys: &TY_VEC,
-            };
-
-            let h = tpc_tmpl.render().unwrap_or("Rendering failed".into());
-            let t_dir = "www/".to_owned() + &msg.message + ".html";
-            std::fs::write(&t_dir, h.as_bytes())?;
-            Ok(HttpResponse::Ok().content_type("text/html").body(h))
-        }
-        Err(e) => Ok(e.error_response()),
-    }
-}
-
-// GET /t/{topic}/{ty}
-//
-// static file default, otherwise generate
-pub async fn topic_either(
-    db: Data<DbAddr>,
-    p: Path<(String, String)>,
-) -> ServiceResult<HttpResponse> {
-    let pa = p.clone();
-    let topic = pa.0;
-    let ty = pa.1;
-
-    let dir = "www/".to_owned() + &topic + "-" + &ty + ".html";
-    let s_html = std::fs::read(dir);
-    match s_html {
-        Ok(s) => {
-            let html = String::from_utf8(s).unwrap_or_default();
-            return Ok(HttpResponse::Ok()
-                .content_type("text/html; charset=utf-8")
-                .body(html)
-            )
-        }
-        _ => {
-            return topic_dyn(db, p).await
-        }
     }
 }
 
@@ -240,7 +160,7 @@ pub async fn item_from(
             };
 
             let h = by_tmpl.render().unwrap_or("Rendering failed".into());
-            // let t_dir = "www/".to_owned() + &msg.message + ".html";
+            // let t_dir = "www/collection/".to_owned() + &msg.message + ".html";
             // std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
@@ -248,7 +168,7 @@ pub async fn item_from(
     }
 }
 
-// GET /more/{topic}/{ty}?page=&perpage=42
+// GET /moreitems/{topic}/{ty}?page=&perpage=42
 //
 pub async fn more_item(
     db: Data<DbAddr>,
@@ -365,128 +285,16 @@ pub async fn site(p_info: Path<String>) -> ServiceResult<HttpResponse>{
     )
 }
 
-// generate static html
-pub fn gen_html(
-    topic: String,
-    ty: String,
-    conn: &PooledConn,
-) -> ServiceResult<()> {
-
-    let dir = topic.clone() + "-" + &ty;
-    let tp = topic.trim().to_lowercase();
-
-    let (query_item, query_blog) = match tp.trim() {
-        "all" => {
-            (
-                QueryItems::Index(ty.clone(), 42, 1),
-                QueryBlogs::Index("index".into(), 42, 1)
-            )
-        }
-        "from" => {
-            (
-                QueryItems::Author(ty.clone(), 42, 1),
-                QueryBlogs::Name(ty.clone(), 42, 1)
-            )
-        } 
-        _ => {
-            (
-                QueryItems::Tt(topic.clone(), ty.clone(), 42, 1),
-                QueryBlogs::Top(topic.clone(), 42, 1)
-            )
-        }
-    };
-
-    let (i_list, _) = query_item.get(conn)?;
-    let (b_list, _) = query_blog.get(conn)?;
-
-    let by_tmpl = CollectionTmpl {
-        ty: &ty,
-        topic: &topic,
-        items: &i_list,
-        blogs: &b_list,
-        tys: &TY_VEC,
-    };
-
-    let h = by_tmpl.render().unwrap_or("Rendering failed".into());
-    let t_dir = "www/".to_owned() + &dir + ".html";
-    std::fs::write(&t_dir, h.as_bytes())?;
-            
-    Ok(())
-}
-
-// del static html
-pub fn del_html(name: &str) -> ServiceResult<()> {
-    let to_del_html = "www/".to_owned() + name + ".html";
-    std::fs::remove_file(to_del_html)?;
-    Ok(())
-}
-
 // GET /api/generate-staticsite
 //
-// statify site
+// just del cached file 
 pub async fn statify_site(
     db: Data<DbAddr>,
     _auth: CheckCan,
 ) -> ServiceResult<HttpResponse> {
-    let ss = StaticSite();
-    let res = db.send(ss).await?; 
-    match res {
-        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-        Err(e) => Ok(e.error_response()),
-    }
-}
+    del_dir("www/collection");
 
-// DELETE /api/stfile/{t-t}  // any potential issue??
-//
-// delete static file.
-pub async fn del_static_file(
-    p: Path<String>
-) -> ServiceResult<HttpResponse> {
-    del_html(&p.into_inner())?;
-
-    Ok(HttpResponse::Ok().json(String::from("delete")))
-}
-
-// GET /api/generate-staticsite-noexpose
-// alt statify site
-//
-// non auth, only for background job,  do not expose!
-pub async fn statify_site_(
-    db: Data<DbAddr>,
-) -> ServiceResult<HttpResponse> {
-    let ss = StaticSite();
-    let res = db.send(ss).await?; 
-    match res {
-        Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-        Err(e) => Ok(e.error_response()),
-    }
-}
-
-pub struct StaticSite();
-
-impl Message for StaticSite {
-    type Result = ServiceResult<String>;
-}
-
-impl Handler<StaticSite> for Dba {
-    type Result = ServiceResult<String>;
-
-    fn handle(&mut self, ss: StaticSite, _: &mut Self::Context) -> Self::Result {
-        let conn = &self.0.get()?;
-        gen_static(conn);
-
-        Ok(String::from("Done"))
-    }
-}
-
-pub fn gen_static(conn: &PooledConn) -> ServiceResult<()> {
-    for tpc in TOPIC_VEC.iter() {
-        for typ in TY_VEC.clone() {
-            gen_html(tpc.to_string(), typ.into(), conn);
-        }
-    }
-          
-    Ok(())
+    Ok(HttpResponse::Ok().json(String::from("done")))
 }
 
 // GET /generate-sitemap
@@ -502,6 +310,32 @@ pub async fn gen_sitemap(_auth: CheckCan)-> ServiceResult<HttpResponse> {
     std::fs::write("www/sitemap.xml", h.as_bytes())?;
 
     Ok(HttpResponse::Ok().json("Done".to_owned()))
+}
+
+// DELETE /api/stfile/{t-t}  // any potential issue??
+//
+// delete static file.
+pub async fn del_static_file(
+    p: Path<String>
+) -> ServiceResult<HttpResponse> {
+    del_html(&p.into_inner())?;
+
+    Ok(HttpResponse::Ok().json(String::from("delete")))
+}
+
+
+// del static html
+pub fn del_html(name: &str) -> ServiceResult<()> {
+    let to_del_html = "www/".to_owned() + name + ".html";
+    std::fs::remove_file(to_del_html)?;
+    Ok(())
+}
+
+// del static dir and re-create dir
+pub fn del_dir(dir_name: &str) -> ServiceResult<()> {
+    std::fs::remove_dir_all(dir_name)?;
+    std::fs::create_dir(dir_name)?;
+    Ok(())
 }
 
 // =====================================================================

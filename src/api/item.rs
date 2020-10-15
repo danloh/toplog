@@ -333,21 +333,17 @@ impl NewItem {
         let link_vec = vec!(ilink);
         serde_add_links(link_vec);
 
-        // ========================
-        // way-1: gen html, renew cache, heavy!
+        // ========================================================
         let itm = item_new.clone();
         let tpc = itm.topic;
-        // let typ = if itm.is_top { itm.ty } else { "Misc".into() };
-        // use crate::view::tmpl::gen_html;
-        // gen_html(tpc, typ, conn);   // TODO: ignor error but log
-
-        // ==========================
-        // way-2: del related html, re-generate when visit, clean cache
+        // del related html, re-generate when visit, clean cache
         let name1 = "all-Misc";
-        let name2 = tpc + "-Misc";
+        let name2 = tpc.clone() + "-Misc";
+        let name3 = tpc + "-newest";
         del_html(name1).unwrap_or(());
         del_html(&name2).unwrap_or(());
-        // ==========================
+        del_html(&name3).unwrap_or(());
+        // =========================================================
         
         Ok(item_new)
     }
@@ -454,17 +450,11 @@ impl UpdateItem {
             serde_add_links(link_vec);
         }
 
-        // ========================
-        // // way-1: gen html, renew cache, heavy!
+        // ======================================================
         let itm = item_update.clone();
         let tpc = itm.topic;
         let itmty = itm.ty;
-        // let typ = if itm.is_top { itmty } else { "Misc".into() };
-        // use crate::view::tmpl::gen_html;
-        // gen_html(tpc, typ, conn);   // TODO: ignor error but log
-
-        // ==========================
-        // way-2: del related html, re-generate when visit, clean cache
+        // del related html, re-generate when visit, clean cache
         let name0 = "all-index";
         let name1 = "all-Misc";
         let name2 = tpc.clone() + "-Misc";
@@ -475,7 +465,7 @@ impl UpdateItem {
         del_html(&name2).unwrap_or(());
         del_html(&name3).unwrap_or(());
         del_html(&name4).unwrap_or(());
-        // ==========================
+        // ============================================================
         
         Ok(item_update)
     }
@@ -539,12 +529,14 @@ impl SpiderItem {
         let link_vec = vec!(ilink.to_string());
         serde_add_links(link_vec);
         
-        // ==========================
+        // ==================================
         // del related html
         del_html("all-Misc").unwrap_or(());
-        let name1 = topic + "-Misc";
+        let name1 = topic.clone() + "-Misc";
         del_html(&name1).unwrap_or(());
-        // ==========================
+        let name2 = topic + "-newest";
+        del_html(&name2).unwrap_or(());
+        // ==================================
 
         Ok(new_item)
     }
@@ -680,11 +672,11 @@ impl Message for QueryItem {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum QueryItems {
     Index(String, i32, i32),
-    Topic(String, i32, i32), // topic, perpage, page
+    Topic(String, i32, i32),        // topic, perpage, page
     User(String, String, i32, i32), // uname, action:submit|vote, 
-    Ty(String, i32, i32), // ty, perpage, page
-    Tt(String, String, i32, i32), // topic, ty, perpage, page
-    Author(String, i32, i32),  // aname, ..
+    Ty(String, i32, i32),           // ty, perpage, page
+    Tt(String, String, i32, i32),   // topic, ty, perpage, page
+    Author(String, i32, i32),       // aname, ..
 }
 
 impl QueryItems {
@@ -696,7 +688,7 @@ impl QueryItems {
         let mut item_list: Vec<Item> = Vec::new();
         let mut item_count = 0; // currently no need
         match self {
-            QueryItems::Index(typ, o, p) => {  // topic = all -/a/
+            QueryItems::Index(typ, o, p) => {  // topic = all 
                 let p_o = std::cmp::max(0, p-1);
                 match typ.to_lowercase().trim() {
                     "index" => {

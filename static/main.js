@@ -101,7 +101,7 @@ function loadMoreItems(topic='all', ty='Article') {
   if (!hasMoreIdx) { return; }
   idxPage += 1;
   fetch(
-    `/more/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`
+    `/moreitems/${topic}/${ty}?page=${idxPage}&perpage=${PerPage}`
   ).then(resp => {
     //console.log(resp);
     resp.text().then( r => {

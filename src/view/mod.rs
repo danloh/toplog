@@ -181,20 +181,6 @@ mod filters {
         Ok(b64)
     }
 
-    // set baseurl per topic
-    pub fn set_baseurl(s: &str) -> TmplResult<String> {
-        use crate::util::helper::en_base64;
-        
-        let check_s = s.trim();
-        let baseurl = if  check_s == "all" || check_s == "from" { 
-            "/a/".to_owned() 
-        } else { 
-            "/t/".to_owned() + check_s + "/"
-        };
-    
-        Ok(baseurl)
-    }
-
     pub fn date_fmt(
         value: &NaiveDate, 
         fmt: &str, 

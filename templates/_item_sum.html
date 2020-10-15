@@ -27,7 +27,7 @@
     <span class="meta-tag">{{ a_ty }}</span> 
     <span class="badge-circle tab-{{ a_topic }}"></span> <!-- topic badge -->
     {%- if a_topic != topic -%}
-      <span class="meta-tag"><a href="/t/{{ a_topic }}/{{ a_ty }}">{{ a_topic }}</a></span>
+      <span class="meta-tag"><a href="/collection?tpc={{ a_topic }}&ty={{ a_ty }}">{{ a_topic }}</a></span>
     {%- else -%}
       <span class="meta-tag">{{ a_topic }}</span>
     {%- endif -%}
