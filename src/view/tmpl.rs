@@ -88,7 +88,7 @@ pub async fn collection_dyn(
     q: Query<PerQuery>,
 ) -> ServiceResult<HttpResponse> {
     let pq = q.clone();
-    let ty = pq.ty.unwrap_or(String::from("index"));
+    let ty = pq.ty.unwrap_or(String::from("Misc"));
     let mut topic = pq.tpc.unwrap_or(String::from("all"));
     if topic.trim() == "from" {
         topic = String::from("all");

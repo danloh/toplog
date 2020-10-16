@@ -6,8 +6,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (authBox) { authBox.style.display = 'none'; }
   }
   let query = document.location.search;
-  let docRefer = document.referrer;  // TODO: do some check 
-  RedirectURL = getRedirect('redirect', query) || docRefer || '/';
+  let docRefer = document.referrer;  
+  // for do some check: 1-should be same host,
+  let urlHost = document.location.origin;
+
+  RedirectURL = getRedirect('redirect', query) 
+    || docRefer.startsWith(urlHost) ? docRefer : '/'
+    || '/';
   let toWhat = getQueryParam('to', query);
   let toNum = toWhat == 'signin' 
     ? 0 

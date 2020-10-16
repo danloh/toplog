@@ -173,17 +173,18 @@ pub fn parse_common_page(html: Html, url: &str) -> PageInfo {
         .unwrap_or(&String::from(""))
         .to_string();
     
-    let img_src: String = if og_img.len() == 0 {
-        // random body img
-        page_ele_paser(
-            &html, "body img", "src", ""
-        )
-        .first()
-        .unwrap_or(&String::from(""))
-        .to_string()
-    } else {
-        og_img
-    };
+    let img_src: String = og_img;
+    // if og_img.len() == 0 {
+    //     // random body img
+    //     page_ele_paser(
+    //         &html, "body img", "src", ""
+    //     )
+    //     .first()
+    //     .unwrap_or(&String::from(""))
+    //     .to_string()
+    // } else {
+    //     og_img
+    // };
 
     // get content descript -- meta description or og:description
     //

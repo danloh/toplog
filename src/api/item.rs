@@ -253,8 +253,8 @@ pub struct Item {
     pub logo: String,
     pub author: String,
     pub ty: String,      // item|translate|media|event|book
-    pub lang: String,
-    pub topic: String,
+    pub lang: String,    // en, cn...
+    pub topic: String,   // programing: Python|Rust, etc.
     pub link: String,
     pub link_host: String,
     pub origin_link: String, // for translate
