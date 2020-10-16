@@ -60,33 +60,3 @@ function initTagBar(tags) {
 //   showTagList.push(...tags);
 //   initTagBar(showTagList);
 // }
-
-
-// autosize textarea
-const newEvtListener = (parent, type, listener) => parent.addEventListener(type, listener);
-function initAutoSize(ids=[]) {
-  const autoSize = (id) => {
-    let text = document.getElementById(id);
-    const resize = () => {
-        text.style.height = 'auto';
-        text.style.height = text.scrollHeight + 'px';
-    };
-    const delayedResize = () => {
-        window.setTimeout(resize, 0);
-    };
-    newEvtListener(text, 'change',  resize);
-    newEvtListener(text, 'focus',  resize);
-    newEvtListener(text, 'cut',     delayedResize);
-    newEvtListener(text, 'paste',   delayedResize);
-    newEvtListener(text, 'drop',    delayedResize);
-    newEvtListener(text, 'keydown', delayedResize);
-
-    text.focus();
-    text.select();
-    resize();
-  };
-
-  for (let id of ids) {
-    autoSize(id);
-  }
-}

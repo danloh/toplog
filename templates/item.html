@@ -34,13 +34,13 @@
           {%- if item.is_top -%} .. {%- else -%} ::: {%- endif -%}
         </a>
       </div>
-      <div id="md-item-content" class="item-md">{{ a_content|md|safe }}</div>
-      {%- let logo = item.clone().logo -%}
+      {%- let logo = item.logo.clone() -%}
       {%- if logo.len() > 0 -%}
       <span>
-        <img class="item-thumb" src="{{ logo }}" referrerPolicy="no-referrer">
+        <img class="item-img" src="{{ logo }}" loading="lazy" referrerPolicy="no-referrer">
       </span>
       {%- endif -%}
+      <div id="md-item-content" class="item-md">{{ a_content|md|safe }}</div>
     </section>
   </div>
   <div class="page-side"></div>

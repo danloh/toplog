@@ -27,6 +27,11 @@ async function onSubmit() {
   const bd = buildSubmit();
   let newSub = bd[0];
   let csrf = bd[1];
+  let title = newSub.title;
+  let topic = newSub.topic;
+  let content = newSub.content;
+
+  if (!title || !topic || !content || !csrf) return;
   
   let headers = {
     'Authorization': getCookie(TOK),
@@ -71,17 +76,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     pub_at: pubat,
   };
 
-  //initAutoSize(['subtl-title', 'subtl-link', 'subtl-intro', 'subtl-cover']);
+  initAutoSize(['subtl-title', 'subtl-link', 'subtl-content', 'subtl-logo']);
 
   let ids = ['title', 'link', 'content', 'pub_at', 'logo'];
   setValsByIDs(ids, SUB_PREFIX, info);
 })
-
-function getToday() {
-  let now = new Date();
-  let dd = String(now.getDate()).padStart(2, '0');
-  let mm = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
-  let yyyy = String(now.getFullYear());
-  let today = yyyy + '-' + mm + '-' + dd;
-  return today;
-}

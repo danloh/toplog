@@ -84,13 +84,16 @@ CREATE TABLE itemlabels (
   PRIMARY KEY (item_id, label)
 );
 
+-- origin creation
 CREATE TABLE comments (
   id INTEGER PRIMARY KEY DEFAULT nextval('serial_seq'),
+  title VARCHAR DEFAULT '',
   content TEXT NOT NULL DEFAULT '',
   author VARCHAR NOT NULL,
   post_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   vote INTEGER NOT NULL DEFAULT 1,
-  is_closed BOOLEAN NOT NULL DEFAULT FALSE
+  is_closed BOOLEAN NOT NULL DEFAULT FALSE,
+  as_ty SMALLINT NOT NULL DEFAULT 1 -- 1-article, 0-comments
 );
 
 CREATE TABLE itemcomments (

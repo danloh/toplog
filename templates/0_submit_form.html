@@ -20,13 +20,13 @@
     <section class="form-item-wrap wrap-layout">
       <textarea class="input-box form-input-link" id="subtl-link" rows="1" spellcheck="false" required></textarea>
     </section>
-    <span class="form-tips">Author</span>
+    <span class="form-tips">Author*</span>
     <section class="form-item-wrap wrap-layout">
       <input class="input-box form-input-author" id="subtl-author">
     </section>
     <span class="form-tips">Summary*</span>
     <section class="form-item-wrap wrap-layout">
-      <textarea class="input-box form-input-intro" id="subtl-content" rows="2" spellcheck="false"></textarea>
+      <textarea class="input-box form-input-intro" id="subtl-content" rows="2" spellcheck="false" required></textarea>
     </section>
     <span class="form-tips">Select Category and Domain*</span>
     <section class="form-item-wrap wrap-layout">
@@ -36,10 +36,8 @@
         <option value="{{ c }}">{{ c }}</option>
         {%- endfor -%}
       </select>
-    </section>
-    <section class="form-item-wrap wrap-layout">
       <select id="subtl-topic" class="form-input form-input-select" required>
-        <option value=" ">Select Domain</option>
+        <option value="">Select Domain</option>
         {%- for d in iTopics -%}
         <option value="{{ d }}">{{ d }}</option>
         {%- endfor -%}

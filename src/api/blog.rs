@@ -451,15 +451,17 @@ impl Message for QueryBlogs {
 // TODO
 //
 //#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
-//#[table_name = "topics"]
-pub struct Topic {
+//#[table_name = "pkgs"]
+pub struct Pkg {
     pub id: i32,
-    pub tname: String,
-    pub slug: String,    // uri friendly
-    pub domain: String,  // Programming|Company|Tech|Culture ...
-    pub kind: String,    // web|framework|renderer|parser|Platform|language|Application ...
+    pub pname: String,
+    pub slug: String,     // uri friendly
+    pub lang: String,     // programing lang: Rust|Python...
+    pub domain: String,   // web|game|renderer|parser|Application ...
+    pub sub0: String,     // framework|io|...
+    pub sub1: String,     // reserve
     pub intro: String,
-    pub license: String,
+    pub link: String, 
     pub logo: String,
     pub vote: i32,
 }
@@ -472,3 +474,33 @@ y_id: topic, eg. Web
 stack:  as what in Tech Stack, eg. webframework
 app: what, eg. Actix-web
 */
+
+//#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
+//#[table_name = "topics"]
+pub struct Topic {
+    pub id: i32,
+    pub tname: String,
+    pub slug: String,    // uri friendly
+    pub ty: String,      // Programming|Company|Tech|Culture ...
+    pub intro: String,
+    pub logo: String,
+    pub vote: i32,
+}
+
+//#[derive(Clone, Debug, Serialize, Deserialize, Default, Identifiable, Queryable)]
+//#[table_name = "stacks"]
+pub struct Stack {
+    pub id: i32,
+    pub sname: String,
+    pub slug: String,    // uri friendly
+    pub intro: String,
+    pub logo: String,
+    pub vote: i32,
+}
+
+// #[table_name = "stackpkg"]
+pub struct StackPkg {
+    pub stack_id: i32,
+    pub pkg_id: i32,
+    pub ty: String,
+}

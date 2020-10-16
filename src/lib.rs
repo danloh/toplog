@@ -202,7 +202,11 @@ pub async fn init_server() -> std::io::Result<()> {
             )
             .service( 
                 resource("/item/{id}")
-                    .route(get().to(view::tmpl::item_view))
+                    .route(get().to(view::tmpl::item_view_either))
+            )
+            .service( 
+                resource("/item/{id}/dyn")
+                    .route(get().to(view::tmpl::item_view_dyn))
             )
             .service(
                 resource("/@{uname}")

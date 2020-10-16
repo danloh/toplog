@@ -13,11 +13,12 @@
 {%- endblock navMain -%}
 
 {%- block mainview -%}
+<div class="form-help-tips"></div>
 {%- if is_new -%}
 <div class="form-tips">
-  > Submit Link to Suggest New Item<button class="toolbtn" onclick="showInputUrl()">>></button>
+  > Submit Link to Suggest New Item<button class="toolbtn" onclick="switchForm()">>></button>
 </div>
-<div class="main-page form-page" id="new-form-viaurl">
+<div class="main-page form-page" id="new-i-form-viaurl">
   <div class="viaurl-form" id="new-via-url">
     <div class="form-wrap">
       <textarea class="input-box" id="new-i-viaurl" rows="1" spellcheck="false" placeholder="Paste a Link"></textarea>
@@ -28,25 +29,25 @@
   </div>
 </div>
 <div class="form-tips">
-  > Fill the Form to Suggest New Item
+  > Fill the Form to Suggest New Item<button class="toolbtn" onclick="switchForm(1)">>></button>
 </div>
 {%- endif -%}
 
 <div class="main-page form-page" id="new-i-form-page">
   <div class="page-main form-box">
-    <span class="form-tips">Title</span>
+    <span class="form-tips">Title*</span>
     <section class="form-item-wrap wrap-layout" title="Title">
       <textarea class="input-box form-input-title" id="new-i-title" spellcheck="false" placeholder="Title" required></textarea>
     </section>
-    <span class="form-tips">Summary</span>
+    <span class="form-tips">Summary*</span>
     <section class="form-item-wrap wrap-layout">
       <textarea class="input-box form-input-intro" id="new-i-content" rows="2" spellcheck="false" required></textarea>
     </section>
-    <span class="form-tips">Link</span>
+    <span class="form-tips">Link*</span>
     <section class="form-item-wrap wrap-layout" title="Link">
-      <textarea class="input-box" id="new-i-link" spellcheck="false" placeholder="Link"></textarea>
+      <textarea class="input-box" id="new-i-link" spellcheck="false" placeholder="Link" required></textarea>
     </section>
-    <span class="form-tips">Author</span>
+    <span class="form-tips">Author*</span>
     <section class="form-item-wrap wrap-layout" title="Origin Author">
       <input class="input-box" id="new-i-author" placeholder="Origin Author" />
     </section>
@@ -73,16 +74,16 @@
     <section class="form-item-wrap wrap-layout" title="Cover">
       <textarea class="input-box" id="new-i-logo" spellcheck="false" placeholder="Cover"></textarea>
     </section>
-    <span class="form-tips">Publish Date</span>
+    <span class="form-tips">Publish Date*</span>
     <section class="form-item-wrap wrap-layout" title="Publish Date">
       <input type="date" class="input-box" id="new-i-pub_at" placeholder="Publish Date" />
     </section>
-    <span class="form-tips">Add Tag</span>
+    <!-- <span class="form-tips">Add Tag</span>
     <div id="sa-tags-container" class="tags-container"></div>
     <section class="form-item-wrap wrap-layout">
       <input class="input-box" id="new-i-tag" onkeypress="addTag(event, 'new-i-tag')" 
        placeholder="Input then Enter" />
-    </section>
+    </section> -->
     <section class="form-item-wrap wrap-layout">
       <button onClick="newItem()" id="new-i-btn" class="toolbtn form-submit-btn">
         Submit

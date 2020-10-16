@@ -337,9 +337,9 @@ impl NewItem {
         let itm = item_new.clone();
         let tpc = itm.topic;
         // del related html, re-generate when visit, clean cache
-        let name1 = "all-Misc";
-        let name2 = tpc.clone() + "-Misc";
-        let name3 = tpc + "-newest";
+        let name1 = "collection/all-Misc";
+        let name2 = String::from("collection/") + &tpc + "-Misc";
+        let name3 = String::from("collection/") + &tpc + "-newest";
         del_html(name1).unwrap_or(());
         del_html(&name2).unwrap_or(());
         del_html(&name3).unwrap_or(());
@@ -455,16 +455,18 @@ impl UpdateItem {
         let tpc = itm.topic;
         let itmty = itm.ty;
         // del related html, re-generate when visit, clean cache
-        let name0 = "all-index";
-        let name1 = "all-Misc";
-        let name2 = tpc.clone() + "-Misc";
-        let name3 = tpc + "-" + &itmty;
-        let name4 = String::from("all-") + &itmty;
+        let name0 = "collection/all-index";
+        let name1 = "collection/all-Misc";
+        let name2 = String::from("collection/") + &tpc + "-Misc";
+        let name3 = String::from("collection/") + &tpc + "-" + &itmty;
+        let name4 = String::from("collection/all-") + &itmty;
+        let name5 = String::from("item/") + &itm.id.to_string();
         del_html(name0).unwrap_or(());
         del_html(name1).unwrap_or(());
         del_html(&name2).unwrap_or(());
         del_html(&name3).unwrap_or(());
         del_html(&name4).unwrap_or(());
+        del_html(&name5).unwrap_or(());
         // ============================================================
         
         Ok(item_update)
@@ -531,10 +533,11 @@ impl SpiderItem {
         
         // ==================================
         // del related html
-        del_html("all-Misc").unwrap_or(());
-        let name1 = topic.clone() + "-Misc";
+        del_html("collection/all-Misc").unwrap_or(());
+        del_html("collection/all-newest").unwrap_or(());
+        let name1 = String::from("collection/") + &topic + "-Misc";
         del_html(&name1).unwrap_or(());
-        let name2 = topic + "-newest";
+        let name2 = String::from("collection/") + &topic + "-newest";
         del_html(&name2).unwrap_or(());
         // ==================================
 
@@ -634,14 +637,14 @@ impl QueryItem {
         let tpc = itm.topic;
         let typ = itm.ty;
         // println!("here {}, {}", tpc, typ);
-        let name1 = tpc.clone() + "-" + &typ;
-        let name2 = tpc +  "-Misc";
-        let name3 = String::from("all-") + &typ;
+        let name1 = String::from("collection/") + &tpc + "-" + &typ;
+        let name2 = String::from("collection/") + &tpc +  "-Misc";
+        let name3 = String::from("collection/all-") + &typ;
         del_html(&name1).unwrap_or(());
         del_html(&name2).unwrap_or(());
         del_html(&name3).unwrap_or(());
-        del_html("all-Misc").unwrap_or(());
-        del_html("all-index").unwrap_or(());
+        del_html("collection/all-Misc").unwrap_or(());
+        del_html("collection/all-index").unwrap_or(());
         // =========================
 
         Ok(item)

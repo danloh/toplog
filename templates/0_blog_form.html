@@ -9,34 +9,35 @@
 {%- endblock navMain -%}
 
 {%- block mainview -%}
+<div class="form-help-tips"></div>
 <div class="main-page form-page" id="new-b-form-page">
   <div class="page-main form-box">
-    <span class="form-tips">Blogger Name</span>
+    <span class="form-tips">Blogger Name*</span>
     <section class="form-item-wrap wrap-layout" title="Name">
       <input class="input-box" id="new-b-aname" placeholder="Name" required>
     </section>
     <span class="form-tips">Blog Name*</span>
     <section class="form-item-wrap wrap-layout" title="Blog Name">
-      <input class="input-box" id="new-b-blog_host" placeholder="Blog Name">
+      <input class="input-box" id="new-b-blog_host" placeholder="Blog Name" required>
     </section>
     <span class="form-tips">Blog Link*</span>
-    <section class="form-item-wrap wrap-layout" title="Blog Link" required>
-      <textarea class="input-box" id="new-b-blog_link" spellcheck="false" placeholder="Blog Link"></textarea>
+    <section class="form-item-wrap wrap-layout" title="Blog Link">
+      <textarea class="input-box" id="new-b-blog_link" spellcheck="false" placeholder="Blog Link" required></textarea>
     </section>
     <span class="form-tips">Select Domain*</span>
     <section class="form-item-wrap wrap-layout">
       <select id="new-b-topic" class="form-input form-input-select" required>
-        <option value=" ">Select Domain</option>
+        <option value="">Select Domain</option>
         {%- for d in iTopics -%}
         <option value="{{ d }}">{{ d }}</option>
         {%- endfor -%}
       </select>
     </section>
-    <span class="form-tips">Avatar</span>
+    <span class="form-tips">Blog Logo*</span>
     <section class="form-item-wrap wrap-layout">
       <textarea class="input-box" id="new-b-avatar" spellcheck="false"></textarea>
     </section>
-    <span class="form-tips">Introduction</span>
+    <span class="form-tips">Introduction*</span>
     <section class="form-item-wrap wrap-layout">
       <textarea class="input-box form-input-intro" id="new-b-intro" rows="2" spellcheck="false"></textarea>
     </section>
@@ -53,12 +54,12 @@
       <input type="checkbox" class="" id="new-b-is_top" value="top" />
       <label for="new-b-is_top">This is Featured Blog</label>
     </section>
-    <span class="form-tips">Add Tag</span>
+    <!-- <span class="form-tips">Add Tag</span>
     <div id="sa-tags-container" class="tags-container"></div>
     <section class="form-item-wrap wrap-layout">
       <input class="input-box" id="new-b-tag" onkeypress="addTag(event, 'new-b-tag')" 
        placeholder="Input then Enter" />
-    </section>
+    </section> -->
     <section class="form-item-wrap wrap-layout">
       <button onClick="newBlog()" id="new-b-btn" class="toolbtn form-submit-btn">
         Submit

@@ -43,7 +43,7 @@ function getValsByIDs(ids=[], prefix='') {
   let vals = [];
   for ( let id of ids ) {
     let ele = document.getElementById(prefix + id);
-    let val = ele ? ele.value || ele.innerHTML : '';
+    let val = ele ? ele.value : '';
     vals.push(val);
   }
   return vals;
@@ -230,6 +230,47 @@ function signOut(to='/') {
   // delCookie(CAN);
   delCookie('oMg');
   window.location.href = to;
+}
+
+// gen today date
+//
+function getToday() {
+  let now = new Date();
+  let dd = String(now.getDate()).padStart(2, '0');
+  let mm = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
+  let yyyy = String(now.getFullYear());
+  let today = yyyy + '-' + mm + '-' + dd;
+  return today;
+}
+
+// autosize textarea
+//
+const newEvtListener = (parent, type, listener) => parent.addEventListener(type, listener);
+function initAutoSize(ids=[]) {
+  const autoSize = (id) => {
+    let text = document.getElementById(id);
+    const resize = () => {
+        text.style.height = 'auto';
+        text.style.height = text.scrollHeight + 'px';
+    };
+    const delayedResize = () => {
+        window.setTimeout(resize, 0);
+    };
+    newEvtListener(text, 'change',  resize);
+    newEvtListener(text, 'focus',  resize);
+    newEvtListener(text, 'cut',     delayedResize);
+    newEvtListener(text, 'paste',   delayedResize);
+    newEvtListener(text, 'drop',    delayedResize);
+    newEvtListener(text, 'keydown', delayedResize);
+
+    text.focus();
+    text.select();
+    resize();
+  };
+
+  for (let id of ids) {
+    autoSize(id);
+  }
 }
 
 // gen avatar

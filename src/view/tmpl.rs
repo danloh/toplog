@@ -214,9 +214,31 @@ pub async fn more_item(
     }
 }
 
-// GET /item/{id}
+// GET /item/{id}  
 //
-pub async fn item_view(
+// static file default, otherwise generate
+pub async fn item_view_either(
+    db: Data<DbAddr>,
+    p: Path<i32>,
+) -> ServiceResult<HttpResponse> {
+    let id = p.clone();
+    let dir = "www/item/".to_owned() + &id.to_string() + ".html";
+    let s_html = std::fs::read(dir);
+    match s_html {
+        Ok(s) => {
+            let html = String::from_utf8(s).unwrap_or_default();
+            return Ok(HttpResponse::Ok()
+                .content_type("text/html; charset=utf-8")
+                .body(html)
+            )
+        }
+        _ => {
+            return item_view_dyn(db, p).await
+        }
+    }
+}
+// GET /item/{id}/dyn
+pub async fn item_view_dyn(
     db: Data<DbAddr>,
     p: Path<i32>,
 ) -> ServiceResult<HttpResponse> {
@@ -235,8 +257,10 @@ pub async fn item_view(
             let item_tmpl = ItemTmpl {
                 item: &msg,
             };
-
             let h = item_tmpl.render().unwrap_or("Rendering failed".into());
+            let h_dir = "www/item/".to_owned() + &id.to_string() + ".html";
+            std::fs::write(&h_dir, h.as_bytes())?;
+
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
         Err(e) => Ok(e.error_response()),
@@ -292,7 +316,7 @@ pub async fn statify_site(
     db: Data<DbAddr>,
     _auth: CheckCan,
 ) -> ServiceResult<HttpResponse> {
-    del_dir("www/collection");
+    del_dir("www/collection").unwrap_or(());
 
     Ok(HttpResponse::Ok().json(String::from("done")))
 }

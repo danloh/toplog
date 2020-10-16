@@ -169,6 +169,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // await loadTagsInitBar('blog', res_blog.id);
   }
 
-  // initAutoSize(['new-b-intro', 'new-b-avatar']);
+  initAutoSize(['new-b-intro', 'new-b-avatar']);
 
 })

@@ -43,7 +43,9 @@ textarea {
 .header {
   z-index: 999;
   height: 45px;
-  min-width: 240px;
+  /* min-width: 240px; */
+  background-color: #f1f3f2;
+  /* box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2); */
 }
 
 .site-logo {
@@ -125,7 +127,8 @@ textarea {
 .footer {
   margin-top: 3em;
   background-color: #f5f5f5;
-  min-width: 240px;
+  /* min-width: 240px; */
+  box-shadow: 0 -2px 2px -1px rgba(0,0,0,.2);
 }
 .footer .bottom {
   margin: 5px auto;
@@ -182,7 +185,7 @@ textarea {
 .banner .banner-bar,
 .main-view {
   max-width: 960px;
-  min-width: 240px;
+  /* min-width: 240px; */
 }
 
 .main-page, .info-page {
@@ -280,6 +283,11 @@ textarea {
 .item-md {
   color: #98a3ad;
   font-size: 18px;
+}
+.item-img {
+  border-radius: 2px;
+  max-width: 100%;
+  max-height: 42%;
 }
 .item-thumb {
   border-radius: 2.5%;
@@ -379,7 +387,7 @@ textarea {
   flex: 1;
   display: block;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: #ecebea;
   border: 2px solid #fff;
 }
 .submit-btn {
@@ -416,29 +424,27 @@ textarea {
   border: 0;
 }
 .form-input-title {
-  font-size: 1.1em;
+  font-size: 1.05em;
   line-height: 1.5em;
   font-weight: 500;
+  height: 32px;
 }
 .form-input-intro {
   font-size: 0.9em;
   line-height: 1.5em;
 }
+.form-input-link {
+  font-size: 0.85em;
+  height: 32px;
+}
 .form-input-select {
   font-size: 0.8em;
-  background-color: #f9f9f9;
 }
 .cache-tips, .autosave-tips, .form-help-tips {
   background-color: #f8f6e3;
   font-size: 14px;
   padding: 5px;
   margin: 5px 0;
-}
-.new-story-tips {
-  font-size: 15px;
-  padding: 5px;
-  margin: 5px 0;
-  border-bottom: 2px solid #dddcdc;
 }
 .viaurl-form {
   width: 100%;

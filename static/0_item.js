@@ -1,4 +1,6 @@
 let S_PREFIX = "new-i-";
+let NEW_AS = '';
+let NEW_FOR = '';
 let UP_ITEM = {title: '', content: '', logo: ''};
 
 let IS_NEW_OR_NOT = true;  // new or edit
@@ -9,12 +11,12 @@ function buildItem () {
 
   let title = vals[ids.indexOf('title')];
   let content = vals[ids.indexOf('content')];
-  let topic = vals[ids.indexOf('topic')];
-  let ty = vals[ids.indexOf('ty')] || 'Article';
+  let topic = vals[ids.indexOf('topic')] || NEW_FOR;
+  let ty = vals[ids.indexOf('ty')] || NEW_AS || 'Article';
   let logo = vals[ids.indexOf('logo')];
   let author = vals[ids.indexOf('author')];
   let link = vals[ids.indexOf('link')];
-  let pub_at = vals[ids.indexOf('pub_at')];
+  let pub_at = vals[ids.indexOf('pub_at')] || getToday();
   let csrf = vals[ids.indexOf('csrf')];
   
   // refer to struct NewItem
@@ -41,7 +43,6 @@ async function newItem() {
   let title = new_itm.title;
   let topic = new_itm.topic;
   let content = new_itm.content;
-
 
   if (title && topic && content && csrf) {
     let newaBtn = document.getElementById(S_PREFIX + "btn");
@@ -82,7 +83,7 @@ async function newItem() {
       body: JSON.stringify(q_data)
     };
     let resp = IF_TO_FETCH 
-      ? await fetch('/api/items', options) 
+      ? await fetch('/api/items', options)
       : {ok: true, nofetch: true};
     // console.log(resp);
 
@@ -147,8 +148,8 @@ async function newItemViaUrl() {
 
   let sp_data = {
     url,
-    topic: '',
-    ty: ''
+    topic: NEW_FOR || '',
+    ty: NEW_AS || ''
   };
 
   let options = {
@@ -172,19 +173,22 @@ async function newItemViaUrl() {
 }
 
 // hide or show viaurl
-let showViaUrl = true;
-function showInputUrl(mut=true) {
-  showViaUrl = !showViaUrl && mut;
-  let viaurl = document.getElementById('new-s-form-viaurl');
-  if (viaurl) { viaurl.style.display = showViaUrl ? '' : 'none'; }
+function switchForm(to=0) {
+  let viaurl = document.getElementById('new-i-form-viaurl');
+  let viaform = document.getElementById('new-i-form-page');
+  if (viaurl && viaform) { 
+    viaurl.style.display = to ? 'none' : '';
+    viaform.style.display = to ? '' : 'none';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
   if (!getCookie(TOK)) return;
-  let docPath = document.location.pathname;
-  if (docPath.startsWith('/edititem')) {
+  let urlPath = document.location.pathname;
+  let urlQry = document.location.search;
+  if (urlPath.startsWith('/edititem')) {
     // load item
-    let itmid = document.location.search.split('?id=')[1];
+    let itmid = urlQry.split('?id=')[1];
     if (!itmid) return;
     let resp = await fetch(`/api/items/${itmid}`);
     if (!resp.ok) return;
@@ -197,7 +201,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     setValsByIDs(ids, S_PREFIX, res_item);
     // load tags and init tagsbar
     // await loadTagsInitBar('item', res_item.id);
+  } else { // newitem
+    let viaform = document.getElementById('new-i-form-page');
+    if (viaform) { viaform.style.display = 'none'; }
+
+    NEW_AS = getQueryParam('as', urlQry) || '';
+    NEW_FOR = getQueryParam('for', urlQry) || '';
+    // console.log(NEW_AS, NEW_FOR);
+    let newids = ['ty','topic'];
+    setValsByIDs(newids, S_PREFIX, {ty: NEW_AS, topic: NEW_FOR});
   }
 
-  // initAutoSize(['new-i-title', 'new-i-content', 'new-i-logo']);
+  initAutoSize(['new-i-title', 'new-i-content', 'new-i-link', 'new-i-logo']);
 })
