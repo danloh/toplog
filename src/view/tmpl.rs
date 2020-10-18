@@ -17,6 +17,7 @@ use crate::view::{
     CollectionTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
     SiteMapTmpl
 };
+use crate::api::auth::{CheckTopic};
 
 // for extrct query param
 // 
@@ -45,13 +46,14 @@ pub struct FromQuery {
 //
 pub async fn dyn_index(
     db: Data<DbAddr>,
+    c_tpc: CheckTopic,
 ) -> ServiceResult<HttpResponse> {
     let q = Query(PerQuery{
         ty: None,
         tpc: None,
         ord: None
     });
-    collection_dyn(db, q).await
+    collection_dyn(db, q, c_tpc).await
 }
 
 // GET /collection?ty=&tpc=&ord=
@@ -60,10 +62,15 @@ pub async fn dyn_index(
 pub async fn collection_either(
     db: Data<DbAddr>,
     q: Query<PerQuery>,
+    c_tpc: CheckTopic,
 ) -> ServiceResult<HttpResponse> {
     let pq = q.clone();
     let ty = pq.ty.unwrap_or(String::from("index"));
-    let mut tpc = pq.tpc.unwrap_or(String::from("all"));
+    
+    let mut tpc = pq.tpc.unwrap_or({
+        let topic = c_tpc.clone().0;
+        if topic.trim().len() == 0 { String::from("all") } else { topic }
+    });
     if tpc.trim() == "from" {
         tpc = String::from("all");
     }
@@ -78,7 +85,7 @@ pub async fn collection_either(
             )
         }
         _ => {
-            return collection_dyn(db, q).await
+            return collection_dyn(db, q, c_tpc).await
         }
     }
 }
@@ -86,13 +93,18 @@ pub async fn collection_either(
 pub async fn collection_dyn(
     db: Data<DbAddr>,
     q: Query<PerQuery>,
+    c_tpc: CheckTopic,
 ) -> ServiceResult<HttpResponse> {
     let pq = q.clone();
     let ty = pq.ty.unwrap_or(String::from("Misc"));
-    let mut topic = pq.tpc.unwrap_or(String::from("all"));
+    let mut topic = pq.tpc.unwrap_or({
+        let tpc = c_tpc.0;
+        if tpc.trim().len() == 0 { String::from("all") } else { tpc }
+    });
     if topic.trim() == "from" {
         topic = String::from("all");
     }
+    // println!("Topic: {:?}", topic);
     let tpc_msg = Topic { 
         topic: topic.clone(), 
         ty: ty.clone(),

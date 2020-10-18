@@ -80,7 +80,7 @@ textarea {
 }
 .search-box .search-text {
   height: 18px;
-  width: 120px;
+  width: 240px;
 }
 .nav-menu .right-menu {
   float: right;
@@ -611,6 +611,9 @@ textarea {
 }
 .tab-Web {
   background-color: #60c1e4;
+}
+.pad {
+  padding: 5px;
 }
 
 .blog-info {

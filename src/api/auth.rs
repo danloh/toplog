@@ -685,6 +685,24 @@ impl FromRequest for CheckAuth {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CheckTopic(pub String);
+
+impl FromRequest for CheckTopic {
+    type Config = ();
+    type Error = ServiceError;
+    type Future = Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        if let Some(cooki) = req.cookie("topic") {
+            let tpc_val = cooki.value();
+            // println!("cookie: {:?}", cookie_val);
+            return ok(CheckTopic(String::from(tpc_val)));
+        } 
+        ok(CheckTopic(String::new()))
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CheckCsrf();
 
 impl FromRequest for CheckCsrf {

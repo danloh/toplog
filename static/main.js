@@ -177,9 +177,16 @@ function openLink(link, admin=false) {
   window.location.href = link;
 }
 
+function navTopic(topic, ty) {
+  setCookie('topic', topic);
+  let link = `/collection?tpc=${topic}&ty=${ty}`;
+  window.location.href = link;
+}
+
 
 // auth 
 // set cookie
+// credit to js-cookie
 function setCookie (key, value, attributes) {
   if (typeof document === 'undefined') return;
 

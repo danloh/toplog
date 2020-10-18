@@ -62,6 +62,16 @@
         <input type="text" id="q" placeholder=" Search ..." class="search-text"/>
       </form>
       <!--end google site search -->
+      <div class="topic-list">
+        <span class="meta-tag">
+          <a href="/collection?tpc=all">More Topic:</a>
+        </span>
+        {%- for tpc in iTopics -%}
+        <span class="meta-tag">
+          <a href="/collection?tpc={{tpc}}" class="pad tab-{{ tpc }}">{{ tpc }}</a>
+        </span>
+        {%- endfor -%}
+      </div>
     </div>
     <br>
   {%- endblock foot -%}
