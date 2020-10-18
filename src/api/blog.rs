@@ -12,7 +12,7 @@ use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{ReqQuery};
-use crate::api::auth::{CheckUser, CheckCan};
+use crate::api::auth::{CheckUser, CheckCan, CheckCsrf};
 use crate::{Dba, DbAddr, PooledConn};
 use crate::schema::{blogs};
 
@@ -21,6 +21,7 @@ use crate::schema::{blogs};
 pub async fn new(
     blog: Json<NewBlog>,
     _can: CheckCan,
+    _csrf: CheckCsrf,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let res = db.send(blog.into_inner()).await?;
@@ -44,6 +45,7 @@ impl Handler<NewBlog> for Dba {
 pub async fn update(
     blog: Json<UpdateBlog>,
     _can: CheckCan,
+    _csrf: CheckCsrf,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let res = db.send(blog.into_inner()).await?;

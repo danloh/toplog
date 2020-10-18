@@ -14,7 +14,7 @@ use chrono::{NaiveDateTime, NaiveDate, Utc};
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{
     ReqQuery, ActionQuery, 
-    auth::{CheckUser, CheckCan},
+    auth::{CheckUser, CheckCan, CheckCsrf},
     re_test_url,
 };
 use crate::view::tmpl::del_html;
@@ -26,6 +26,7 @@ use crate::schema::{items, voteitems};
 pub async fn new(
     item: Json<NewItem>,
     _auth: CheckUser,
+    _csrf: CheckCsrf,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let res = db.send(item.into_inner()).await?;
@@ -49,6 +50,7 @@ impl Handler<NewItem> for Dba {
 // spider a url
 pub async fn spider(
     sp: Json<SpiderItem>,
+    _csrf: CheckCsrf,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let item = sp.into_inner();
@@ -78,6 +80,7 @@ impl Handler<SpiderItem> for Dba {
 pub async fn update(
     item: Json<UpdateItem>,
     _auth: CheckUser,
+    _csrf: CheckCsrf,
     db: Data<DbAddr>,
 ) -> ServiceResult<HttpResponse> {
     let res = db.send(item.into_inner()).await?;

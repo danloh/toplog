@@ -168,7 +168,8 @@ pub async fn item_from(
     }
 }
 
-// GET /moreitems/{topic}/{ty}?page=&perpage=42
+// GET /moreitems/{topic}/{ty}?page=&perpage=42 
+// pagination
 //
 pub async fn more_item(
     db: Data<DbAddr>,
@@ -191,10 +192,13 @@ pub async fn more_item(
     let topic_msg = Topic{ topic, ty, page };
 
     if let Err(e) = topic_msg.validate() {
-        return Ok(e.error_response());
+        return blank_response().await;
     }
 
-    let res =  db.send(topic_msg).await?;
+    let res = match db.send(topic_msg).await {
+        Ok(r) => { r },
+        Err(_) => { return blank_response().await }
+    };
     match res {
         Ok(msg) => {
             let mesg: Vec<&str> = (&msg.message).split("-").collect();
@@ -210,7 +214,7 @@ pub async fn more_item(
 
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => return blank_response().await,
     }
 }
 
@@ -360,6 +364,15 @@ pub fn del_dir(dir_name: &str) -> ServiceResult<()> {
     std::fs::remove_dir_all(dir_name)?;
     std::fs::create_dir(dir_name)?;
     Ok(())
+}
+
+// for general erro response
+//
+pub async fn blank_response() -> ServiceResult<HttpResponse> {
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(String::new())
+    )
 }
 
 // =====================================================================
