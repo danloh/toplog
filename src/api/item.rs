@@ -256,14 +256,12 @@ pub struct Item {
     pub logo: String,
     pub author: String,
     pub ty: String,      // item|translate|media|event|book
-    pub lang: String,    // en, cn...
     pub topic: String,   // programing: Python|Rust, etc.
     pub link: String,
     pub link_host: String,
-    pub origin_link: String, // for translate
+    pub pub_at: NaiveDate,
     pub post_by: String,
     pub post_at: NaiveDateTime,
-    pub pub_at: NaiveDate,
     pub is_top: bool,
     pub vote: i32,
 }

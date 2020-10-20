@@ -183,7 +183,6 @@ pub struct Blog {
     pub topic: String,
     pub blog_link: String,
     pub blog_host: String,
-    pub tw_link: String,
     pub gh_link: String,
     pub other_link: String,
     pub is_top: bool,

@@ -18,7 +18,6 @@ table! {
         topic -> Varchar,
         blog_link -> Varchar,
         blog_host -> Varchar,
-        tw_link -> Varchar,
         gh_link -> Varchar,
         other_link -> Varchar,
         is_top -> Bool,
@@ -29,11 +28,13 @@ table! {
 table! {
     comments (id) {
         id -> Int4,
+        title -> Nullable<Varchar>,
         content -> Text,
         author -> Varchar,
         post_at -> Timestamp,
         vote -> Int4,
         is_closed -> Bool,
+        as_ty -> Int2,
     }
 }
 
@@ -60,14 +61,12 @@ table! {
         logo -> Varchar,
         author -> Varchar,
         ty -> Varchar,
-        lang -> Varchar,
         topic -> Varchar,
         link -> Varchar,
         link_host -> Varchar,
-        origin_link -> Varchar,
+        pub_at -> Date,
         post_by -> Varchar,
         post_at -> Timestamp,
-        pub_at -> Date,
         is_top -> Bool,
         vote -> Int4,
     }

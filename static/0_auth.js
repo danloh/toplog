@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // redirect when authed on signin / signup
   if (toNum < 2 && getCookie(TOK)) {
-    window.location.href = RedirectURL.search('/auth?to=signin') == -1 ? RedirectURL : '/';
+    window.location.href = RedirectURL.search(/auth\?to=sign/) == -1 ? RedirectURL : '/';
   }
 
   if (toNum >= 3 && !getCookie(TOK)) return;
@@ -187,7 +187,7 @@ async function updateUser() {
   let options = {
     method:  'POST', 
     headers: {
-      'Content-Type': 'application/json', 
+      'Content-Type': 'application/json',
       'Authorization': getCookie(TOK),
     },
     body: JSON.stringify(upUser)

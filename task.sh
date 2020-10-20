@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/admin/topb
+cd /path_to/job
 ./job 
 
 ## chmod +x task.sh
