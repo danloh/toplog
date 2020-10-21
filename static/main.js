@@ -170,7 +170,8 @@ function openLink(link, admin=false) {
     ? getCookie("oMg") === "true" 
     : Boolean(getCookie(TOK));
   if (!check && !admin) {
-    window.location.href = "/auth?to=signin";
+    let redi = document.location.origin + link;
+    window.location.href = `/auth?to=signin&redirect=${redi}`;
     return;
   }
   if (!check) return;

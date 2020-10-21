@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   let urlHost = document.location.origin;
 
   RedirectURL = getRedirect('redirect', query) 
-    || docRefer.startsWith(urlHost) ? docRefer : '/'
-    || '/';
+    || (docRefer.startsWith(urlHost) ? docRefer : '/');
   let toWhat = getQueryParam('to', query);
   let toNum = toWhat == 'signin' 
     ? 0 

@@ -199,6 +199,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     let ids = ['title', 'content', 'logo', 'author', 'ty','topic', 'link', 'pub_at'];
     setValsByIDs(ids, S_PREFIX, res_item);
+    
+    initAutoSize(['new-i-content', 'new-i-link', 'new-i-logo']);
+
     // load tags and init tagsbar
     // await loadTagsInitBar('item', res_item.id);
   } else { // newitem
@@ -211,6 +214,4 @@ document.addEventListener('DOMContentLoaded', async function() {
     let newids = ['ty','topic'];
     setValsByIDs(newids, S_PREFIX, {ty: NEW_AS, topic: NEW_FOR});
   }
-
-  initAutoSize(['new-i-title', 'new-i-content', 'new-i-link', 'new-i-logo']);
 })
