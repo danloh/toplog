@@ -110,10 +110,10 @@ function loadMoreItems(topic='all', ty='Article') {
         console.log("No More");
         hasMoreIdx = false;
       }
+      window.scrollTo(0, document.body.scrollHeight);
       document.getElementById('item-list').innerHTML += r;
     })
   });
-  window.scrollTo(0, document.body.scrollHeight);
 }
 
 function toggleTop(id) {

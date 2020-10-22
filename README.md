@@ -5,8 +5,8 @@ online demo: https://toplog.cc/
 
 ## Feature
 
-- Find Featured blogs on specific topic and aggregate the good posts via a bot;
-- Submit and share good articles you read to toplog by a simple one click via a bookmarklet;
+- Find Featured blogs on specific topic and aggregate the good posts via a simple bot;
+- Submit and share good articles you read to toplog by just one simple click via a bookmarklet;
 - vote or save the article to read again later
 - discuss (WIP)
 
@@ -19,3 +19,15 @@ online demo: https://toplog.cc/
 - [VanillaJS](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 Thanks！
+
+## Welcome To Join
+
+- welcome to use the service, sign up or not: https://toplog.cc/ ; 
+- Appreciate any bug report / pr / suggestion; 
+- find good blog on any topics and define the rules to feed bot, just in [cfg.rs](https://github.com/danloh/toplog/blob/master/src/bot/cfg.rs), anyone can do it even though you are not a fan of Rust Language.
+
+## Todo
+
+- Discuss feature (WIP) 
+- stack: How x do y 
+- RSS Feed

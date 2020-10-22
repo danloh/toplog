@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use crate::bot::spider::WebPage;
 
-// TODO: CLEAN UP URL
+// 
 
 pub fn get_links(page: &WebPage) -> Vec<String> {
     let domain = &page.domain;
@@ -112,10 +112,11 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
             }
         }
         // Rust: Without Boats
-        "boats.gitlab.io" => {
+        "without.boats" => {
             for link in raw_links {
-                if link.starts_with("https://boats.gitlab.io/blog/post/") {
-                    links.push(link)
+                if link.starts_with("/blog/") {
+                    let f_link = "https://without.boats".to_string() + &link;
+                    links.push(f_link)
                 }
             }
         }
@@ -346,7 +347,7 @@ lazy_static! {
         map.insert("kazlauskas.me", ("Simonas Kazlauskas", "Rust"));
         map.insert("fnordig.de", ("Jan-Erik Rediger", "Rust"));
         map.insert("pietroalbini.org", ("Pietro Albini", "Rust"));
-        map.insert("boats.gitlab.io", ("Without Boats", "Rust"));
+        map.insert("without.boats", ("Without Boats", "Rust"));
         map.insert("deterministic.space", ("Pascal Hertleif", "Rust"));
         map.insert("fitzgeraldnick.com", ("Nick Fitzgerald", "Rust"));
         map.insert("blog.digital-scurf.org", ("Daniel Silverstone", "Rust"));
@@ -392,7 +393,7 @@ lazy_static! {
             "https://www.ralfj.de/blog/", // ralf
             "https://fitzgeraldnick.com/", // fitz
             "https://deterministic.space/", // pascal
-            "https://boats.gitlab.io/blog/", // boats
+            "https://without.boats/blog/", // boats
             "https://www.pietroalbini.org/", 
             "https://fnordig.de/posts/",  // badboy
             "https://kazlauskas.me/", // nagisa

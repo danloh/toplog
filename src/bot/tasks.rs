@@ -141,6 +141,7 @@ pub fn gen_static_site(_env: &Environment) -> Result<(), PerformError> {
 
     use crate::view::tmpl::del_dir;
     del_dir("www/collection").unwrap_or(());
+    del_dir("www/item").unwrap_or(());
     
     Ok(())
 }
