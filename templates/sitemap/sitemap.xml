@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
-      http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9  http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <url>
   <loc>https://toplog.cc/</loc>
   <changefreq>Daily</changefreq>
   <priority>1.0</priority>
 </url>
 {%- for t in tys -%}
-<url>
-  <loc>https://toplog.cc/a/{{ t }}</loc>
-  <changefreq>Daily</changefreq>
-  <priority>0.9</priority>
-</url>
 {%- for tp in topics -%}
 <url>
-  <loc>https://toplog.cc/t/{{ tp }}/{{ t }}</loc>
+  <loc>https://toplog.cc/collection?tpc={{ tp }}&ty={{ t }}</loc>
   <changefreq>Daily</changefreq>
   <priority>0.9</priority>
 </url>

@@ -39,9 +39,10 @@
     <span class="meta-tag"><a href="/from?by={{ a_author }}">{{ item.author }}</a></span>
     <!-- <span class="meta-tag">{{ item.pub_at|date_fmt("%b %d, %Y") }}</span>  -->
     <a id="up-{{ itmid }}" onclick="upVote('{{ itmid }}')" href="javascript:void(0);" title="Read Again Later">
+      <span id="vote-{{ itmid }}" class="vote-num">{{ item.vote }}</span>
       <span class="badge-heart"></span>
     </a> 
-    <!-- <span id="vote-{{ itmid }}" class="meta-tag vote-num">{{ item.vote }}</span>&nbsp;&nbsp; -->
+    <span class="meta-tag"></span>
     <div class="menudown">
       <button onclick="showMenu('item-opt-{{ itmid }}')" class="toolbtn more-opt-btn" title="More">
         •••

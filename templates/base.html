@@ -64,7 +64,9 @@
       <!--end google site search -->
       <div class="topic-list">
         <span class="meta-tag">
-          <a href="/collection?tpc=all">More Topic:</a>
+          <a onclick="navTopic('all', 'Misc')" href="javascript:void(0);">
+            More Topic:
+          </a>
         </span>
         {%- for tpc in iTopics -%}
         <span class="meta-tag">
@@ -80,7 +82,7 @@
 <script src="/static/main.js"></script>
 {%- block script -%}{%- endblock script -%}
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-154003490-1"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-19524523-1"></script>
 <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-154003490-1');</script>
 </body>
 </html>
