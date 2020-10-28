@@ -9,6 +9,7 @@ use actix_web::{
 use base64::decode;
 use diesel::prelude::*;
 use diesel::{self, ExpressionMethods, QueryDsl, RunQueryDsl};
+use log::error;
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{ReqQuery};
@@ -27,7 +28,7 @@ pub async fn new(
     let res = db.send(blog.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -51,7 +52,7 @@ pub async fn update(
     let res = db.send(blog.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -78,7 +79,7 @@ pub async fn get(
     let res = db.send(blog).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -97,7 +98,7 @@ pub async fn toggle_top(
     let res = db.send(blog).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -116,7 +117,7 @@ pub async fn del(
     let res = db.send(blog).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b.aname)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -154,7 +155,7 @@ pub async fn get_list(
     let res = db.send(blog).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -296,6 +297,7 @@ impl UpdateBlog {
             || new_other_link != old.other_link.trim()
             || new_is_top != old.is_top;
         if !check_changed {
+            error!("no change");
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
 
@@ -375,6 +377,7 @@ impl QueryBlog {
         // let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
         // let check_permission: bool = self.uname == admin_env;
         // if !check_permission {
+        //     error!("unauth");
         //     return Err(ServiceError::Unauthorized);
         // }
 

@@ -16,6 +16,7 @@ use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Duration, Local, NaiveDateTime, Utc};
 use std::convert::From;
 use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation};
+use log::error;
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{Msg, AuthMsg, UserMsg};
@@ -53,13 +54,14 @@ pub async fn signup(
     };
 
     if let Err(e) = reg.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
     
     let res = db.send(reg).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -90,6 +92,7 @@ pub async fn signin(
     };
 
     if let Err(e) = auth_user.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
 
@@ -109,7 +112,7 @@ pub async fn signin(
             };
             Ok(HttpResponse::Ok().json(auth_msg))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -139,7 +142,7 @@ pub async fn get(
             };
             Ok(HttpResponse::Ok().json(user_msg))
         }
-        Err(er) => Ok(er.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -173,6 +176,7 @@ pub async fn update(
     }
 
     if let Err(e) = up_user.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
 
@@ -192,7 +196,7 @@ pub async fn update(
             };
             Ok(HttpResponse::Ok().json(auth_msg))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -236,7 +240,7 @@ pub async fn change_psw(
     let res = db.send(user_psw).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)),
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -266,9 +270,13 @@ impl Handler<ChangePsw> for Dba {
                         message: String::from("Success"),
                     })
                 }
-                _ => { return Err(ServiceError::BadRequest("Failed Auth".into()));},
+                _ => { 
+                    error!("auth failed");
+                    return Err(ServiceError::BadRequest("Failed Auth".into()));
+                },
             }
         } else {
+            error!("not existing");
             return Err(ServiceError::BadRequest("Not Existing".into()));
         }
     }
@@ -284,13 +292,14 @@ pub async fn reset_psw_req(
     let psw_req = re_req.into_inner(); // need uname and email
 
     if let Err(e) = psw_req.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
 
     let res = db.send(psw_req).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 401 or 404
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -325,13 +334,14 @@ pub async fn reset_psw(
     };
     
     if let Err(e) = reset.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
 
     let res = db.send(reset).await?;
     match res {
         Ok(msg) => Ok(HttpResponse::Ok().json(msg)), // 200 or 404
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -348,6 +358,7 @@ impl Handler<ResetReq> for Dba {
 
         let rq_email = check_user.email;
         if !re_test_email(&rq_email) {
+            error!("invalid email"); 
             return Err(ServiceError::BadRequest("InValid Email or Username".into()));
         }
 
@@ -389,8 +400,10 @@ impl Handler<ResetPsw> for Dba {
                     message: String::from("Success"),
                 });
             }
+            error!("auth failed");
             return Err(ServiceError::BadRequest("Auth Failed".into()));
         } else {
+            error!("not existing");
             return Err(ServiceError::BadRequest("Not Existing".into()));
         }
     }
@@ -417,7 +430,7 @@ pub async fn confirm_email(
             }.to_string();
             Ok(HttpResponse::Ok().content_type("text/html").body(cfm))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -605,6 +618,7 @@ impl FromRequest for CheckUser {
                 return ok(user);
             }
         }
+        error!("unauth");
         err(ServiceError::Unauthorized.into())
     }
 }
@@ -660,6 +674,7 @@ impl FromRequest for CheckCan {
         if check_permission {
             return ok(u);
         }
+        error!("unauth");
         err(ServiceError::Unauthorized.into())
     }
 }
@@ -720,6 +735,7 @@ impl FromRequest for CheckCsrf {
                 }
             }
         }
+        error!("csrf");
         err(ServiceError::BadRequest(String::from("c")).into())
     }
 }
@@ -789,6 +805,7 @@ impl RegUser {
         if check {
             Ok(())
         } else {
+            error!("username or psw");
             Err(ServiceError::BadRequest("Invalid username or password".into()))
         }
     }
@@ -867,6 +884,7 @@ impl AuthUser {
         if check {
             Ok(())
         } else {
+            error!("username or psw");
             Err(ServiceError::BadRequest("Invalid username or password".into()))
         }
     }
@@ -894,6 +912,7 @@ impl AuthUser {
                 _ => { return Err(ServiceError::BadRequest("Auth Failed".into()));}
             }
         }
+        error!("unauth");
         Err(ServiceError::BadRequest("Auth Failed".into()))
     }
 }
@@ -943,6 +962,7 @@ impl UpdateUser {
         if check {
             Ok(())
         } else {
+            error!("input");
             Err(ServiceError::BadRequest("Invalid Input".into()))
         }
     }
@@ -1028,6 +1048,7 @@ impl ChangePsw {
         if check {
             Ok(())
         } else {
+            error!("psw");
             Err(ServiceError::BadRequest("Invalid password".into()))
         }
     }
@@ -1049,6 +1070,7 @@ impl ResetReq {
         if check {
             Ok(())
         } else {
+            error!("input");
             Err(ServiceError::BadRequest("Invalid".into()))
         }
     }
@@ -1079,6 +1101,7 @@ impl ResetPsw {
         if check {
             Ok(())
         } else {
+            error!("psw");
             Err(ServiceError::BadRequest("Invalid password".into()))
         }
     }

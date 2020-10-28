@@ -35,6 +35,7 @@ fn main() {
 
     loop {
         if let Err(e) = runner.run_all_pending_jobs() {
+            log::error!("back worker: {}", e);
             failure_count += 1;
             if failure_count < 5 {
                 eprintln!(

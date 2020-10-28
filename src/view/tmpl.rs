@@ -12,6 +12,7 @@ use actix_web::{
     Result
 };
 use chrono::{SecondsFormat, Utc};
+use log::error;
 use crate::view::{
     Template, TY_VEC, TOPIC_VEC, 
     CollectionTmpl, ItemTmpl, ItemsTmpl, AboutTmpl, ProfileTmpl,
@@ -131,7 +132,7 @@ pub async fn collection_dyn(
             std::fs::write(dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e);  Ok(e.error_response()) },
     }
 }
 
@@ -154,6 +155,7 @@ pub async fn item_from(
     };
     
     if let Err(e) = topic_msg.validate() {
+        error!("{}", e);
         return Ok(e.error_response());
     }
 
@@ -176,7 +178,7 @@ pub async fn item_from(
             // std::fs::write(&t_dir, h.as_bytes())?;
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e);  Ok(e.error_response()) },
     }
 }
 
@@ -204,12 +206,13 @@ pub async fn more_item(
     let topic_msg = Topic{ topic, ty, page };
 
     if let Err(e) = topic_msg.validate() {
+        error!("{}", e);
         return blank_response().await;
     }
 
     let res = match db.send(topic_msg).await {
         Ok(r) => { r },
-        Err(_) => { return blank_response().await }
+        Err(e) => { error!("{}", e); return blank_response().await }
     };
     match res {
         Ok(msg) => {
@@ -226,7 +229,7 @@ pub async fn more_item(
 
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
-        Err(e) => return blank_response().await,
+        Err(e) => { error!("{}", e); return blank_response().await }
     }
 }
 
@@ -279,7 +282,7 @@ pub async fn item_view_dyn(
 
             Ok(HttpResponse::Ok().content_type("text/html").body(h))
         }
-        Err(e) => Ok(e.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -417,6 +420,7 @@ impl Topic {
         if check {
             Ok(())
         } else {
+            error!("input");
             Err(ServiceError::BadRequest("Invalid Input".into()))
         }
     }

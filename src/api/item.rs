@@ -10,6 +10,7 @@ use base64::decode;
 use diesel::prelude::*;
 use diesel::{self, dsl::any, ExpressionMethods, QueryDsl, RunQueryDsl};
 use chrono::{NaiveDateTime, NaiveDate, Utc};
+use log::error;
 
 use crate::errors::{ServiceError, ServiceResult};
 use crate::api::{
@@ -32,7 +33,7 @@ pub async fn new(
     let res = db.send(item.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -56,13 +57,14 @@ pub async fn spider(
     let item = sp.into_inner();
     
     if let Err(e) = item.validate() {
+        error!("{}", e); 
         return Ok(e.error_response());
     }
     
     let res = db.send(item).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -86,7 +88,7 @@ pub async fn update(
     let res = db.send(item.into_inner()).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -113,7 +115,7 @@ pub async fn get(
     let res = db.send(item).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -132,7 +134,7 @@ pub async fn toggle_top(
     let res = db.send(item).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b.is_top)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -152,7 +154,7 @@ pub async fn vote_or_veto(
     let res = db.send(item).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b.vote)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -172,7 +174,7 @@ pub async fn del(
     let res = db.send(item).await?;
     match res {
         Ok(b) => Ok(HttpResponse::Ok().json(b.id)),
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -227,7 +229,7 @@ pub async fn get_list(
             };
             Ok(HttpResponse::Ok().json(res))
         },
-        Err(err) => Ok(err.error_response()),
+        Err(e) => { error!("{}", e); Ok(e.error_response()) },
     }
 }
 
@@ -399,6 +401,7 @@ impl UpdateItem {
             || new_link != old_link
             || new_pub_at != old.pub_at;
         if !check_changed {
+            error!("no change"); 
             return Err(ServiceError::BadRequest("Nothing Changed".to_owned()));
         }
         
@@ -552,6 +555,7 @@ impl SpiderItem {
         if check {
             Ok(())
         } else {
+            error!("url");
             Err(ServiceError::BadRequest("Invalid Url".into()))
         }
     }
@@ -660,6 +664,7 @@ impl QueryItem {
         let admin_env = dotenv::var("ADMIN").unwrap_or("".to_string());
         let check_permission: bool = self.uname == admin_env;
         if !check_permission {
+            error!("no permission");
             return Err(ServiceError::Unauthorized);
         }
 

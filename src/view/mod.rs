@@ -86,6 +86,7 @@ mod filters {
     };
     use chrono_tz::Tz;
     use unic_segment::GraphemeIndices;
+    use log::error;
 
     pub fn host(s: &str) -> TmplResult<String> {
         use crate::util::helper::get_host;
@@ -222,7 +223,7 @@ mod filters {
         let timezone =  if tz.len() > 0 {
             match tz.parse::<Tz>() {
                 Ok(timezone) => Some(timezone),
-                Err(_) => { return Ok(value) }
+                Err(e) => { error!("{}", e); return Ok(value) }
             }
         } else {
             None
@@ -238,7 +239,7 @@ mod filters {
                     },
                     Err(_) => match value.parse::<NaiveDateTime>() {
                         Ok(val) => val.format(format),
-                        Err(_) => { return Ok(value) }
+                        Err(e) => { error!("{}", e); return Ok(value) }
                     },
                 }
             } else {
@@ -247,7 +248,7 @@ mod filters {
                             val.and_hms(0, 0, 0), Utc
                         )
                         .format(format),
-                    Err(_) => { return Ok(value) }
+                    Err(e) => { error!("{}", e); return Ok(value) }
                 }
             };
     
