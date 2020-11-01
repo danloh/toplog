@@ -74,8 +74,12 @@ impl WebPage {
     }
 
     // extract links in html page
-    pub fn extract_links(&self) -> Vec<String> {
-        let link_selector = Selector::parse("a").unwrap();
+    pub fn extract_links(&self, selector_str: &str) -> Vec<String> {
+        let link_selector = match Selector::parse(selector_str) {
+            Ok(selector) => selector,
+            _ => return Vec::new()
+        };
+        
         let html = self.get_html();
         let link_refs: Vec<_> = html.select(&link_selector).collect();
         let mut links: Vec<String> = Vec::new();
@@ -126,7 +130,10 @@ pub fn page_ele_paser(
     attr_str: &str,
     alt_txt: &str,
 ) -> Vec<String> {
-    let a_selector = Selector::parse(sel_str).unwrap();
+    let a_selector = match Selector::parse(sel_str) {
+        Ok(selector) => selector,
+        _ => return Vec::new()
+    };
     let a_vec: Vec<_> = html.select(&a_selector).collect();
 
     if a_vec.len() == 0 {

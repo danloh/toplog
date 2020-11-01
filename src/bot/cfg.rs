@@ -7,12 +7,11 @@ use crate::bot::spider::WebPage;
 
 pub fn get_links(page: &WebPage) -> Vec<String> {
     let domain = &page.domain;
-    let raw_links = page.extract_links();
     let mut links: Vec<String> = Vec::new();
     match domain.trim() {
         // Rust: team Blog
         "blog.rust-lang.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://blog.rust-lang.org".to_string() + &link;
                     links.push(f_link)
@@ -21,7 +20,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Nicholas Matsakis 
         "smallcultfollowing.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/babysteps/blog/2020") {
                     let f_link = "http://smallcultfollowing.com".to_string() + &link;
                     links.push(f_link)
@@ -30,7 +29,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: async-std
         "async.rs" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/") && !(link.contains("/tags/"))
                     && !(link.contains("/page/")) 
                 {
@@ -41,7 +40,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: tokio
         "tokio.rs" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://tokio.rs/blog/2020") 
                     && !(link.contains("/#")) 
                 {
@@ -51,7 +50,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Guillaume Gomez 
         "blog.guillaume-gomez.fr" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://blog.guillaume-gomez.fr/articles/2020") {
                     links.push(link)
                 }
@@ -59,7 +58,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Ralf Jung
         "ralfj.de" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/2020") {
                     let f_link = "https://www.ralfj.de".to_string() + &link;
                     links.push(f_link)
@@ -68,7 +67,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Steve Klabnik
         "words.steveklabnik.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://words.steveklabnik.com/writing/") {
                     links.push(link)
                 }
@@ -76,7 +75,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Nick Cameron
         "ncameron.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/") && !(link.contains("/author/")) {
                     let f_link = "https://www.ncameron.org".to_string() + &link;
                     links.push(f_link)
@@ -85,7 +84,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Simonas Kazlauskas
         "kazlauskas.me" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("./entries/") {
                     let f_link = "https://kazlauskas.me".to_string() 
                         + &link.replacen("./", "/", 1);
@@ -95,7 +94,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Jan-Erik Rediger
         "fnordig.de" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://fnordig.de".to_string() + &link;
                     links.push(f_link)
@@ -104,7 +103,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Pietro Albini
         "pietroalbini.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/") && !(link.contains(".xml")) {
                     let f_link = "https://www.pietroalbini.org".to_string() + &link;
                     links.push(f_link)
@@ -113,7 +112,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Without Boats
         "without.boats" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/") {
                     let f_link = "https://without.boats".to_string() + &link;
                     links.push(f_link)
@@ -122,7 +121,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Pascal Hertleif
         "deterministic.space" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/") && !(link.contains(".xml")) {
                     let f_link = "https://deterministic.space".to_string() + &link;
                     links.push(f_link)
@@ -131,7 +130,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Nick Fitzgerald
         "fitzgeraldnick.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://fitzgeraldnick.com".to_string() + &link;
                     links.push(f_link)
@@ -140,7 +139,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Daniel Silverstone
         "blog.digital-scurf.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("./posts/") && link.len() > 8 
                     && !(link.contains("/#")) 
                 {
@@ -152,7 +151,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Claus Matzinger
         "blog.x5ff.xyz" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/blog/") && link.len() > 6 
                     && !(link.contains("/page/")) && !(link.contains(".xml")) 
                 {
@@ -163,7 +162,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Andre Bogus
         "llogiq.github.io" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://llogiq.github.io".to_string() + &link;
                     links.push(f_link)
@@ -172,7 +171,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Tony Arcieri
         "tonyarcieri.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://tonyarcieri.com/") {
                     links.push(link)
                 }
@@ -180,7 +179,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Yoshua Wuyts
         "blog.yoshuawuyts.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://blog.yoshuawuyts.com/") 
                     && !(link.contains(".xml"))  
                 {
@@ -190,7 +189,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Sean McArthur
         "seanmonstar.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://seanmonstar.com/post/")  {
                     links.push(link)
                 }
@@ -198,7 +197,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Ryan Levick
         "blog.ryanlevick.com" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://blog.ryanlevick.com/") 
                     && link.len() > 28  
                 {
@@ -208,7 +207,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Aleksey Kladov
         "matklad.github.io" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://matklad.github.io".to_string() + &link;
                     links.push(f_link)
@@ -217,7 +216,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Embedded Rust
         "rust-embedded.github.io" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://rust-embedded.github.io/blog/") 
                     && link.len() > 38  
                     && !(link.contains(".xml")) 
@@ -229,7 +228,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Aleksey Kladov
         "blog.troutwine.us" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://blog.troutwine.us".to_string() + &link;
                     links.push(f_link)
@@ -238,7 +237,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Rust-Station
         "rustacean-station.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/episode/") 
                     && link.len() > 10  
                 {
@@ -249,7 +248,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Raph Levien
         "raphlinus.github.io" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/rust/2020/") {
                     let f_link = "https://raphlinus.github.io".to_string() + &link;
                     links.push(f_link)
@@ -258,7 +257,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Armin Ronacher
         "lucumr.pocoo.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://lucumr.pocoo.org".to_string() + &link;
                     links.push(f_link)
@@ -267,7 +266,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Stjepan Glavina
         "stjepang.github.io" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/") {
                     let f_link = "https://stjepang.github.io".to_string() + &link;
                     links.push(f_link)
@@ -276,7 +275,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: bastion.rs
         "blog.bastion.rs" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/2020/")  
                 {
                     let f_link = "https://blog.bastion.rs".to_string() + &link;
@@ -286,9 +285,9 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Rust: Jane Lusby
         "yaah.dev" => {
-            for link in raw_links {
+            for link in page.extract_links("a.post-link") {
                 if link.starts_with("/") 
-                    && !(link.contains("/about")) 
+                    && !(link.contains("/about"))
                     && !(link.contains("/feed"))
                 {
                     let f_link = "https://yaah.dev".to_string() + &link;
@@ -296,9 +295,19 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
-         // CPP: fluentcpp
-         "fluentcpp.com" => {
-            for link in raw_links {
+        // Rust: Jane Lusby
+        "levpaul.com" => {
+            for link in page.extract_links("a.article-title") {
+                if link.starts_with("/posts/")
+                {
+                    let f_link = "https://levpaul.com".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
+        // CPP: fluentcpp
+        "fluentcpp.com" => {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://www.fluentcpp.com/2020") 
                     && link.len() > 32  
                     && !(link.contains("/#")) 
@@ -310,7 +319,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Go: Team Blog
         "blog.golang.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("/") && link.len() > 2 
                     && !(link.contains("/index")) 
                     && !(link.contains("//")) 
@@ -322,7 +331,7 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
         }
         // Web: Mozilla
         "hacks.mozilla.org" => {
-            for link in raw_links {
+            for link in page.extract_links("a") {
                 if link.starts_with("https://hacks.mozilla.org/2020/") 
                     || link.starts_with("https://hacks.mozilla.org/2019/") 
                 {
@@ -378,6 +387,7 @@ lazy_static! {
         map.insert("stjepang.github.io", ("Stjepan Glavina", "Rust")); 
         map.insert("blog.bastion.rs", ("bastion.rs", "Rust")); 
         map.insert("yaah.dev", ("Jane Lusby", "Rust"));
+        map.insert("levpaul.com", ("Levi Lovelock", "Rust"));
         // c++
         map.insert("fluentcpp.com", ("Jonathan Boccara", "CPP"));
         // Golang
@@ -430,6 +440,7 @@ lazy_static! {
             "https://stjepang.github.io/",  // Stjepan Glavina
             "https://blog.bastion.rs/", // bastion.rs
             "https://yaah.dev/",        // Jane Lusby
+            "https://levpaul.com/",
             // cpp
             "https://www.fluentcpp.com/",
             // ## Golang
