@@ -284,6 +284,18 @@ pub fn get_links(page: &WebPage) -> Vec<String> {
                 }
             }
         }
+        // Rust: Jane Lusby
+        "yaah.dev" => {
+            for link in raw_links {
+                if link.starts_with("/") 
+                    && !(link.contains("/about")) 
+                    && !(link.contains("/feed"))
+                {
+                    let f_link = "https://yaah.dev".to_string() + &link;
+                    links.push(f_link)
+                }
+            }
+        }
          // CPP: fluentcpp
          "fluentcpp.com" => {
             for link in raw_links {
@@ -365,6 +377,7 @@ lazy_static! {
         map.insert("lucumr.pocoo.org", ("Armin Ronacher", "Rust")); 
         map.insert("stjepang.github.io", ("Stjepan Glavina", "Rust")); 
         map.insert("blog.bastion.rs", ("bastion.rs", "Rust")); 
+        map.insert("yaah.dev", ("Jane Lusby", "Rust"));
         // c++
         map.insert("fluentcpp.com", ("Jonathan Boccara", "CPP"));
         // Golang
@@ -416,6 +429,7 @@ lazy_static! {
             "https://lucumr.pocoo.org/",  //  Armin Ronacher
             "https://stjepang.github.io/",  // Stjepan Glavina
             "https://blog.bastion.rs/", // bastion.rs
+            "https://yaah.dev/",        // Jane Lusby
             // cpp
             "https://www.fluentcpp.com/",
             // ## Golang
