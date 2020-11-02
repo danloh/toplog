@@ -405,8 +405,6 @@ textarea {
   padding: 0 10px 0 0; 
   border-right: 3px solid #e1ebec;
 }
-
-
 .form-item-label {
   width: 10px;
 }
@@ -474,6 +472,13 @@ textarea {
   padding: 10px 15px;
   font-size: 16px;
   background-color:#dce6e2;
+}
+
+.bookmarklet-tips {
+  font-size: 20px;
+  text-align: center;
+  background-color: #e6ebf2;
+  padding: 10px 20px;
 }
 
 .badge, .badge-circle, .badge-heart,
