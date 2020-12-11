@@ -1,6 +1,6 @@
 [package]
 name = "srv"
-version = "0.5.0"
+version = "0.1.0"
 authors = ["danloh"]
 edition = "2018"
 
@@ -10,7 +10,7 @@ edition = "2018"
 futures = "0.3"
 actix = "0.10.0"
 actix-rt = "1.1"
-actix-web = "3.1"
+actix-web = "3.3"
 actix-cors = "0.4"
 diesel = { version = "1.4.5", features = ["postgres","chrono","serde_json","r2d2"] }
 r2d2 = "0.8"
@@ -25,10 +25,10 @@ lettre_email = "0.9"
 rand = "0.7"
 
 derive_more = "0.99"
-regex = "1.4.1"
+regex = "1.4.2"
 lazy_static = "1.4.0"
 deunicode = "1.1.1"
-bcrypt = "0.8.2"
+bcrypt = "0.9.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 chrono-tz = "0.5"
 
@@ -42,10 +42,10 @@ actix-files = "0.4"
 unic-segment = "0.9.0"
 pulldown-cmark = { version = "0.8.0", default-features = false }
 ammonia = "3"
-askama = "0.10.3"
+askama = "0.10"
 
 reqwest = { version = "0.10", features = ["blocking"] }
 scraper = "0.12.0"
 
 swirl = { git = "https://github.com/sgrif/swirl.git", rev = "de5d8bb" }
-parking_lot = "0.11.0"
+parking_lot = "0.11"

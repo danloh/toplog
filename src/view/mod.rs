@@ -96,10 +96,10 @@ mod filters {
 
     pub fn num_unit(num: &i32) -> TmplResult<String> {
         let x = *num;
-        let (n, u): (i32, &str) = if x >= 1000 {
+        let (n, u): (i32, &str) = if x > 9000 {
+           (9, "k+")
+        } else if x >= 1000 {
             (num / 1000, "k")
-        } else if x > 9000 {
-            (9, "k+")
         } else {
             (x, "")
         };
