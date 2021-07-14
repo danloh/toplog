@@ -1,8 +1,6 @@
 # toplog
 An Aggregator for Programmers Powered by Rust but not only for Rust
 
-online demo: https://toplog.cc/
-
 ## Feature
 
 - Find Featured blogs on specific topic and aggregate the good posts via a simple bot;
@@ -26,9 +24,3 @@ Thanks！
 - Appreciate any bug report / pr / suggestion; 
 - find good blog on any topics and define the rules to feed bot, just in [cfg.rs](https://github.com/danloh/toplog/blob/master/src/bot/cfg.rs), anyone can do it even though you are not a fan of Rust Language.
 
-## Todo
-
-- Test
-- Discuss feature (WIP) 
-- stack: How x do y 
-- RSS Feed
