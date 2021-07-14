@@ -20,7 +20,7 @@ Thanks！
 
 ## Welcome To Join
 
-- welcome to use the service, sign up or not: https://toplog.cc/ ; 
+- you can compile and deploy freely; 
 - Appreciate any bug report / pr / suggestion; 
 - find good blog on any topics and define the rules to feed bot, just in [cfg.rs](https://github.com/danloh/toplog/blob/master/src/bot/cfg.rs), anyone can do it even though you are not a fan of Rust Language.
 
